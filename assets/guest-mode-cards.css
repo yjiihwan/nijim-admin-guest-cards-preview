@@ -1,0 +1,122 @@
+/* ===== 니짐내짐 어드민 Guest mode — 기능 신청 카드 (본문 그리드 전용) =====
+   design SPEC.md v1 (2026-07-22) 구현본.
+   WHY 클래스 prefix `gm-`: 기존 어드민 전역 CSS와의 충돌을 막기 위함.
+   범위: 본문 카드 그리드만. GNB·사이드바 스타일은 이 파일에 없음. */
+
+.gm-scope{
+  --gm-pink:#FC2066;
+  --gm-pink-strong:#D4004E; /* CTA 채움. 15px 흰 글자 대비 5.37 (AA) */
+  --gm-pink-pressed:#B00042;
+  --gm-pink-tint:#FFF0F5;
+  --gm-pink-tint2:#FFD9E5;
+  --gm-sky:#39B4FF;
+  --gm-sky-text:#0A6FA8;
+  --gm-sky-tint:#EAF6FF;
+  --gm-text:#202024;
+  --gm-sub:#6B6B73;
+  --gm-line:#ECECEF;
+  --gm-surface:#FFFFFF;
+  --gm-ok:#00C281;
+
+  --gm-r-card:20px;
+  --gm-r-img:14px;
+  --gm-r-btn:12px;
+  --gm-pad:24px;
+  --gm-gap:20px;
+  --gm-sh-1:0 1px 2px rgba(22,22,28,.04), 0 6px 18px rgba(22,22,28,.06);
+  --gm-sh-2:0 2px 4px rgba(22,22,28,.05), 0 16px 36px rgba(22,22,28,.11);
+
+  color:var(--gm-text);
+  -webkit-font-smoothing:antialiased;
+}
+.gm-scope *{box-sizing:border-box}
+
+.gm-h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.gm-lead{margin-top:26px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.gm-lead h2{margin:0;font-size:19px;font-weight:800;letter-spacing:-.02em}
+.gm-lead p{margin:0;font-size:13.5px;color:var(--gm-sub)}
+
+.gm-grid{
+  margin-top:20px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--gm-gap);
+  align-items:stretch;
+}
+
+.gm-card{
+  background:var(--gm-surface);
+  border:1px solid var(--gm-line);
+  border-radius:var(--gm-r-card);
+  padding:var(--gm-pad);
+  box-shadow:var(--gm-sh-1);
+  display:flex;flex-direction:column;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.gm-card:hover{transform:translateY(-3px);box-shadow:var(--gm-sh-2);border-color:var(--gm-pink-tint2)}
+.gm-card.is-rec{border-color:var(--gm-pink-tint2)}
+.gm-card.is-rec::before{
+  content:"";display:block;height:3px;
+  margin:calc(-1*var(--gm-pad)) calc(-1*var(--gm-pad)) 18px;
+  border-radius:var(--gm-r-card) var(--gm-r-card) 0 0;
+  background:linear-gradient(135deg,var(--gm-pink),#FF5C8F);
+}
+.gm-card.is-wide{grid-column:1 / -1}
+
+.gm-chd{display:flex;align-items:flex-start;gap:10px}
+.gm-chd h3{margin:0;font-size:18px;font-weight:800;letter-spacing:-.025em;line-height:1.35;flex:1;min-width:0}
+.gm-badge{flex:none;font-size:11px;font-weight:800;letter-spacing:-.01em;padding:3px 8px;border-radius:6px;
+  background:var(--gm-pink-tint);color:var(--gm-pink-pressed);margin-right:2px}
+.gm-badge.is-new{background:var(--gm-sky-tint);color:var(--gm-sky-text)}
+
+/* ---- 상태 칩 3종: 색 + 문구 + 도트 3중 구분 ---- */
+.gm-chip{flex:none;display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 10px;
+  border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:-.01em;white-space:nowrap;border:1px solid}
+.gm-chip .gm-dot{width:6px;height:6px;border-radius:50%;flex:none}
+.gm-chip.s-none{background:#F4F4F6;border-color:#E3E3E8;color:#6B6B73}
+.gm-chip.s-none .gm-dot{background:#A9A9B2}
+.gm-chip.s-pending{background:var(--gm-sky-tint);border-color:#BFE4FF;color:var(--gm-sky-text)}
+.gm-chip.s-pending .gm-dot{background:var(--gm-sky);box-shadow:0 0 0 3px rgba(57,180,255,.22)}
+.gm-chip.s-approved{background:#E8FBF3;border-color:#B7EFD9;color:#00795A}
+.gm-chip.s-approved .gm-dot{background:var(--gm-ok)}
+
+.gm-ben{margin:12px 0 0;font-size:16px;font-weight:700;line-height:1.45;letter-spacing:-.025em;color:var(--gm-text)}
+.gm-ben em{font-style:normal;color:var(--gm-pink-strong)}
+.gm-desc{margin:7px 0 0;font-size:13.5px;line-height:1.62;color:var(--gm-sub);letter-spacing:-.015em}
+
+/* WHY flex:none — 빠지면 flex 컬럼에서 이미지가 눌려 카드 행별 높이가 어긋난다 (SPEC ⑥) */
+.gm-thumb{margin-top:18px;border-radius:var(--gm-r-img);overflow:hidden;background:#F1F1F4;
+  aspect-ratio:16/9;border:1px solid rgba(22,22,28,.05);flex:none}
+.gm-card.is-wide .gm-thumb{aspect-ratio:32/9}
+.gm-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+
+.gm-spacer{flex:1;min-height:14px}
+
+.gm-cta{display:block;width:100%;height:48px;line-height:46px;text-align:center;
+  border-radius:var(--gm-r-btn);font-size:15px;font-weight:700;letter-spacing:-.02em;
+  border:1.5px solid transparent;cursor:pointer;transition:.15s;font-family:inherit;
+  text-decoration:none;padding:0}
+.gm-cta.v-fill{background:var(--gm-pink-strong);color:#fff}
+.gm-cta.v-fill:hover{background:var(--gm-pink-pressed)}
+.gm-cta.v-line{background:#fff;color:var(--gm-pink-strong);border-color:var(--gm-pink-strong)}
+.gm-cta.v-line:hover{background:var(--gm-pink-tint)}
+.gm-cta.v-wait{background:#fff;color:#8A8A93;border-color:var(--gm-line);cursor:default}
+.gm-cta.v-wait:hover{background:#fff}
+.gm-cta.v-done{background:var(--gm-pink-tint);color:var(--gm-pink-pressed);border-color:var(--gm-pink-tint2)}
+.gm-cta.v-done:hover{background:var(--gm-pink-tint2)}
+.gm-cta:focus-visible{outline:2px solid var(--gm-pink-strong);outline-offset:2px}
+.gm-card.is-wide .gm-cta{height:52px;line-height:50px;font-size:16px}
+
+@media (max-width:900px){
+  .gm-grid{grid-template-columns:1fr}
+  .gm-card.is-wide{grid-column:auto}
+  .gm-card.is-wide .gm-thumb{aspect-ratio:16/9}
+  .gm-card.is-wide .gm-cta{height:48px;line-height:46px;font-size:15px}
+  .gm-h1{font-size:21px}
+  .gm-lead h2{font-size:17px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .gm-card{transition:none}
+  .gm-card:hover{transform:none}
+}

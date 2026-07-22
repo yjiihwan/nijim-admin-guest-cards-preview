@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guest mode 카드 — 구현본 미리보기 (상태 전환 가능)</title>
+<link rel="stylesheet" href="assets/guest-mode-cards.css">
+<style>
+  body{margin:0;background:#F7F7F9;font-family:"Pretendard",-apple-system,sans-serif}
+  .page{padding:34px 40px 56px}
+  .switch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+  .switch button{font:700 12.5px/1 inherit;padding:9px 14px;border-radius:9px;border:1px solid #E3E3E8;
+    background:#fff;color:#55555c;cursor:pointer}
+  .switch button.on{background:#16161C;border-color:#16161C;color:#fff}
+  .log{margin-top:18px;font-size:12.5px;color:#6B6B73;min-height:18px}
+  @media (max-width:900px){.page{padding:22px 16px 40px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="switch">
+    <button data-mode="mixed" class="on">혼합 (디자인 시안과 동일)</button>
+    <button data-mode="NONE">전체 미신청</button>
+    <button data-mode="PENDING">전체 검토중</button>
+    <button data-mode="APPROVED">전체 승인완료</button>
+  </div>
+  <div id="root"></div>
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+const PENDING_CTA = '신청 검토중 · 평균 1~2영업일';
+const FEATURES = [
+  {key:'website',title:'전용 웹사이트',benefitHtml:'우리 센터 홈페이지를 <em>제작비 0원</em>으로',
+   desc:'페이지를 자유롭게 만들어 광고·홍보에 바로 쓰고, 온라인 쇼핑몰처럼 멤버십 상품까지 판매할 수 있어요.',
+   image:'01_website.png',cta:{none:'전용 웹사이트 개설신청하기',pending:PENDING_CTA,approved:'웹사이트 관리하러 가기'},manageUrl:'/admin/website'},
+  {key:'offline_payment',title:'비대면결제 (QR·웹·앱)',benefitHtml:'키오스크 없이 <em>24시간 무인 결제</em>',
+   desc:'고객이 자기 폰으로 알아서 결제하니, 비싼 키오스크를 두지 않아도 24시간 무인 운영이 가능해요.',
+   image:'02_payment.png',recommended:true,cta:{none:'비대면결제 도입신청하기',pending:PENDING_CTA,approved:'비대면결제 관리하러 가기'},manageUrl:'/admin/payment'},
+  {key:'online_ads',title:'온라인광고',benefitHtml:'니짐내짐 앱에서 <em>우리 센터가 검색</em>되게',
+   desc:'센터 소개 정보를 입력해 신청하고 승인되면, 바로 앱에 우리 센터 정보가 노출돼요.',
+   image:'03_ads.png',cta:{none:'온라인광고 신청하기',pending:PENDING_CTA,approved:'광고 관리하러 가기'},manageUrl:'/admin/ads'},
+  {key:'subscription',title:'월 정기결제 구독멤버십',benefitHtml:'넷플릭스처럼, <em>매달 자동으로 들어오는 매출</em>',
+   desc:'월 정기결제 상품을 판매해 회원이 더 쉽게 등록하게 만들고, 반복 매출로 역대 최대 매출에 도전해 보세요.',
+   image:'04_subscription.png',recommended:true,cta:{none:'구독멤버십 도입신청하기',pending:PENDING_CTA,approved:'구독멤버십 관리하러 가기'},manageUrl:'/admin/subscription'},
+  {key:'access_control',title:'무인 출입제어 시스템',benefitHtml:'회원이 스스로 여는 출입문, <em>상주 인력 0명</em>',
+   desc:'회원이 직접 출입문을 열고 닫아요. 직원은 언제 어디서든 누가 출입했는지 확인하고 원격으로 문을 여닫을 수 있어요.',
+   image:'05_access.png',cta:{none:'무인 출입제어 도입신청하기',pending:PENDING_CTA,approved:'출입제어 관리하러 가기'},manageUrl:'/admin/access'},
+  {key:'norder',title:'N 오더',benefitHtml:'센터 안 음료·자물쇠·굿즈를 <em>앱에서 바로 판매</em>',
+   desc:'회원이 상품을 확인하고 원터치결제로 클릭 한 번에 주문해요. 무인 판매로 부가 매출이 붙습니다.',
+   image:'06_norder.png',cta:{none:'N 오더 이용시작하기',pending:PENDING_CTA,approved:'N 오더 관리하러 가기'},manageUrl:'/admin/norder'},
+  {key:'iot_control',title:'IoT 원격자동제어',benefitHtml:'조명·냉난방을 앱에서 끄고, <em>전기요금을 줄입니다</em>',
+   desc:'조명·냉난방·환기 등 설비를 앱에서 원격으로 켜고 끌 수 있어요. 시간대별 자동 스케줄을 걸어두면 사람이 없는 시간에 알아서 꺼져, 무인 운영과 전기요금 절감이 동시에 가능합니다.',
+   image:'07_iot.png',recommended:true,isNew:true,wide:true,
+   cta:{none:'IoT 원격제어 도입신청하기',pending:PENDING_CTA,approved:'IoT 제어판 열기'},manageUrl:'/admin/iot'},
+];
+const MIXED = {website:'APPROVED',offline_payment:'NONE',online_ads:'NONE',subscription:'NONE',
+  access_control:'PENDING',norder:'NONE',iot_control:'NONE'};
+
+const chipLabel = s => s==='APPROVED'?'승인완료 · 사용중' : s==='PENDING'?'신청됨 · 검토중' : '미신청';
+const chipClass = s => s==='APPROVED'?'s-approved' : s==='PENDING'?'s-pending' : 's-none';
+const ctaVariant = (s,rec) => s==='APPROVED'?'done' : s==='PENDING'?'wait' : (rec?'fill':'line');
+const ctaLabel = (d,s) => s==='APPROVED'?d.cta.approved : s==='PENDING'?d.cta.pending : d.cta.none;
+
+function render(mode){
+  const total = FEATURES.length;
+  const cards = FEATURES.map((d,i)=>{
+    const raw = mode==='mixed' ? MIXED[d.key] : mode;
+    const st = raw==='REJECTED' ? 'NONE' : raw;
+    const wide = !!d.wide && total%2===1 && i===total-1;
+    const v = ctaVariant(st,d.recommended);
+    const badge = d.isNew ? '<span class="gm-badge is-new">NEW</span>'
+      : (d.recommended ? '<span class="gm-badge">추천</span>' : '');
+    return `<article class="gm-card${d.recommended?' is-rec':''}${wide?' is-wide':''}">
+      <div class="gm-chd">
+        <h3>${badge}${d.title}</h3>
+        <span class="gm-chip ${chipClass(st)}"><span class="gm-dot"></span>${chipLabel(st)}</span>
+      </div>
+      <p class="gm-ben">${d.benefitHtml}</p>
+      <p class="gm-desc">${d.desc}</p>
+      <div class="gm-thumb"><img src="img/${d.image}" alt=""></div>
+      <div class="gm-spacer"></div>
+      <button type="button" class="gm-cta v-${v}" data-key="${d.key}" data-status="${st}"
+        data-url="${d.manageUrl}" ${st==='PENDING'?'disabled aria-disabled="true"':''}>${ctaLabel(d,st)}</button>
+    </article>`;
+  }).join('');
+
+  document.getElementById('root').innerHTML =
+    `<div class="gm-scope">
+      <h1 class="gm-h1">Guest mode</h1>
+      <div class="gm-lead"><h2>센터 운영을 더 스마트하게 해보세요</h2>
+        <p>신청하시면 검토 후 승인해 드려요. 승인되면 바로 사용하실 수 있습니다.</p></div>
+      <div class="gm-grid">${cards}</div>
+    </div>`;
+
+  document.querySelectorAll('.gm-cta').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const {key,status,url} = b.dataset;
+      const log = document.getElementById('log');
+      if(status==='PENDING'){ log.textContent = '검토중 — 클릭 무시됨(중복 신청 차단)'; return; }
+      log.textContent = status==='APPROVED'
+        ? `[라우팅] ${key} → ${url} (신청 모달 아님)`
+        : `[신청 모달] ${key} 신청 폼 열기`;
+    });
+  });
+}
+
+document.querySelectorAll('.switch button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.switch button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById('log').textContent='';
+    render(btn.dataset.mode);
+  });
+});
+render('mixed');
+</script>
+</body>
+</html>
