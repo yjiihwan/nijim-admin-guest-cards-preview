@@ -55,12 +55,6 @@
 }
 .gm-card:hover{transform:translateY(-3px);box-shadow:var(--gm-sh-2);border-color:var(--gm-pink-tint2)}
 .gm-card.is-rec{border-color:var(--gm-pink-tint2)}
-.gm-card.is-rec::before{
-  content:"";display:block;height:3px;
-  margin:calc(-1*var(--gm-pad)) calc(-1*var(--gm-pad)) 18px;
-  border-radius:var(--gm-r-card) var(--gm-r-card) 0 0;
-  background:linear-gradient(135deg,var(--gm-pink),#FF5C8F);
-}
 .gm-card.is-wide{grid-column:1 / -1}
 
 .gm-chd{display:flex;align-items:flex-start;gap:10px}
