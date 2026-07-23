@@ -31,15 +31,12 @@
 <script>
 const PENDING_CTA = '신청 검토중 · 평균 1~2영업일';
 const FEATURES = [
-  {key:'website',title:'전용 웹사이트',benefitHtml:'우리 센터 홈페이지를 <em>제작비 0원</em>으로',
-   desc:'페이지를 자유롭게 만들어 광고·홍보에 바로 쓰고, 온라인 쇼핑몰처럼 멤버십 상품까지 판매할 수 있어요.',
-   image:'01_website.png',cta:{none:'전용 웹사이트 개설신청하기',pending:PENDING_CTA,approved:'웹사이트 관리하러 가기'},manageUrl:'/admin/website'},
+  {key:'website',title:'온라인 홍보 (웹·앱)',benefitHtml:'전용 홈페이지 + 앱 검색노출, <em>웹·앱 양쪽에서 홍보</em>',
+   desc:'제작비 0원으로 전용 홈페이지를 만들어 광고·홍보·멤버십 판매에 쓰고, 니짐내짐 앱에도 우리 센터가 검색·노출돼요. 웹과 앱, 양쪽에서 신규 회원을 만나세요.',
+   image:'01_website.png',cta:{none:'온라인 홍보 시작하기',pending:PENDING_CTA,approved:'온라인 홍보 관리하러 가기'},manageUrl:'/admin/website'},
   {key:'offline_payment',title:'비대면결제 (QR·웹·앱)',benefitHtml:'키오스크 없이 <em>24시간 무인 결제</em>',
    desc:'고객이 자기 폰으로 알아서 결제하니, 비싼 키오스크를 두지 않아도 24시간 무인 운영이 가능해요.',
    image:'02_payment.png',recommended:true,cta:{none:'비대면결제 도입신청하기',pending:PENDING_CTA,approved:'비대면결제 관리하러 가기'},manageUrl:'/admin/payment'},
-  {key:'online_ads',title:'온라인광고',benefitHtml:'니짐내짐 앱에서 <em>우리 센터가 검색</em>되게',
-   desc:'센터 소개 정보를 입력해 신청하고 승인되면, 바로 앱에 우리 센터 정보가 노출돼요.',
-   image:'03_ads.png',cta:{none:'온라인광고 신청하기',pending:PENDING_CTA,approved:'광고 관리하러 가기'},manageUrl:'/admin/ads'},
   {key:'subscription',title:'월 정기결제 구독멤버십',benefitHtml:'넷플릭스처럼, <em>매달 자동으로 들어오는 매출</em>',
    desc:'월 정기결제 상품을 판매해 회원이 더 쉽게 등록하게 만들고, 반복 매출로 역대 최대 매출에 도전해 보세요.',
    image:'04_subscription.png',recommended:true,cta:{none:'구독멤버십 도입신청하기',pending:PENDING_CTA,approved:'구독멤버십 관리하러 가기'},manageUrl:'/admin/subscription'},
@@ -54,7 +51,7 @@ const FEATURES = [
    image:'07_iot.png',recommended:true,isNew:true,wide:true,
    cta:{none:'IoT 원격제어 도입신청하기',pending:PENDING_CTA,approved:'IoT 제어판 열기'},manageUrl:'/admin/iot'},
 ];
-const MIXED = {website:'APPROVED',offline_payment:'NONE',online_ads:'NONE',subscription:'NONE',
+const MIXED = {website:'APPROVED',offline_payment:'NONE',subscription:'NONE',
   access_control:'PENDING',norder:'NONE',iot_control:'NONE'};
 
 const chipLabel = s => s==='APPROVED'?'승인완료 · 사용중' : s==='PENDING'?'신청됨 · 검토중' : '미신청';

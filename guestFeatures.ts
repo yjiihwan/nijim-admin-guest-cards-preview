@@ -6,7 +6,6 @@
 export type GuestFeatureKey =
   | 'website'
   | 'offline_payment'
-  | 'online_ads'
   | 'subscription'
   | 'access_control'
   | 'norder'
@@ -42,14 +41,14 @@ export const PENDING_CTA = '신청 검토중 · 평균 1~2영업일';
 export const GUEST_FEATURES: GuestFeatureDef[] = [
   {
     key: 'website',
-    title: '전용 웹사이트',
-    benefitHtml: '우리 센터 홈페이지를 <em>제작비 0원</em>으로',
-    desc: '페이지를 자유롭게 만들어 광고·홍보에 바로 쓰고, 온라인 쇼핑몰처럼 멤버십 상품까지 판매할 수 있어요.',
+    title: '온라인 홍보 (웹·앱)',
+    benefitHtml: '전용 홈페이지 + 앱 검색노출, <em>웹·앱 양쪽에서 홍보</em>',
+    desc: '제작비 0원으로 전용 홈페이지를 만들어 광고·홍보·멤버십 판매에 쓰고, 니짐내짐 앱에도 우리 센터가 검색·노출돼요. 웹과 앱, 양쪽에서 신규 회원을 만나세요.',
     image: '01_website.png',
     cta: {
-      none: '전용 웹사이트 개설신청하기',
+      none: '온라인 홍보 시작하기',
       pending: PENDING_CTA,
-      approved: '웹사이트 관리하러 가기',
+      approved: '온라인 홍보 관리하러 가기',
     },
     manageUrl: '/admin/website',
   },
@@ -66,19 +65,6 @@ export const GUEST_FEATURES: GuestFeatureDef[] = [
       approved: '비대면결제 관리하러 가기',
     },
     manageUrl: '/admin/payment',
-  },
-  {
-    key: 'online_ads',
-    title: '온라인광고',
-    benefitHtml: '니짐내짐 앱에서 <em>우리 센터가 검색</em>되게',
-    desc: '센터 소개 정보를 입력해 신청하고 승인되면, 바로 앱에 우리 센터 정보가 노출돼요.',
-    image: '03_ads.png',
-    cta: {
-      none: '온라인광고 신청하기',
-      pending: PENDING_CTA,
-      approved: '광고 관리하러 가기',
-    },
-    manageUrl: '/admin/ads',
   },
   {
     key: 'subscription',
