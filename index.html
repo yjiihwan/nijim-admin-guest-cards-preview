@@ -68,7 +68,7 @@ function render(mode){
     const v = ctaVariant(st,d.recommended);
     const badge = d.isNew ? '<span class="gm-badge is-new">NEW</span>'
       : (d.recommended ? '<span class="gm-badge">추천</span>' : '');
-    return `<article class="gm-card${d.recommended?' is-rec':''}${wide?' is-wide':''}">
+    return `<article class="gm-card${d.recommended?' is-rec':''}${wide?' is-wide':''}" data-key="${d.key}">
       <div class="gm-chd">
         <h3>${badge}${d.title}</h3>
         <span class="gm-chip ${chipClass(st)}"><span class="gm-dot"></span>${chipLabel(st)}</span>

@@ -90,6 +90,11 @@
 .gm-card.is-wide .gm-thumb{aspect-ratio:32/9}
 .gm-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 
+/* WHY website 카드만 세로형(3:4) 프로모 이미지 → 썸네일도 3/4.
+   데스크 2열에서 카드가 넓어 세로 썸네일이 과하게 커지므로 max-width로 중앙 배치.
+   이미지 비율(0.747)≈3/4 이라 object-fit:cover 상하 크롭 거의 없음. */
+.gm-card[data-key="website"] .gm-thumb{aspect-ratio:3/4;max-width:320px;margin-left:auto;margin-right:auto}
+
 .gm-spacer{flex:1;min-height:14px}
 
 .gm-cta{display:block;width:100%;height:48px;line-height:46px;text-align:center;
