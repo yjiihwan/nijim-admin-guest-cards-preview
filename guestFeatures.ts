@@ -109,8 +109,8 @@ export const GUEST_FEATURES: GuestFeatureDef[] = [
   {
     key: 'iot_control',
     title: 'IoT 원격자동제어',
-    benefitHtml: '조명·냉난방을 앱에서 끄고, <em>전기요금을 줄입니다</em>',
-    desc: '조명·냉난방·환기 등 설비를 앱에서 원격으로 켜고 끌 수 있어요. 시간대별 자동 스케줄을 걸어두면 사람이 없는 시간에 알아서 꺼져, 무인 운영과 전기요금 절감이 동시에 가능합니다.',
+    benefitHtml: '센터에 없어도, <em>조명·냉난방을 앱으로 원격 제어</em>',
+    desc: '조명·냉난방·환기 등 센터 설비를 앱에서 원격으로 켜고 끌 수 있어요. 오픈·마감 시간에 맞춰 자동 스케줄을 걸어두면 설비가 알아서 켜지고 꺼져서, 센터에 나가지 않아도 운영 준비가 끝나 있습니다.',
     image: '07_iot.png',
     recommended: true,
     isNew: true,
