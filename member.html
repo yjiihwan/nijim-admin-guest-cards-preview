@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>입점 센터 화면 — 구현본 미리보기 (상태 전환 가능)</title>
+<link rel="stylesheet" href="assets/guest-mode-cards.css">
+<style>
+  body{margin:0;background:#F7F7F9;font-family:"Pretendard",-apple-system,sans-serif}
+  .page{padding:34px 40px 56px}
+  .switch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;align-items:center}
+  .switch button{font:700 12.5px/1 inherit;padding:9px 14px;border-radius:9px;border:1px solid #E3E3E8;
+    background:#fff;color:#55555c;cursor:pointer}
+  .switch button.on{background:#16161C;border-color:#16161C;color:#fff}
+  .switch .nav{margin-left:auto;font:700 12.5px/1 inherit;color:#E42A6B;text-decoration:none;
+    padding:9px 14px;border:1px solid #F6CBDB;border-radius:9px;background:#fff}
+  .log{margin-top:18px;font-size:12.5px;color:#6B6B73;min-height:18px}
+  .gm-scope .gm-lead + .gm-grid{margin-bottom:34px}
+  @media (max-width:900px){.page{padding:22px 16px 40px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="switch">
+    <button data-mode="mixed" class="on">혼합 (기본)</button>
+    <button data-mode="NONE">전체 미신청</button>
+    <button data-mode="PENDING">전체 검토중</button>
+    <button data-mode="APPROVED">전체 승인완료</button>
+    <a class="nav" href="index.html">← Guest mode 화면 보기</a>
+  </div>
+  <div id="root"></div>
+  <div class="log" id="log"></div>
+</div>
+
+<script>
+const PENDING_CTA = '신청 검토중 · 평균 1~2영업일';
+
+/* 섹션 1 — 노출·판촉 세팅. instant:true 카드는 승인 절차 없이 바로 쓰는 기능이라
+   상태칩 없이 CTA가 항상 활성이다(실제 어드민과 동일). */
+const PROMO = [
+  {key:'coupon',title:'맞춤형 쿠폰',benefitHtml:'할인조건 내 마음대로, <em>쿠폰으로 강조 노출까지</em>',
+   desc:'최소주문금액 등 할인조건을 직접 설정해 쿠폰을 발행할 수 있어요. 쿠폰을 발행하면 지도와 목록에서 우리 센터가 강조 표시되고, 상위노출 확률도 더 올라가요.',
+   image:'08_coupon.png',instant:true,cta:{none:'쿠폰 발행하기'},manageUrl:'/admin/coupon'},
+  {key:'timesale',title:'타임세일 선착순 이벤트',benefitHtml:'지금 이 시간만, <em>선착순 특가로 신규 회원 몰이</em>',
+   desc:'타임세일·선착순 할인 이벤트를 열 수 있어요. 이벤트가 열리면 앱에서 카운트다운과 함께 강조 표시되고, 상위노출 확률도 더 올라가요.',
+   image:'09_timesale.png',instant:true,cta:{none:'타임세일 이벤트 열기'},manageUrl:'/admin/timesale'},
+  {key:'subscription',title:'월 정기결제 구독멤버십',benefitHtml:'넷플릭스처럼, <em>매달 자동으로 들어오는 매출</em>',
+   desc:'월 정기결제 상품을 판매해 회원이 더 쉽게 등록하게 만들고, 반복 매출로 역대 최대 매출에 도전해 보세요.',
+   image:'04_subscription.png',recommended:true,cta:{none:'구독멤버십 도입신청하기',pending:PENDING_CTA,approved:'구독멤버십 관리하러 가기'},manageUrl:'/admin/subscription'},
+  {key:'daypass',title:'1일권',benefitHtml:'부담 없는 첫 방문, <em>1일권으로 체험 고객 유치</em>',
+   desc:'하루 이용권을 판매할 수 있어요. 1일권을 열어두면 근처에서 운동할 곳을 찾는 고객에게 우리 센터가 강조 표시되고, 체험 고객이 정기 회원으로 이어집니다.',
+   image:'10_daypass.png',instant:true,cta:{none:'1일권 판매 신청하기'},manageUrl:'/admin/daypass'},
+];
+
+/* 섹션 2 — 운영 자동화 (게스트모드와 동일 카드) */
+const OPS = [
+  {key:'access_control',title:'무인 출입제어 시스템',benefitHtml:'회원이 스스로 여는 출입문, <em>상주 인력 0명</em>',
+   desc:'회원이 직접 출입문을 열고 닫아요. 직원은 언제 어디서든 누가 출입했는지 확인하고 원격으로 문을 여닫을 수 있어요.',
+   image:'05_access.png',cta:{none:'무인 출입제어 도입신청하기',pending:PENDING_CTA,approved:'출입제어 관리하러 가기'},manageUrl:'/admin/access'},
+  {key:'norder',title:'N 오더',benefitHtml:'센터 안 음료·자물쇠·굿즈를 <em>앱에서 바로 판매</em>',
+   desc:'회원이 상품을 확인하고 원터치결제로 클릭 한 번에 주문해요. 무인 판매로 부가 매출이 붙습니다.',
+   image:'06_norder.png',cta:{none:'N 오더 이용시작하기',pending:PENDING_CTA,approved:'N 오더 관리하러 가기'},manageUrl:'/admin/norder'},
+  {key:'iot_control',title:'IoT 원격자동제어',benefitHtml:'센터에 없어도, <em>조명·냉난방을 앱으로 원격 제어</em>',
+   desc:'조명·냉난방·환기 등 센터 설비를 앱에서 원격으로 켜고 끌 수 있어요. 오픈·마감 시간에 맞춰 자동 스케줄을 걸어두면 설비가 알아서 켜지고 꺼져서, 센터에 나가지 않아도 운영 준비가 끝나 있습니다.',
+   image:'07_iot.png',recommended:true,isNew:true,wide:true,
+   cta:{none:'IoT 원격제어 도입신청하기',pending:PENDING_CTA,approved:'IoT 제어판 열기'},manageUrl:'/admin/iot'},
+];
+
+const MIXED = {subscription:'NONE',access_control:'PENDING',norder:'NONE',iot_control:'NONE'};
+
+const chipLabel = s => s==='APPROVED'?'승인완료 · 사용중' : s==='PENDING'?'신청됨 · 검토중' : '미신청';
+const chipClass = s => s==='APPROVED'?'s-approved' : s==='PENDING'?'s-pending' : 's-none';
+const ctaVariant = (s,rec) => s==='APPROVED'?'done' : s==='PENDING'?'wait' : (rec?'fill':'line');
+
+function card(d, st, wide){
+  const instant = !!d.instant;
+  const v = instant ? 'fill' : ctaVariant(st, d.recommended);
+  const badge = d.isNew ? '<span class="gm-badge is-new">NEW</span>'
+    : (d.recommended ? '<span class="gm-badge">추천</span>' : '');
+  const chip = instant ? '' :
+    `<span class="gm-chip ${chipClass(st)}"><span class="gm-dot"></span>${chipLabel(st)}</span>`;
+  const label = instant ? d.cta.none
+    : (st==='APPROVED'?d.cta.approved : st==='PENDING'?d.cta.pending : d.cta.none);
+  return `<article class="gm-card${d.recommended?' is-rec':''}${wide?' is-wide':''}" data-key="${d.key}">
+    <div class="gm-chd"><h3>${badge}${d.title}</h3>${chip}</div>
+    <p class="gm-ben">${d.benefitHtml}</p>
+    <p class="gm-desc">${d.desc}</p>
+    <div class="gm-thumb"><img src="img/${d.image}" alt=""></div>
+    <div class="gm-spacer"></div>
+    <button type="button" class="gm-cta v-${v}" data-key="${d.key}" data-status="${instant?'INSTANT':st}"
+      data-url="${d.manageUrl}" ${(!instant && st==='PENDING')?'disabled aria-disabled="true"':''}>${label}</button>
+  </article>`;
+}
+
+function render(mode){
+  const stOf = d => d.instant ? 'NONE' : (mode==='mixed' ? (MIXED[d.key]??'NONE') : mode);
+  const promo = PROMO.map(d=>card(d, stOf(d), false)).join('');
+  const ops = OPS.map((d,i)=>card(d, stOf(d), !!d.wide && OPS.length%2===1 && i===OPS.length-1)).join('');
+  document.getElementById('root').innerHTML =
+    `<div class="gm-scope">
+      <h1 class="gm-h1">입점 센터 홈</h1>
+      <div class="gm-lead"><h2>다양한 세팅으로 내 센터를 더 돋보이게 만들어보세요</h2>
+        <p>쿠폰·이벤트·상품을 열면 앱에서 우리 센터가 강조 표시되고 상위노출 확률이 올라가요.</p></div>
+      <div class="gm-grid">${promo}</div>
+      <div class="gm-lead"><h2>센터 운영을 더 스마트하게 해보세요</h2>
+        <p>신청하시면 검토 후 승인해 드려요. 승인되면 바로 사용하실 수 있습니다.</p></div>
+      <div class="gm-grid">${ops}</div>
+    </div>`;
+
+  document.querySelectorAll('.gm-cta').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const {key,status,url} = b.dataset;
+      const log = document.getElementById('log');
+      if(status==='PENDING'){ log.textContent = '검토중 — 클릭 무시됨(중복 신청 차단)'; return; }
+      log.textContent = (status==='APPROVED'||status==='INSTANT')
+        ? `[라우팅] ${key} → ${url}`
+        : `[신청 모달] ${key} 신청 폼 열기`;
+    });
+  });
+}
+
+document.querySelectorAll('.switch button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.switch button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    document.getElementById('log').textContent='';
+    render(btn.dataset.mode);
+  });
+});
+render('mixed');
+</script>
+</body>
+</html>
