@@ -84,10 +84,8 @@
 .gm-card.is-wide .gm-thumb{aspect-ratio:32/9}
 .gm-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 
-/* WHY website 카드는 정사각(1:1) 프로모 이미지(720×720) → 썸네일도 1/1.
-   이미지 비율(1.0)=1/1 이라 object-fit:cover 크롭 0.
-   데스크 2열에서 카드가 넓어 정사각 썸네일이 과하게 커지므로 max-width로 중앙 배치. */
-.gm-card[data-key="website"] .gm-thumb{aspect-ratio:1/1;max-width:360px;margin-left:auto;margin-right:auto}
+/* (2026-07-28) website 카드 1:1 예외 제거 — 이미지가 다른 카드와 동일한 16:9(1376×768)로
+   교체되어 기본 .gm-thumb 규칙을 그대로 따른다. */
 
 .gm-spacer{flex:1;min-height:14px}
 
