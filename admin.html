@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>최고관리자 — 기능 신청 관리 (미리보기)</title>
+<style>
+  :root{
+    --pink:#FC2066; --pink-strong:#D4004E; --pink-pressed:#B00042; --pink-tint:#FFF0F5; --pink-tint2:#FFD9E5;
+    --sky:#39B4FF; --sky-text:#0A6FA8; --sky-tint:#EAF6FF;
+    --ok:#00C281; --ok-tint:#E8FBF3; --ok-text:#00795A;
+    --red:#E23A55; --red-text:#C02440; --red-tint:#FDECEE; --red-line:#F6C7CD;
+    --text:#202024; --sub:#6B6B73; --line:#ECECEF;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#F7F7F9;font-family:"Pretendard",-apple-system,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+  .page{padding:34px 40px 64px;max-width:1280px;margin:0 auto}
+  .topnav{display:flex;gap:8px;margin-bottom:18px}
+  .topnav a{font:700 12.5px/1 inherit;color:#E42A6B;text-decoration:none;padding:9px 14px;border:1px solid #F6CBDB;border-radius:9px;background:#fff}
+  h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.02em}
+  .sub{margin:6px 0 0;font-size:13.5px;color:var(--sub)}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 1px 2px rgba(22,22,28,.04)}
+  .stat .k{font-size:12.5px;color:var(--sub);font-weight:700}
+  .stat .v{margin-top:6px;font-size:26px;font-weight:800;letter-spacing:-.02em}
+  .stat .v em{font-style:normal;font-size:13px;color:var(--sub);font-weight:700;margin-left:4px}
+  .stat.hot .v{color:var(--pink-strong)}
+
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:26px}
+  .tabs{display:flex;gap:6px}
+  .tabs button{font:700 13px/1 inherit;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
+  .tabs button.on{background:#16161C;border-color:#16161C;color:#fff}
+  .tabs button .n{margin-left:5px;font-size:11.5px;padding:2px 7px;border-radius:999px;background:#F2F2F5;color:var(--sub)}
+  .tabs button.on .n{background:rgba(255,255,255,.18);color:#fff}
+  select,input[type=search]{height:40px;border-radius:10px;border:1px solid var(--line);background:#fff;font:600 13px inherit;color:var(--text);padding:0 12px}
+  input[type=search]{width:220px}
+  .spacer{flex:1}
+
+  .bulk{display:none;align-items:center;gap:10px;margin-top:14px;background:#16161C;color:#fff;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700}
+  .bulk.show{display:flex}
+  .bulk button{font:700 12.5px/1 inherit;padding:9px 13px;border-radius:9px;border:0;cursor:pointer}
+  .bulk .ok{background:var(--ok);color:#fff}
+  .bulk .rej{background:var(--red);color:#fff}
+  .bulk .clr{background:rgba(255,255,255,.15);color:#fff}
+
+  .board{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(22,22,28,.04)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  thead th{font-size:12px;color:var(--sub);text-align:left;font-weight:700;padding:12px 14px;border-bottom:1px solid var(--line);background:#FBFBFC;white-space:nowrap}
+  tbody td{padding:13px 14px;border-bottom:1px solid #F3F3F6;vertical-align:middle}
+  tbody tr:hover{background:#FDF7FA}
+  .center{font-weight:800;letter-spacing:-.02em}
+  .center small{display:block;font-weight:600;color:var(--sub);margin-top:2px}
+  .feat{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;background:var(--pink-tint);color:var(--pink-pressed);font-size:11.5px;font-weight:800;white-space:nowrap}
+  .chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 10px;border-radius:999px;font-size:11.5px;font-weight:700;border:1px solid;white-space:nowrap}
+  .chip .dot{width:6px;height:6px;border-radius:50%}
+  .chip.p{background:var(--sky-tint);border-color:#BFE4FF;color:var(--sky-text)} .chip.p .dot{background:var(--sky)}
+  .chip.a{background:var(--ok-tint);border-color:#B7EFD9;color:var(--ok-text)} .chip.a .dot{background:var(--ok)}
+  .chip.r{background:var(--red-tint);border-color:var(--red-line);color:var(--red-text)} .chip.r .dot{background:var(--red)}
+  .ago{color:var(--sub);white-space:nowrap} .ago b{color:var(--pink-strong)}
+  .acts{display:flex;gap:6px;justify-content:flex-end}
+  .acts button{font:700 12.5px/1 inherit;padding:9px 13px;border-radius:9px;cursor:pointer;border:1.5px solid transparent}
+  .acts .ok{background:var(--ok);color:#fff} .acts .ok:hover{filter:brightness(.94)}
+  .acts .rej{background:#fff;color:var(--red-text);border-color:var(--red-line)} .acts .rej:hover{background:var(--red-tint)}
+  .procinfo{font-size:12px;color:var(--sub);text-align:right;line-height:1.5}
+  .procinfo .rr{display:inline-block;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;color:var(--red-text)}
+  .empty{padding:46px;text-align:center;color:var(--sub);font-size:13.5px}
+  .log{margin-top:16px;font-size:12.5px;color:var(--sub);min-height:18px}
+
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(22,22,28,.45);z-index:50;align-items:center;justify-content:center}
+  .modal-bg.show{display:flex}
+  .modal{width:min(480px,92vw);background:#fff;border-radius:18px;padding:24px}
+  .modal h3{margin:0;font-size:17px;font-weight:800}
+  .modal .who{margin-top:6px;font-size:13px;color:var(--sub)}
+  .tpl{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+  .tpl button{font:600 12px/1 inherit;padding:8px 11px;border-radius:999px;border:1px solid var(--line);background:#FBFBFC;cursor:pointer;color:var(--sub)}
+  .tpl button:hover{border-color:var(--red-line);color:var(--red-text);background:var(--red-tint)}
+  .modal textarea{width:100%;margin-top:10px;min-height:96px;border-radius:12px;border:1px solid var(--line);padding:12px;font:600 13.5px/1.6 inherit;color:var(--text);resize:vertical}
+  .modal textarea:focus{outline:2px solid var(--red);outline-offset:1px}
+  .mbtns{display:flex;gap:8px;margin-top:16px}
+  .mbtns button{flex:1;height:46px;border-radius:12px;font:700 14.5px inherit;cursor:pointer;border:1.5px solid transparent}
+  .mbtns .go{background:var(--red);color:#fff} .mbtns .go:disabled{opacity:.4;cursor:default}
+  .mbtns .cancel{background:#fff;border-color:var(--line);color:var(--sub)}
+
+  @media (max-width:900px){
+    .page{padding:22px 14px 48px}
+    .stats{grid-template-columns:repeat(2,1fr)}
+    thead th:nth-child(4),tbody td:nth-child(4){display:none}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topnav">
+    <a href="index.html">Guest mode 화면</a><a href="member.html">입점 센터 화면</a>
+  </div>
+  <h1>기능 신청 관리 <span style="font-size:13px;color:var(--sub);font-weight:700">최고관리자</span></h1>
+  <p class="sub">전 센터의 기능 도입 신청을 확인하고 승인·반려 처리합니다. 반려 시 사유는 센터 화면에 그대로 표시됩니다.</p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <div class="tabs" id="tabs"></div>
+    <select id="featSel"><option value="">전체 기능</option></select>
+    <input type="search" id="q" placeholder="센터명 검색">
+    <div class="spacer"></div>
+  </div>
+
+  <div class="bulk" id="bulk">
+    <span id="bulkN"></span>
+    <button class="ok" id="bulkOk">일괄 승인</button>
+    <button class="rej" id="bulkRej">일괄 반려</button>
+    <button class="clr" id="bulkClr">선택 해제</button>
+  </div>
+
+  <div class="board"><table>
+    <thead><tr>
+      <th style="width:34px"><input type="checkbox" id="selAll"></th>
+      <th>센터</th><th>신청 기능</th><th>신청일</th><th>대기</th><th>상태</th><th style="text-align:right">처리</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table><div class="empty" id="empty" style="display:none">조건에 맞는 신청 건이 없습니다.</div></div>
+  <div class="log" id="log"></div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>신청 반려</h3>
+    <div class="who" id="mWho"></div>
+    <div class="tpl">
+      <button data-t="제출하신 사업자 정보와 센터 정보가 일치하지 않아요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.">정보 불일치</button>
+      <button data-t="필수 서류(사업자등록증/시설 사진)가 누락되었어요. 서류를 보완해 다시 신청해 주세요.">서류 미비</button>
+      <button data-t="현재 센터 운영 상태가 도입 기준을 충족하지 않아요. 자세한 내용은 고객센터로 문의해 주세요.">운영 기준 미충족</button>
+    </div>
+    <textarea id="mReason" placeholder="반려 사유를 입력하세요 — 센터 사장님 화면에 이 문구가 그대로 표시됩니다."></textarea>
+    <div class="mbtns">
+      <button class="cancel" id="mCancel">취소</button>
+      <button class="go" id="mGo" disabled>반려 확정</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── 목데이터: 수십 개 센터 규모 재현(고정 시드 — 새로고침해도 동일) ── */
+const FEATS = {
+  website:'온라인 홍보', offline_payment:'비대면결제', subscription:'구독멤버십',
+  access_control:'무인 출입제어', norder:'N 오더', iot_control:'IoT 원격제어', daypass:'1일권',
+};
+const NAMES = ['헬스보이짐','아이언짐','머슬팩토리','핏스테이션','바디빌드','스파르타짐','그릿피트니스','펌핑짐','코어짐','라이언피트'];
+const BRANCH = ['강남역점','역삼점','홍대점','합정점','성수점','잠실점','판교점','분당점','일산점','부천점','수원점','동탄점','해운대점','서면점','대전 둔산점','청주점','전주점','광주 상무점','제주점','목동점'];
+const REASONS = [
+  '제출하신 사업자 정보와 센터 정보가 일치하지 않아요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.',
+  '필수 서류(사업자등록증/시설 사진)가 누락되었어요. 서류를 보완해 다시 신청해 주세요.',
+  '현재 센터 운영 상태가 도입 기준을 충족하지 않아요. 자세한 내용은 고객센터로 문의해 주세요.',
+];
+let seed = 7;
+const rnd = () => (seed = (seed*1103515245 + 12345) % 2147483648) / 2147483648;
+const pick = a => a[Math.floor(rnd()*a.length)];
+const NOW = Date.now();
+const DB = Array.from({length: 48}, (_, i) => {
+  const st = rnd() < .58 ? 'PENDING' : (rnd() < .62 ? 'APPROVED' : 'REJECTED');
+  const applied = NOW - Math.floor(rnd()*14*864e5 + 36e5);
+  return {
+    id: 'ap' + (1000 + i),
+    center: pick(NAMES), branch: pick(BRANCH),
+    feat: pick(Object.keys(FEATS)),
+    appliedAt: applied, status: st,
+    processedAt: st === 'PENDING' ? null : applied + Math.floor(rnd()*3*864e5),
+    reason: st === 'REJECTED' ? pick(REASONS) : null,
+  };
+});
+
+/* ── 상태 ── */
+let tab = 'PENDING', feat = '', q = '';
+const sel = new Set();
+const fmt = t => { const d = new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
+const ago = t => { const h = Math.floor((NOW-t)/36e5); return h < 24 ? `${h}시간` : `${Math.floor(h/24)}일`; };
+const CHIP = { PENDING:['p','검토 대기'], APPROVED:['a','승인완료'], REJECTED:['r','반려됨'] };
+
+function counts(){ const c={PENDING:0,APPROVED:0,REJECTED:0}; DB.forEach(r=>c[r.status]++); return c; }
+function filtered(){
+  return DB.filter(r =>
+    (tab==='ALL' || r.status===tab) &&
+    (!feat || r.feat===feat) &&
+    (!q || (r.center + ' ' + r.branch).includes(q))
+  ).sort((a,b)=> a.status==='PENDING'&&b.status==='PENDING' ? a.appliedAt-b.appliedAt : (b.processedAt??b.appliedAt)-(a.processedAt??a.appliedAt));
+}
+
+function render(){
+  const c = counts();
+  const today = DB.filter(r=>r.processedAt && NOW-r.processedAt < 864e5).length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat hot"><div class="k">검토 대기</div><div class="v">${c.PENDING}<em>건</em></div></div>
+    <div class="stat"><div class="k">오늘 처리</div><div class="v">${today}<em>건</em></div></div>
+    <div class="stat"><div class="k">승인완료 (누적)</div><div class="v">${c.APPROVED}<em>건</em></div></div>
+    <div class="stat"><div class="k">반려 (누적)</div><div class="v">${c.REJECTED}<em>건</em></div></div>`;
+
+  const tabs = [['PENDING','검토 대기',c.PENDING],['APPROVED','승인완료',c.APPROVED],['REJECTED','반려됨',c.REJECTED],['ALL','전체',DB.length]];
+  document.getElementById('tabs').innerHTML = tabs.map(([k,l,n]) =>
+    `<button data-tab="${k}" class="${tab===k?'on':''}">${l}<span class="n">${n}</span></button>`).join('');
+  document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.tab; sel.clear(); render();});
+
+  const list = filtered();
+  const rows = document.getElementById('rows');
+  rows.innerHTML = list.map(r => {
+    const [cc, cl] = CHIP[r.status];
+    const waiting = r.status==='PENDING';
+    return `<tr>
+      <td>${waiting?`<input type="checkbox" data-sel="${r.id}" ${sel.has(r.id)?'checked':''}>`:''}</td>
+      <td class="center">${r.center} <small>${r.branch}</small></td>
+      <td><span class="feat">${FEATS[r.feat]}</span></td>
+      <td class="ago">${fmt(r.appliedAt)}</td>
+      <td class="ago">${waiting ? (NOW-r.appliedAt > 3*864e5 ? `<b>${ago(r.appliedAt)} 경과</b>` : ago(r.appliedAt)+' 경과') : '—'}</td>
+      <td><span class="chip ${cc}"><span class="dot"></span>${cl}</span></td>
+      <td>${waiting
+        ? `<div class="acts"><button class="ok" data-ok="${r.id}">승인</button><button class="rej" data-rej="${r.id}">반려</button></div>`
+        : `<div class="procinfo">${fmt(r.processedAt)} · 최고관리자${r.reason?`<br><span class="rr" title="${r.reason}">사유: ${r.reason}</span>`:''}</div>`}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('empty').style.display = list.length ? 'none' : 'block';
+
+  rows.querySelectorAll('[data-ok]').forEach(b=>b.onclick=()=>approve([b.dataset.ok]));
+  rows.querySelectorAll('[data-rej]').forEach(b=>b.onclick=()=>openReject([b.dataset.rej]));
+  rows.querySelectorAll('[data-sel]').forEach(cb=>cb.onchange=()=>{cb.checked?sel.add(cb.dataset.sel):sel.delete(cb.dataset.sel); syncBulk();});
+  document.getElementById('selAll').onchange = e => {
+    sel.clear();
+    if (e.target.checked) list.filter(r=>r.status==='PENDING').forEach(r=>sel.add(r.id));
+    render();
+  };
+  syncBulk();
+}
+
+function syncBulk(){
+  const bulk = document.getElementById('bulk');
+  bulk.classList.toggle('show', sel.size>0);
+  document.getElementById('bulkN').textContent = `${sel.size}건 선택됨`;
+}
+const logEl = t => document.getElementById('log').textContent = t;
+
+function approve(ids){
+  ids.forEach(id => { const r = DB.find(x=>x.id===id); if(r&&r.status==='PENDING'){ r.status='APPROVED'; r.processedAt=Date.now(); } });
+  ids.forEach(id=>sel.delete(id));
+  logEl(`✅ ${ids.length}건 승인 — 센터 화면 칩이 '승인완료 · 사용중'으로 바뀌고 관리 메뉴가 열립니다.`);
+  render();
+}
+
+/* 반려 모달 */
+let rejTargets = [];
+function openReject(ids){
+  rejTargets = ids;
+  const first = DB.find(x=>x.id===ids[0]);
+  document.getElementById('mWho').textContent = ids.length===1
+    ? `${first.center} ${first.branch} — ${FEATS[first.feat]}`
+    : `${ids.length}건 일괄 반려 (같은 사유가 모두에게 표시됩니다)`;
+  const ta = document.getElementById('mReason');
+  ta.value=''; document.getElementById('mGo').disabled = true;
+  document.getElementById('modalBg').classList.add('show'); ta.focus();
+}
+document.querySelectorAll('.tpl button').forEach(b=>b.onclick=()=>{
+  const ta=document.getElementById('mReason'); ta.value=b.dataset.t;
+  document.getElementById('mGo').disabled=false; ta.focus();
+});
+document.getElementById('mReason').oninput = e => document.getElementById('mGo').disabled = !e.target.value.trim();
+document.getElementById('mCancel').onclick = () => document.getElementById('modalBg').classList.remove('show');
+document.getElementById('mGo').onclick = () => {
+  const reason = document.getElementById('mReason').value.trim();
+  if(!reason) return;
+  rejTargets.forEach(id => { const r=DB.find(x=>x.id===id); if(r&&r.status==='PENDING'){ r.status='REJECTED'; r.processedAt=Date.now(); r.reason=reason; } });
+  rejTargets.forEach(id=>sel.delete(id));
+  document.getElementById('modalBg').classList.remove('show');
+  logEl(`⛔ ${rejTargets.length}건 반려 — 센터 화면에 '반려됨' 칩과 입력한 사유가 그대로 표시되고, '다시 신청하기'가 열립니다.`);
+  render();
+};
+
+document.getElementById('bulkOk').onclick = () => approve([...sel]);
+document.getElementById('bulkRej').onclick = () => openReject([...sel]);
+document.getElementById('bulkClr').onclick = () => { sel.clear(); render(); };
+document.getElementById('featSel').innerHTML += Object.entries(FEATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+document.getElementById('featSel').onchange = e => { feat = e.target.value; render(); };
+document.getElementById('q').oninput = e => { q = e.target.value.trim(); render(); };
+
+render();
+</script>
+</body>
+</html>
