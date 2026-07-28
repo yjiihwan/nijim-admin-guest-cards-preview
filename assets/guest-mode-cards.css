@@ -117,3 +117,10 @@
   .gm-card{transition:none}
   .gm-card:hover{transform:none}
 }
+
+/* 반려(REJECTED) 상태 — 2026-07-28 형 결정: 별도 칩 + 사유 노출 + 재신청 허용 */
+.gm-chip.s-rejected{background:#FDECEE;border-color:#F6C7CD;color:#C02440}
+.gm-chip.s-rejected .gm-dot{background:#E23A55;box-shadow:0 0 0 3px rgba(226,58,85,.18)}
+.gm-reject{margin-top:10px;padding:10px 12px;border-radius:10px;background:#FDECEE;
+  border:1px solid #F6C7CD;font-size:12.5px;line-height:1.55;color:#8E2136}
+.gm-reject b{color:#C02440;font-weight:800;margin-right:2px}

@@ -1,5 +1,6 @@
 import './guest-mode-cards.css';
 import {
+  DEFAULT_REJECT_REASON,
   GUEST_FEATURES,
   chipClass,
   chipLabel,
@@ -19,6 +20,8 @@ export interface GuestFeatureState {
   approvedAt?: string | null;
   /** 승인완료 CTA 라우팅 목적지. 없으면 정적 정의의 manageUrl 사용 */
   manageUrl?: string | null;
+  /** REJECTED일 때 최고관리자가 남긴 반려 사유 (API_SPEC.md rejectedReason) */
+  rejectedReason?: string | null;
 }
 
 export interface GuestModeCardsProps {
@@ -51,13 +54,14 @@ export function GuestModeCards({ states, imageBase, onApply, onNavigate }: Guest
 
       <div className="gm-grid">
         {GUEST_FEATURES.map((def, i) => {
-          const raw = byKey.get(def.key)?.status ?? 'NONE';
-          // REJECTED는 재신청 가능해야 하므로 미신청과 동일 취급
-          const status: GuestFeatureStatus = raw === 'REJECTED' ? 'NONE' : raw;
+          const state = byKey.get(def.key);
+          // REJECTED는 별도 칩+사유 노출+재신청 허용 (2026-07-28 확정)
+          const status: GuestFeatureStatus = state?.status ?? 'NONE';
+          const rejectReason = state?.rejectedReason || DEFAULT_REJECT_REASON;
           const variant = ctaVariant(status, def.recommended);
           const wide = isWide(i, total, def);
           const label = ctaLabel(def, status);
-          const manageUrl = byKey.get(def.key)?.manageUrl || def.manageUrl;
+          const manageUrl = state?.manageUrl || def.manageUrl;
 
           const cardClass = [
             'gm-card',
@@ -82,6 +86,10 @@ export function GuestModeCards({ states, imageBase, onApply, onNavigate }: Guest
               <p className="gm-ben" dangerouslySetInnerHTML={{ __html: def.benefitHtml }} />
               <p className="gm-desc">{def.desc}</p>
 
+              {status === 'REJECTED' && (
+                <div className="gm-reject"><b>반려 사유</b>· {rejectReason}</div>
+              )}
+
               <div className="gm-thumb">
                 <img src={`${imageBase}/${def.image}`} alt="" loading="lazy" />
               </div>
@@ -98,7 +106,7 @@ export function GuestModeCards({ states, imageBase, onApply, onNavigate }: Guest
                 onClick={() => {
                   if (status === 'PENDING') return;
                   if (status === 'APPROVED') navigate(manageUrl, def);
-                  else onApply(def);
+                  else onApply(def); // NONE·REJECTED 모두 신청/재신청 모달 (REJECTED는 모달에 사유 표시 권장)
                 }}
               >
                 {label}

@@ -26,6 +26,7 @@
     <button data-mode="NONE">전체 미신청</button>
     <button data-mode="PENDING">전체 검토중</button>
     <button data-mode="APPROVED">전체 승인완료</button>
+    <button data-mode="REJECTED">전체 반려</button>
     <a class="nav" href="index.html">← Guest mode 화면 보기</a>
   </div>
   <div id="root"></div>
@@ -66,11 +67,12 @@ const OPS = [
    cta:{none:'IoT 원격제어 도입신청하기',pending:PENDING_CTA,approved:'IoT 제어판 열기'},manageUrl:'/admin/iot'},
 ];
 
-const MIXED = {subscription:'NONE',access_control:'PENDING',norder:'NONE',iot_control:'NONE'};
+const MIXED = {subscription:'NONE',access_control:'PENDING',norder:'REJECTED',iot_control:'NONE'};
 
-const chipLabel = s => s==='APPROVED'?'승인완료 · 사용중' : s==='PENDING'?'신청됨 · 검토중' : '미신청';
-const chipClass = s => s==='APPROVED'?'s-approved' : s==='PENDING'?'s-pending' : 's-none';
-const ctaVariant = (s,rec) => s==='APPROVED'?'done' : s==='PENDING'?'wait' : (rec?'fill':'line');
+const chipLabel = s => s==='APPROVED'?'승인완료 · 사용중' : s==='PENDING'?'신청됨 · 검토중' : s==='REJECTED'?'반려됨' : '미신청';
+const chipClass = s => s==='APPROVED'?'s-approved' : s==='PENDING'?'s-pending' : s==='REJECTED'?'s-rejected' : 's-none';
+const ctaVariant = (s,rec) => s==='APPROVED'?'done' : s==='PENDING'?'wait' : s==='REJECTED'?'fill' : (rec?'fill':'line');
+const REJECT_REASON = '제출하신 사업자 정보와 센터 정보가 일치하지 않아 반려되었어요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.';
 
 function card(d, st, wide){
   const instant = !!d.instant;
@@ -80,11 +82,12 @@ function card(d, st, wide){
   const chip = instant ? '' :
     `<span class="gm-chip ${chipClass(st)}"><span class="gm-dot"></span>${chipLabel(st)}</span>`;
   const label = instant ? d.cta.none
-    : (st==='APPROVED'?d.cta.approved : st==='PENDING'?d.cta.pending : d.cta.none);
+    : (st==='APPROVED'?d.cta.approved : st==='PENDING'?d.cta.pending : st==='REJECTED'?'다시 신청하기' : d.cta.none);
   return `<article class="gm-card${d.recommended?' is-rec':''}${wide?' is-wide':''}" data-key="${d.key}">
     <div class="gm-chd"><h3>${badge}${d.title}</h3>${chip}</div>
     <p class="gm-ben">${d.benefitHtml}</p>
     <p class="gm-desc">${d.desc}</p>
+    ${(!instant && st==='REJECTED')?`<div class="gm-reject"><b>반려 사유</b>· ${d.rejectReason??REJECT_REASON}</div>`:''}
     <div class="gm-thumb"><img src="img/${d.image}" alt=""></div>
     <div class="gm-spacer"></div>
     <button type="button" class="gm-cta v-${v}" data-key="${d.key}" data-status="${instant?'INSTANT':st}"
@@ -114,7 +117,9 @@ function render(mode){
       if(status==='PENDING'){ log.textContent = '검토중 — 클릭 무시됨(중복 신청 차단)'; return; }
       log.textContent = (status==='APPROVED'||status==='INSTANT')
         ? `[라우팅] ${key} → ${url}`
-        : `[신청 모달] ${key} 신청 폼 열기`;
+        : status==='REJECTED'
+          ? `[신청 모달] ${key} 재신청 폼 열기 (반려 사유 안내 포함)`
+          : `[신청 모달] ${key} 신청 폼 열기`;
     });
   });
 }

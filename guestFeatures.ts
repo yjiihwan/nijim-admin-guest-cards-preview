@@ -11,7 +11,7 @@ export type GuestFeatureKey =
   | 'norder'
   | 'iot_control';
 
-/** 백엔드가 내려주는 신청 상태. REJECTED는 UI상 NONE(재신청 가능)으로 접는다. */
+/** 백엔드가 내려주는 신청 상태. REJECTED는 별도 칩('반려됨')+사유 노출+재신청 허용 (2026-07-28 확정). */
 export type GuestFeatureStatus = 'NONE' | 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface GuestFeatureDef {
@@ -130,24 +130,28 @@ export type CtaVariant = 'fill' | 'line' | 'wait' | 'done';
 export function ctaVariant(status: GuestFeatureStatus, recommended?: boolean): CtaVariant {
   if (status === 'APPROVED') return 'done';
   if (status === 'PENDING') return 'wait';
+  if (status === 'REJECTED') return 'fill'; // 재신청 유도 — 항상 강조 CTA
   return recommended ? 'fill' : 'line';
 }
 
 export function chipLabel(status: GuestFeatureStatus): string {
   if (status === 'APPROVED') return '승인완료 · 사용중';
   if (status === 'PENDING') return '신청됨 · 검토중';
+  if (status === 'REJECTED') return '반려됨';
   return '미신청';
 }
 
 export function chipClass(status: GuestFeatureStatus): string {
   if (status === 'APPROVED') return 's-approved';
   if (status === 'PENDING') return 's-pending';
+  if (status === 'REJECTED') return 's-rejected';
   return 's-none';
 }
 
 export function ctaLabel(def: GuestFeatureDef, status: GuestFeatureStatus): string {
   if (status === 'APPROVED') return def.cta.approved;
   if (status === 'PENDING') return def.cta.pending;
+  if (status === 'REJECTED') return '다시 신청하기';
   return def.cta.none;
 }
 
@@ -155,3 +159,7 @@ export function ctaLabel(def: GuestFeatureDef, status: GuestFeatureStatus): stri
 export function isWide(index: number, total: number, def: GuestFeatureDef): boolean {
   return Boolean(def.wide) && total % 2 === 1 && index === total - 1;
 }
+
+/** 반려 사유 기본 문구 — 백엔드 rejectedReason이 null일 때 폴백 */
+export const DEFAULT_REJECT_REASON =
+  '제출하신 사업자 정보와 센터 정보가 일치하지 않아 반려되었어요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.';
