@@ -60,7 +60,7 @@ export const GUEST_FEATURES: GuestFeatureDef[] = [
     image: '02_payment.png',
     recommended: true,
     cta: {
-      none: '비대면결제 도입신청하기',
+      none: '비대면결제 시작하기',
       pending: PENDING_CTA,
       approved: '비대면결제 관리하러 가기',
     },
@@ -74,7 +74,7 @@ export const GUEST_FEATURES: GuestFeatureDef[] = [
     image: '04_subscription.png',
     recommended: true,
     cta: {
-      none: '구독멤버십 도입신청하기',
+      none: '구독멤버십 판매 시작하기',
       pending: PENDING_CTA,
       approved: '구독멤버십 관리하러 가기',
     },
