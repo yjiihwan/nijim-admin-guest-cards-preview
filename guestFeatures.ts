@@ -169,8 +169,8 @@ export const DEFAULT_REJECT_REASON =
  *
  * WHY: `access_control`(무인 출입제어)·`iot_control`(IoT 원격자동제어)은 최고관리자
  * 승인만으로 즉시 쓸 수 있는 서비스가 아니다. SaaS와 호환되는 기기를 센터에
- * 설치·시공한 뒤 사용승인까지 나야 동작한다. 설치·시공 규모는 센터 평수·출입문
- * 형태·전자기기 구성·전력구조에 따라 천차만별이라 비대면 자동 제공이 불가능하고,
+ * 설치·시공한 뒤 사용승인까지 나야 동작한다. 설치·시공 규모는 출입문 형태·전자기기
+ * 구성·전력구조에 따라 천차만별이라 비대면 자동 제공이 불가능하고,
  * 담당자 확인 → 현장 상담 → 견적 협의 → 시공 → 사용승인의 실물 절차를 탄다.
  *
  * 그래서 이 2종만 기존 `status`(GuestFeatureStatus)와 **분리된 `flow` 상태**를 쓴다.
@@ -346,22 +346,21 @@ export interface InstallFeatureState {
 
 /* ── 상담용 신청서 폼 스키마 (2026-07-29 전면 재설계) ────────────────────
  * 설계 원칙: 센터 사장님은 전기·설비 비전문가다.
- *   → 본인이 확실히 아는 것(평수·층·연락처·원하는 기기)만 묻는다.
+ *   → 본인이 확실히 아는 것(층·연락처·원하는 기기)만 묻는다.
  *   → 나머지 판단 근거(출입문 형태, 잠금 방식, 전력 구조, 기존 컨트롤러, 배선)는
  *     전부 현장 사진으로 받아 전문가가 보고 결정한다.
  *   → 폼 어디에도 전문용어를 노출하지 않는다. 대상을 가리켜야 하면 눈에 보이는
  *     생김새로 설명한다(예: '차단기 스위치가 여러 개 들어있는 하얀 박스').
  * 폐지된 문항: doors / devices / power / controller / controllerModel / network / doorsLite
+ *              area(센터 평수) / 엘리베이터 유무 — 2026-07-29 2차 정리
  * ---------------------------------------------------------------------- */
 
 export type SurveyFieldType =
-  | 'number-unit'  // 숫자 + 단위 select
   | 'text'
   | 'tel'
   | 'radio'
   | 'select'
-  | 'checkbox-qty'  // 체크박스 + 수량
-  | 'floor'         // 층수 + 엘리베이터 유무
+  | 'checkbox-qty'  // 체크박스 + 수량 (+ '기타' 자유입력)
   | 'photos'        // 슬롯형 현장 사진 업로드
   | 'textarea';
 
@@ -371,8 +370,10 @@ export interface SurveyField {
   type: SurveyFieldType;
   required?: boolean;
   hint?: string;
-  units?: string[];
   options?: string[];
+  /** checkbox-qty 전용 — 이 옵션명을 고르면 기기 이름을 직접 입력받는다 */
+  other?: string;
+  otherPlaceholder?: string;
   /** photos 전용 — 슬롯 정의 */
   slots?: PhotoSlot[];
   placeholder?: string;
@@ -453,14 +454,8 @@ const CONTACT_FIELDS: SurveyField[] = [
     placeholder: '현장 상황 중 미리 알려주실 내용이 있으면 적어주세요. (선택)' },
 ];
 
-const AREA_FIELD: SurveyField = {
-  name: 'area', label: '센터 평수', type: 'number-unit', required: true, units: ['㎡', '평'],
-  hint: '전용 면적 기준으로 적어주세요.',
-};
-
 const FLOOR_FIELD: SurveyField = {
-  name: 'floor', label: '층수 및 엘리베이터 유무', type: 'floor', required: true,
-  placeholder: '예) 지상 3층', options: ['있음', '없음'],
+  name: 'floor', label: '층수', type: 'text', required: true, placeholder: '예) 지상 3층',
 };
 
 /** 사진 문항 — 두 기능 모두 폼 최상단. 이 신청서의 주인공이다. */
@@ -473,17 +468,17 @@ const photoField = (key: InstallFeatureKey): SurveyField => ({
 export const INSTALL_SURVEY_FORMS: Record<InstallFeatureKey, SurveyField[]> = {
   access_control: [
     photoField('access_control'),
-    AREA_FIELD,
     FLOOR_FIELD,
     ...CONTACT_FIELDS,
   ],
   iot_control: [
     photoField('iot_control'),
     // 제어 방식(스마트플러그/릴레이/IR)은 사장님이 판단할 수 없다 → 사진 보고 전문가가 정한다
+    // '기타'는 반드시 배열 맨 뒤 — hvac 슬롯 reqIf가 인덱스 1(냉난방기)을 참조한다
     { name: 'targetDevices', label: '원격으로 켜고 끄고 싶은 기기', type: 'checkbox-qty', required: true,
-      options: ['조명', '냉난방기(에어컨·히터)', '환기설비', '급탕·온수', '제습·가습기', '음향설비', '간판·사인'],
+      options: ['조명', '냉난방기(에어컨·히터)', '환기설비', '급탕·온수', '제습·가습기', '음향설비', '간판·사인', '기타'],
+      other: '기타', otherPlaceholder: '어떤 기기인지 적어주세요 (예: 제빙기)',
       hint: '제어하고 싶은 기기를 고르고 개수만 적어주세요. 어떤 방식으로 연결할지는 사진을 보고 전문가가 정해드려요.' },
-    AREA_FIELD,
     FLOOR_FIELD,
     ...CONTACT_FIELDS,
   ],

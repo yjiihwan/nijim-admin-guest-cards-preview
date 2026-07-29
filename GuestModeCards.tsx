@@ -120,7 +120,7 @@ function FlowNote({ state }: { state: InstallFeatureState }) {
   if (flow === 'CONSULT') {
     return (
       <div className="gm-note">
-        <b>상담 대기</b>· 접수가 승인됐어요. 담당자가 등록하신 연락처로 연락드려 현장 상황(평수·출입문·전력)을
+        <b>상담 대기</b>· 접수가 승인됐어요. 담당자가 등록하신 연락처로 연락드려 현장 상황(출입문·전력 등)을
         확인하고 방문 실사 일정을 잡습니다.
         {state.consult && (
           <dl>
