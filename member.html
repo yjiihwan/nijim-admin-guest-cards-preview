@@ -80,10 +80,60 @@
   .qmeta dt{color:#8A8A93;font-weight:700}
   .qmeta dd{margin:0;font-weight:800;color:#202024}
 
+  /* ══════════ 현장 사진 업로드 (설치형 2종 공용) ══════════ */
+  /* WHY: 사장님은 전기·설비 비전문가라 말로 물으면 답을 못 한다.
+     "무엇을 프레임에 담을지"만 도식으로 보여주고 판단은 전문가가 사진으로 한다. */
+  .ph-tips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .ph-tip{border-radius:10px;padding:9px 11px;font-size:11.5px;line-height:1.7;font-weight:700}
+  .ph-tip b{display:block;font-size:11px;letter-spacing:-.01em;margin-bottom:3px}
+  .ph-tip.good{background:#EFFBF5;border:1px solid #C4EDDC;color:#00795A}
+  .ph-tip.bad{background:#F7F7F9;border:1px solid #E7E7EC;color:#8A8A93}
+  .ph-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+  .ph-slot{border:1px solid #ECECEF;border-radius:14px;background:#fff;padding:9px 9px 11px;
+    display:flex;flex-direction:column;min-width:0}
+  .ph-slot.bad{border-color:#E23A55;background:#FFFAFB}
+  .ph-media{position:relative;border-radius:10px;background:#FBFBFC;border:1.5px dashed #DEDEE4;
+    aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
+  .ph-media:hover{border-color:#FC2066;background:#FFF7FA}
+  .ph-slot.bad .ph-media{border-color:#E23A55}
+  .ph-media svg{width:84%;height:84%;display:block}
+  .ph-cam{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);white-space:nowrap;
+    font-size:11px;font-weight:800;color:#B00042;background:rgba(255,255,255,.92);
+    border:1px solid #F6CBDB;border-radius:999px;padding:4px 9px}
+  .ph-shot{display:none;width:100%;height:100%}
+  .ph-shot img{width:100%;height:100%;object-fit:cover;display:block}
+  .ph-slot.has .ph-media{border-style:solid;border-color:#ECECEF;background:#16161C}
+  .ph-slot.has .ph-art,.ph-slot.has .ph-cam{display:none}
+  .ph-slot.has .ph-shot{display:block}
+  .ph-tt{margin-top:8px;font-size:12.5px;font-weight:800;color:#202024;letter-spacing:-.02em;
+    line-height:1.45;word-break:keep-all;display:flex;gap:5px;align-items:flex-start;flex-wrap:wrap}
+  .ph-badge{flex:none;font-size:10px;font-weight:800;border-radius:999px;padding:2px 7px;
+    background:#F2F2F5;color:#8A8A93;border:1px solid #E7E7EC}
+  .ph-badge.req{background:#FFF0F5;color:#B00042;border-color:#F6CBDB}
+  .ph-g{margin:5px 0 0;font-size:11.5px;line-height:1.6;color:#8A8A93;word-break:keep-all}
+  .ph-more{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+  .ph-th{position:relative;width:44px;height:34px;border-radius:7px;overflow:hidden;border:1px solid #ECECEF}
+  .ph-th img{width:100%;height:100%;object-fit:cover;display:block}
+  .ph-th button{position:absolute;top:1px;right:1px;width:15px;height:15px;border-radius:50%;border:0;
+    background:rgba(22,22,28,.7);color:#fff;font:800 10px/1 inherit;cursor:pointer;padding:0}
+  /* WHY margin-top:auto — 가이드 문구 길이가 슬롯마다 달라서, 버튼을 카드 바닥에 붙여야 행이 안 흐트러진다 */
+  .ph-acts{display:flex;gap:5px;flex-wrap:wrap;margin-top:auto;padding-top:8px}
+  .ph-b{font:800 11px/1 inherit;padding:7px 9px;border-radius:8px;cursor:pointer;
+    border:1px solid #ECECEF;background:#fff;color:#55555C}
+  .ph-b:hover{border-color:#D6D6DD}
+  .ph-b.del{color:#C02440;border-color:#F6C7CD}
+  .ph-b.del:hover{background:#FDECEE}
+
+  @media (min-width:760px){ .ph-grid{grid-template-columns:repeat(3,1fr)} }
   @media (max-width:900px){
     .page{padding:22px 16px 40px}
     .mo{padding:20px 16px;border-radius:16px}
     .cbrow select{width:100%}
+  }
+  @media (max-width:400px){
+    .ph-grid{gap:8px}
+    .ph-slot{padding:7px 7px 9px}
+    .ph-g{font-size:11px}
   }
 </style>
 </head>
@@ -228,35 +278,67 @@ const CONTACT_FIELDS = [
 ];
 const AREA_FIELD  = {name:'area',label:'센터 평수',type:'number-unit',required:true,units:['㎡','평'],hint:'전용 면적 기준으로 적어주세요.'};
 const FLOOR_FIELD = {name:'floor',label:'층수 및 엘리베이터 유무',type:'floor',required:true,placeholder:'예) 지상 3층',options:['있음','없음']};
-const POWER_FIELD = {name:'power',label:'전력구조',type:'power',required:true,options:['단상(220V)','삼상(380V)','모름'],
-  hint:'계약전력은 전기요금 고지서에서 확인할 수 있어요. (모름 선택 시 상담 때 함께 확인해 드려요)'};
+
+/* ══════════ 현장 사진 슬롯 ══════════
+   WHY: 출입문 형태·전자기기·전력구조를 물어봐도 사장님은 답을 모른다.
+   본인이 확실히 아는 것(평수·층·연락처·원하는 기기)만 묻고, 나머지 판단 근거는
+   전부 사진으로 받아 전문가가 본다. 도식은 "무엇을 프레임에 담을지"만 알려준다. */
+const ART_FRAME = '<path d="M4 13V8a4 4 0 014-4h5M68 13V8a4 4 0 00-4-4h-5M4 41v5a4 4 0 004 4h5M68 41v5a4 4 0 01-4 4h-5" stroke="#FC2066" stroke-width="2.6"/>';
+const ART_BODY = {
+  doorFront:'<rect x="27" y="11" width="18" height="34" rx="1.5"/><circle cx="41" cy="29" r="1.7"/><path d="M13 45h46"/>',
+  doorHandle:'<path d="M18 9v36"/><rect x="26" y="14" width="20" height="26" rx="3"/><circle cx="36" cy="23" r="4.5"/><path d="M36 28.5v6"/>',
+  doorWall:'<path d="M10 13h52"/><rect x="14" y="18" width="17" height="28" rx="1.5"/><circle cx="28" cy="32" r="1.5"/><rect x="42" y="19" width="10" height="12" rx="2"/><circle cx="47" cy="25" r="2"/><rect x="43" y="36" width="8" height="7" rx="1.5"/><path d="M45.5 39v1.6M48.5 39v1.6"/><path d="M8 46h56"/>',
+  counterView:'<rect x="44" y="15" width="15" height="26" rx="1.5"/><circle cx="55" cy="29" r="1.4"/><path d="M6 41h56"/><path d="M8 41v9h26v-9M8 45h26"/>',
+  otherDoor:'<rect x="12" y="13" width="16" height="30" rx="1.5"/><circle cx="24" cy="29" r="1.5"/><rect x="44" y="13" width="16" height="30" rx="1.5"/><circle cx="56" cy="29" r="1.5"/><path d="M34 28h4M6 45h60"/>',
+  roomWide:'<path d="M10 44l8-24h36l8 24"/><path d="M18 20h36"/><circle cx="26" cy="27" r="2.6"/><rect x="39" y="24" width="13" height="5.5" rx="1.6"/><path d="M5 44h62"/>',
+  aircon:'<rect x="10" y="15" width="34" height="13" rx="3"/><path d="M14 24h26M14 20h20"/><rect x="52" y="17" width="11" height="24" rx="3"/><circle cx="57.5" cy="24" r="1.4"/><path d="M55 30h5M55 34.5h5"/>',
+  lightSwitch:'<rect x="22" y="10" width="28" height="34" rx="4"/><rect x="27" y="15" width="18" height="7" rx="1.6"/><rect x="27" y="24" width="18" height="7" rx="1.6"/><rect x="27" y="33" width="18" height="6" rx="1.6"/>',
+  breaker:'<path d="M22 12h34v30H22z"/><path d="M22 12L12 7v40l10-5"/><rect x="27" y="21" width="6" height="12" rx="1.6"/><rect x="35" y="21" width="6" height="12" rx="1.6"/><rect x="43" y="21" width="6" height="12" rx="1.6"/>',
+  panel:'<rect x="24" y="12" width="24" height="28" rx="4"/><rect x="29" y="17" width="14" height="9" rx="1.6"/><circle cx="32" cy="33" r="2"/><circle cx="40" cy="33" r="2"/><path d="M12 46h48"/>',
+};
+const photoArt = id => `<svg viewBox="0 0 72 54" aria-hidden="true" fill="none" stroke="#B9B9C2" stroke-width="2"
+  stroke-linecap="round" stroke-linejoin="round">${ART_BODY[id]??''}${ART_FRAME}</svg>`;
+
+const PHOTO_SLOTS = {
+  access_control:[
+    {key:'doorFront',art:'doorFront',title:'출입문 정면',required:true,
+     guide:'문 전체가 다 나오게, 2~3걸음 뒤에서 찍어주세요.'},
+    {key:'doorLock',art:'doorHandle',title:'문손잡이·잠금장치 근접',required:true,
+     guide:'지금 문을 어떻게 잠그는지 보이게 가까이 찍어주세요.'},
+    {key:'doorSurround',art:'doorWall',title:'문 주변 벽·천장',required:true,
+     guide:'문 옆 벽과 위쪽 천장이 보이게. 콘센트나 기존 카드 찍는 기계가 있으면 같이 나오게 찍어주세요.'},
+    {key:'counterView',art:'counterView',title:'카운터에서 출입문 쪽',required:true,
+     guide:'데스크에 서서 문을 바라보고 한 장 찍어주세요.'},
+    {key:'otherDoors',art:'otherDoor',title:'그 외 잠그고 싶은 문',required:false,multi:true,
+     guide:'샤워실·탈의실처럼 따로 통제하고 싶은 문이 있으면 찍어주세요. 여러 장 올려도 돼요.'},
+  ],
+  iot_control:[
+    {key:'roomWide',art:'roomWide',title:'실내 전경',required:true,
+     guide:'제어하고 싶은 기기들이 한눈에 보이게 넓게 찍어주세요.'},
+    {key:'hvac',art:'aircon',title:'에어컨·히터',required:false,reqIf:{cb:'targetDevices',i:1},
+     guide:'실내기 본체와 리모컨을 같이 찍어주세요. 냉난방을 고르시면 꼭 필요해요.'},
+    {key:'lightSwitch',art:'lightSwitch',title:'조명 스위치 벽면',required:true,
+     guide:'스위치 판 전체가 나오게 정면에서 찍어주세요.'},
+    {key:'breaker',art:'breaker',title:'차단기 박스',required:true,
+     guide:'차단기 스위치가 여러 개 들어있는 하얀 박스예요. 문을 열고 안이 보이게 한 장. 보통 출입구나 창고 벽 위쪽에 있어요.'},
+    {key:'existingPanel',art:'panel',title:'이미 쓰고 있는 제어기·조작 패널',required:false,multi:true,
+     guide:'벽에 붙은 온도조절기나 통합 리모컨 같은 게 있으면 찍어주세요.'},
+  ],
+};
+const photoField = key => ({name:'photos',label:'현장 사진',type:'photos',required:true,slots:PHOTO_SLOTS[key],
+  hint:'사진을 보고 전문가가 필요한 장비와 시공 방법을 정해드려요. 스마트폰으로 찍은 사진이면 충분해요.'});
 
 const FORMS = {
   access_control:[
-    AREA_FIELD, FLOOR_FIELD,
-    {name:'doors',label:'출입문 형태와 개수',type:'checkbox-qty',required:true,
-     options:['자동문(슬라이딩)','여닫이문','유리문(강화도어)','스피드게이트·턴게이트','기타'],
-     hint:'해당하는 형태를 모두 고르고 개수를 적어주세요. 도어락·전기정 사양이 여기서 갈립니다.'},
-    {name:'devices',label:'현재 사용 중인 전자기기 종류·개수',type:'checkbox-qty',required:true,
-     options:['조명','냉난방기','환기설비','급탕·온수','CCTV','기존 출입통제 장비']},
-    POWER_FIELD, ...CONTACT_FIELDS,
+    photoField('access_control'),
+    AREA_FIELD, FLOOR_FIELD, ...CONTACT_FIELDS,
   ],
   iot_control:[
-    AREA_FIELD, FLOOR_FIELD,
-    {name:'targetDevices',label:'원격제어할 대상 기기',type:'device-qty',required:true,
+    photoField('iot_control'),
+    {name:'targetDevices',label:'원격으로 켜고 끄고 싶은 기기',type:'checkbox-qty',required:true,
      options:['조명','냉난방기(에어컨·히터)','환기설비','급탕·온수','제습·가습기','음향설비','간판·사인'],
-     methods:['제어방식 선택','스마트플러그','릴레이 결선','적외선(IR) 리모컨','기존 컨트롤러 연동','모름 (상담 필요)'],
-     hint:'기기별로 수량과 원하는 제어 방식을 골라주세요. 이 문항이 견적의 대부분을 결정합니다.'},
-    {name:'controller',label:'기존 통합 컨트롤러 유무',type:'radio',required:true,
-     options:['있음','없음','모름'],hint:'기존 컨트롤러가 있으면 연동으로 시공비가 크게 줄어듭니다.'},
-    {name:'controllerModel',label:'기존 컨트롤러 제조사·모델',type:'text',required:false,
-     placeholder:'예) LG 시스템에어컨 AC Ez / 없으면 비워두세요'},
-    {name:'network',label:'센터 인터넷·Wi-Fi 환경',type:'select',required:true,
-     options:['공유기 Wi-Fi 사용중','유선 인터넷만 있음','인터넷 없음','모름']},
-    {name:'doorsLite',label:'출입문 형태 (참고)',type:'select',required:false,
-     options:['자동문(슬라이딩)','여닫이문','유리문(강화도어)','기타'],
-     hint:'출입제어는 별도 서비스라 참고용으로만 받습니다. (선택)'},
-    POWER_FIELD, ...CONTACT_FIELDS,
+     hint:'제어하고 싶은 기기를 고르고 개수만 적어주세요. 어떤 방식으로 연결할지는 사진을 보고 전문가가 정해드려요.'},
+    AREA_FIELD, FLOOR_FIELD, ...CONTACT_FIELDS,
   ],
 };
 
@@ -280,7 +362,7 @@ function flowNote(key, st){
   if(f==='APPLIED') return `<div class="gm-note"><b>접수 완료</b>· 신청서 잘 받았어요. 담당자가 내용을 확인하고 1~2영업일 안에 연락드려요. 지금은 따로 하실 일 없이 기다려 주시면 돼요.</div>`;
   if(f==='CONSULT'){
     const c = st.consult ?? DEMO_CONSULT[key];
-    return `<div class="gm-note"><b>상담·현장 확인</b>· 접수가 승인됐어요. 담당자가 등록하신 연락처로 연락드려 평수·출입문·전력 상태를 확인하고 방문 일정을 잡아요. 지금은 따로 하실 일 없이 연락을 기다려 주시면 돼요.
+    return `<div class="gm-note"><b>상담·현장 확인</b>· 접수가 승인됐어요. 담당자가 등록하신 연락처로 연락드려 올려주신 사진을 함께 보며 현장 상태를 확인하고 방문 일정을 잡아요. 지금은 따로 하실 일 없이 연락을 기다려 주시면 돼요.
       <dl><dt>배정 담당자</dt><dd>${c.manager}</dd><dt>방문 예정일</dt><dd>${c.visitDate}</dd></dl></div>`;
   }
   if(f==='QUOTED'){
@@ -387,6 +469,109 @@ document.addEventListener('keydown', e => { if(e.key==='Escape' && moBg.classLis
 /* WHY gm-scope: 모달 안에서도 카드와 같은 토큰(.gm-note/.gm-reject 색상 변수)을 쓴다 */
 const openMo = html => { mo.className = 'mo gm-scope'; mo.innerHTML = html; moBg.classList.add('show'); mo.scrollTop = 0; };
 
+/* ── 현장 사진 업로드 ──
+   프로토타입이라 실제 업로드 없이 URL.createObjectURL 로컬 미리보기만 한다.
+   실제 엔드포인트·필드 스키마는 API_SPEC.md §5.4.1 참조. */
+let PHOTOS = {};      // slotKey → [{url, name}]
+let CUR_SLOTS = [];   // 현재 열린 폼의 슬롯 정의
+
+function photoFieldHtml(f){
+  const slot = s => `<div class="ph-slot" data-slot="${s.key}">
+    <div class="ph-media" data-pick="${s.key}" role="button" tabindex="0" aria-label="${s.title} 사진 올리기">
+      <div class="ph-art">${photoArt(s.art)}</div>
+      <div class="ph-shot"></div>
+      <span class="ph-cam">＋ 사진 찍기</span>
+    </div>
+    <div class="ph-tt">${s.title}<span class="ph-badge${s.required?' req':''}" data-badge="${s.key}">${s.required?'필수':'선택'}</span></div>
+    <p class="ph-g">${s.guide}</p>
+    ${s.multi?`<div class="ph-more" data-more="${s.key}"></div>`:''}
+    <div class="ph-acts" data-acts="${s.key}"></div>
+    <input type="file" accept="image/*" capture="environment" ${s.multi?'multiple':''} data-file-cam="${s.key}" hidden>
+    <input type="file" accept="image/*" ${s.multi?'multiple':''} data-file-lib="${s.key}" hidden>
+  </div>`;
+  return `<div class="ph-wrap">
+    <div class="ph-tips">
+      <div class="ph-tip good"><b>이렇게 찍어주세요</b>밝을 때 · 정면에서 · 흔들리지 않게</div>
+      <div class="ph-tip bad"><b>이러면 다시 찍어야 해요</b>너무 멀리서 · 역광 · 일부만 잘림</div>
+    </div>
+    <div class="ph-grid">${f.slots.map(slot).join('')}</div>
+  </div>`;
+}
+
+/* 선택 슬롯이라도 조건(reqIf)이 충족되면 필수로 승격된다 (예: 냉난방 선택 → 에어컨 사진) */
+function slotRequired(s){
+  if(s.required) return true;
+  if(s.reqIf){
+    const cb = mo.querySelector(`[data-cb="${s.reqIf.cb}"][data-i="${s.reqIf.i}"]`);
+    return !!(cb && cb.checked);
+  }
+  return false;
+}
+function updateSlotBadges(){
+  CUR_SLOTS.forEach(s=>{
+    const b = mo.querySelector(`[data-badge="${s.key}"]`);
+    if(!b) return;
+    const req = slotRequired(s);
+    b.textContent = req ? '필수' : '선택';
+    b.classList.toggle('req', req);
+  });
+}
+function paintSlot(key){
+  const s = CUR_SLOTS.find(x=>x.key===key);
+  const el = mo.querySelector(`.ph-slot[data-slot="${key}"]`);
+  if(!s || !el) return;
+  const arr = PHOTOS[key] ?? [];
+  el.classList.toggle('has', arr.length>0);
+  if(arr.length) el.classList.remove('bad');
+  el.querySelector('.ph-shot').innerHTML = arr[0] ? `<img src="${arr[0].url}" alt="${s.title} 미리보기">` : '';
+  const more = el.querySelector('[data-more]');
+  if(more) more.innerHTML = arr.slice(1).map((p,i)=>
+    `<span class="ph-th"><img src="${p.url}" alt=""><button type="button" data-del="${key}" data-idx="${i+1}" aria-label="사진 삭제">×</button></span>`).join('');
+  el.querySelector('[data-acts]').innerHTML = arr.length
+    ? `<button type="button" class="ph-b" data-cam="${key}">${s.multi?'＋ 더 찍기':'다시 찍기'}</button>
+       <button type="button" class="ph-b" data-lib="${key}">앨범</button>
+       <button type="button" class="ph-b del" data-del="${key}" data-idx="0">삭제</button>`
+    : `<button type="button" class="ph-b" data-lib="${key}">앨범에서 고르기</button>`;
+}
+function bindPhotos(){
+  const wrap = mo.querySelector('.ph-wrap');
+  if(!wrap) return;
+  wrap.addEventListener('click', e=>{
+    const del = e.target.closest('[data-del]');
+    if(del){
+      const k = del.dataset.del, i = Number(del.dataset.idx);
+      PHOTOS[k]?.splice(i,1);
+      if(!PHOTOS[k]?.length) delete PHOTOS[k];
+      paintSlot(k); return;
+    }
+    const lib = e.target.closest('[data-lib]');
+    if(lib){ mo.querySelector(`[data-file-lib="${lib.dataset.lib}"]`).click(); return; }
+    const cam = e.target.closest('[data-cam]');
+    if(cam){ mo.querySelector(`[data-file-cam="${cam.dataset.cam}"]`).click(); return; }
+    const pick = e.target.closest('[data-pick]');
+    if(pick) mo.querySelector(`[data-file-cam="${pick.dataset.pick}"]`).click();
+  });
+  wrap.addEventListener('keydown', e=>{
+    const pick = e.target.closest('[data-pick]');
+    if(pick && (e.key==='Enter' || e.key===' ')){ e.preventDefault(); pick.click(); }
+  });
+  wrap.querySelectorAll('input[type=file]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const key = inp.dataset.fileCam ?? inp.dataset.fileLib;
+      const s = CUR_SLOTS.find(x=>x.key===key);
+      const files = [...inp.files];
+      inp.value = '';
+      if(!s || !files.length) return;
+      const list = PHOTOS[key] ?? (PHOTOS[key] = []);
+      if(!s.multi) list.length = 0;
+      files.forEach(f => list.push({url: URL.createObjectURL(f), name: f.name}));
+      paintSlot(key);
+      logEl(`📷 [${s.title}] 사진 ${files.length}장 추가 — 미리보기만 하는 목업이라 서버 업로드는 하지 않습니다.`);
+    });
+  });
+  CUR_SLOTS.forEach(s=>paintSlot(s.key));
+}
+
 /* ── 상담용 신청서 폼 ── */
 function fieldHtml(f){
   const req = f.required ? '<i aria-hidden="true">*</i>' : '';
@@ -398,20 +583,13 @@ function fieldHtml(f){
   } else if(f.type==='floor'){
     body = `<div class="row"><input class="grow" type="text" data-v="${f.name}" placeholder="${f.placeholder}"></div>
       <div class="radios grp">${f.options.map((o,i)=>`<label><input type="radio" name="${f.name}_elev" value="${o}">엘리베이터 ${o}</label>`).join('')}</div>`;
-  } else if(f.type==='power'){
-    body = `<div class="radios grp">${f.options.map(o=>`<label><input type="radio" name="${f.name}_type" value="${o}">${o}</label>`).join('')}</div>
-      <div class="row"><input type="number" min="1" data-v="${f.name}_kw" placeholder="계약전력" style="width:130px"><span style="font-size:13px;font-weight:700;color:#6B6B73">kW</span></div>`;
+  } else if(f.type==='photos'){
+    body = photoFieldHtml(f);
   } else if(f.type==='checkbox-qty'){
     body = `<div class="grp">${f.options.map((o,i)=>`<div class="cbrow">
       <label class="nm"><input type="checkbox" data-cb="${f.name}" data-i="${i}">${o}</label>
       <input type="number" min="1" value="1" data-qty="${f.name}" data-i="${i}" disabled aria-label="${o} 개수">
       <span style="font-size:12px;color:#8A8A93;font-weight:700">개</span></div>`).join('')}</div>`;
-  } else if(f.type==='device-qty'){
-    body = `<div class="grp">${f.options.map((o,i)=>`<div class="cbrow">
-      <label class="nm"><input type="checkbox" data-cb="${f.name}" data-i="${i}">${o}</label>
-      <input type="number" min="1" value="1" data-qty="${f.name}" data-i="${i}" disabled aria-label="${o} 개수">
-      <select data-method="${f.name}" data-i="${i}" disabled aria-label="${o} 제어방식">${f.methods.map(m=>`<option>${m}</option>`).join('')}</select>
-      </div>`).join('')}</div>`;
   } else if(f.type==='radio'){
     body = `<div class="radios grp">${f.options.map(o=>`<label><input type="radio" name="${f.name}" value="${o}">${o}</label>`).join('')}</div>`;
   } else if(f.type==='select'){
@@ -434,21 +612,23 @@ function openSurvey(key){
     : st.flow==='CANCELED'
       ? `<div class="gm-note is-muted" style="margin-top:12px"><b>지난 취소 사유</b>· ${st.canceledReason ?? DEMO_CANCEL}</div>`
       : '';
+  PHOTOS = {};
+  CUR_SLOTS = PHOTO_SLOTS[key] ?? [];
   openMo(`<h3>${d.title} — 도입 상담신청서</h3>
-    <p class="who"><b>제출해도 비용은 발생하지 않아요.</b> 견적을 받아보고 결정하시면 됩니다.<br>센터마다 평수·출입문·전력 구조가 달라서 시공 내용과 금액이 달라져요. 아래 내용을 알려주시면 담당자가 정확한 견적을 준비해 연락드려요.</p>
+    <p class="who"><b>제출해도 비용은 발생하지 않아요.</b> 견적을 받아보고 결정하시면 됩니다.<br>센터마다 현장이 다 달라서 사진 몇 장이면 전문가가 정확하게 판단해요. 어려운 건 안 여쭤볼게요.</p>
     ${prev}
     ${FORMS[key].map(fieldHtml).join('')}
     <div class="sumbar" id="sumbar"></div>
     <div class="mbtns"><button class="sub" data-close>취소</button>
       <button class="go" id="submitSurvey">${again?'다시 상담신청하기':'상담신청 제출하기'}</button></div>`);
 
+  bindPhotos();
   mo.querySelectorAll('[data-cb]').forEach(cb=>{
     cb.addEventListener('change',()=>{
       const n = cb.dataset.cb, i = cb.dataset.i;
       const qty = mo.querySelector(`[data-qty="${n}"][data-i="${i}"]`);
-      const met = mo.querySelector(`[data-method="${n}"][data-i="${i}"]`);
       if(qty) qty.disabled = !cb.checked;
-      if(met) met.disabled = !cb.checked;
+      updateSlotBadges();   // 냉난방 체크 → 에어컨 사진 슬롯이 필수로 승격
     });
   });
   mo.querySelector('[data-close]').onclick = closeMo;
@@ -458,7 +638,9 @@ function openSurvey(key){
 function submitSurvey(key){
   const fields = FORMS[key];
   mo.querySelectorAll('.fld').forEach(el=>el.classList.remove('bad'));
+  mo.querySelectorAll('.ph-slot').forEach(el=>el.classList.remove('bad'));
   const bad = [], data = {};
+  let photoMissing = 0;
   const setErr = (name,msg) => {
     const fld = mo.querySelector(`.fld[data-f="${name}"]`);
     fld.classList.add('bad');
@@ -469,7 +651,17 @@ function submitSurvey(key){
   const radio = n => mo.querySelector(`input[name="${n}"]:checked`)?.value ?? '';
 
   fields.forEach(f=>{
-    if(f.type==='number-unit'){
+    if(f.type==='photos'){
+      const missing = f.slots.filter(s => slotRequired(s) && !(PHOTOS[s.key]?.length));
+      if(missing.length){
+        missing.forEach(s => mo.querySelector(`.ph-slot[data-slot="${s.key}"]`)?.classList.add('bad'));
+        photoMissing = missing.length;
+        return setErr(f.name, `아래 빨갛게 표시된 ${missing.length}칸에 사진을 올려주세요. — ${missing.map(s=>s.title).join(' · ')}`);
+      }
+      data[f.name] = f.slots
+        .filter(s => PHOTOS[s.key]?.length)
+        .map(s => `${s.title} ${PHOTOS[s.key].length}장`).join(', ');
+    } else if(f.type==='number-unit'){
       const v = val(f.name);
       if(f.required && !(Number(v)>0)) return setErr(f.name,'평수를 숫자로 입력해 주세요.');
       data[f.name] = v ? `${v}${val(f.name+'_unit')}` : '';
@@ -478,25 +670,17 @@ function submitSurvey(key){
       if(f.required && !v) return setErr(f.name,'층수를 입력해 주세요.');
       if(f.required && !e) return setErr(f.name,'엘리베이터 유무를 선택해 주세요.');
       data[f.name] = `${v} / 엘리베이터 ${e}`;
-    } else if(f.type==='power'){
-      const t = radio(f.name+'_type'), kw = val(f.name+'_kw');
-      if(f.required && !t) return setErr(f.name,'전력구조를 선택해 주세요.');
-      if(f.required && t!=='모름' && !(Number(kw)>0)) return setErr(f.name,'계약전력(kW)을 입력해 주세요. 모르시면 «모름»을 선택하세요.');
-      data[f.name] = `${t}${kw?` / ${kw}kW`:''}`;
-    } else if(f.type==='checkbox-qty' || f.type==='device-qty'){
+    } else if(f.type==='checkbox-qty'){
       const picked = [];
       mo.querySelectorAll(`[data-cb="${f.name}"]`).forEach(cb=>{
         if(!cb.checked) return;
         const i = cb.dataset.i;
         const q = Number(mo.querySelector(`[data-qty="${f.name}"][data-i="${i}"]`).value)||0;
-        const m = mo.querySelector(`[data-method="${f.name}"][data-i="${i}"]`);
-        picked.push({name:f.options[i], qty:q, method:m?m.value:null, bad:q<1 || (m && m.selectedIndex===0)});
+        picked.push({name:f.options[i], qty:q, bad:q<1});
       });
       if(f.required && !picked.length) return setErr(f.name,'해당하는 항목을 1개 이상 선택해 주세요.');
-      if(picked.some(p=>p.bad)) return setErr(f.name, f.type==='device-qty'
-        ? '선택한 기기의 수량(1 이상)과 제어 방식을 모두 지정해 주세요.'
-        : '선택한 항목의 개수를 1 이상으로 입력해 주세요.');
-      data[f.name] = picked.map(p=>`${p.name} ${p.qty}개${p.method?` (${p.method})`:''}`).join(', ');
+      if(picked.some(p=>p.bad)) return setErr(f.name,'선택한 항목의 개수를 1 이상으로 입력해 주세요.');
+      data[f.name] = picked.map(p=>`${p.name} ${p.qty}개`).join(', ');
     } else if(f.type==='radio'){
       const v = radio(f.name);
       if(f.required && !v) return setErr(f.name,'항목을 선택해 주세요.');
@@ -511,15 +695,19 @@ function submitSurvey(key){
 
   const sum = document.getElementById('sumbar');
   if(bad.length){
-    sum.textContent = `필수 문항 ${bad.length}개를 확인해 주세요.`;
+    const rest = bad.length - (photoMissing ? 1 : 0);
+    sum.textContent = photoMissing
+      ? `사진 ${photoMissing}장을 더 올려주세요.${rest ? ` 그리고 필수 문항 ${rest}개를 확인해 주세요.` : ''}`
+      : `필수 문항 ${bad.length}개를 확인해 주세요.`;
     sum.classList.add('show');
     bad[0].scrollIntoView({block:'center',behavior:'smooth'});
-    (bad[0].querySelector('input,select,textarea'))?.focus({preventScroll:true});
+    (bad[0].querySelector('input,select,textarea,.ph-media'))?.focus({preventScroll:true});
     return;
   }
-  FLOW[key] = {flow:'APPLIED', survey:data};
+  const shots = Object.values(PHOTOS).reduce((n,a)=>n+a.length, 0);
+  FLOW[key] = {flow:'APPLIED', survey:data, photoCount:shots};
   closeMo();
-  logEl(`✅ [${OPS.find(d=>d.key===key).title}] 상담신청서 접수 — 단계: 신청접수 · 검토중 (POST …/install-apply)`);
+  logEl(`✅ [${OPS.find(d=>d.key===key).title}] 상담신청서 접수 — 사진 ${shots}장 첨부 · 단계: 신청접수 · 검토중 (POST …/install-apply)`);
   render();
 }
 

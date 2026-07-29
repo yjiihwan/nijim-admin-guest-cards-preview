@@ -134,8 +134,54 @@
   .totals div{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--sub);padding:3px 0}
   .totals div.t{border-top:1.5px solid #16161C;margin-top:7px;padding-top:9px;font-size:16px;font-weight:800;color:var(--text)}
 
+  /* ── 첨부 사진 갤러리 · 라이트박스 ── */
+  .warnb{display:block;margin-top:4px;font-size:10.5px;font-weight:800;color:var(--red-text);
+    background:var(--red-tint);border:1px solid var(--red-line);border-radius:999px;padding:2px 8px;width:max-content}
+  .gal{margin-top:14px}
+  .galh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;font-weight:800;color:var(--text)}
+  .galh .n{color:var(--sub);font-weight:700}
+  .galh .miss{font-size:11px;font-weight:800;color:var(--red-text);background:var(--red-tint);
+    border:1px solid var(--red-line);border-radius:999px;padding:3px 9px}
+  .galg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+  .gslot{min-width:0}
+  .gslot .gt{font-size:11.5px;font-weight:800;color:var(--text);line-height:1.45;word-break:keep-all;
+    display:flex;gap:4px;align-items:flex-start;flex-wrap:wrap;margin-bottom:5px}
+  .gslot .gt i{flex:none;font-style:normal;font-size:10px;font-weight:800;border-radius:999px;padding:1px 6px;
+    background:#F2F2F5;color:#8A8A93;border:1px solid #E7E7EC}
+  .gslot .gt i.rq{background:var(--pink-tint);color:var(--pink-pressed);border-color:var(--pink-tint2)}
+  .gshots{display:flex;gap:5px;flex-wrap:wrap}
+  .gshot{width:100%;aspect-ratio:4/3;border-radius:9px;overflow:hidden;border:1px solid var(--line);
+    background:#16161C;cursor:zoom-in;padding:0;display:block}
+  .gshots.multi .gshot{width:calc(50% - 3px)}
+  .gshot img{width:100%;height:100%;object-fit:cover;display:block}
+  .gnone{aspect-ratio:4/3;border-radius:9px;border:1.5px dashed var(--red-line);background:#FFFAFB;
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--red-text)}
+  .gnone.opt{border-color:#E3E3E8;background:#FBFBFC;color:#B4B4BC}
+  /* 견적 입력 중에도 사진을 곁에 두고 본다 — 사진이 곧 견적 근거 */
+  .gstrip{display:flex;gap:7px;overflow-x:auto;padding:9px;margin-top:10px;background:#FBFBFC;
+    border:1px solid var(--line);border-radius:12px;-webkit-overflow-scrolling:touch}
+  .gstrip button{flex:none;width:92px;height:69px;border-radius:8px;overflow:hidden;border:1px solid var(--line);
+    background:#16161C;cursor:zoom-in;padding:0}
+  .gstrip img{width:100%;height:100%;object-fit:cover;display:block}
+  .gstrip .sc{flex:none;align-self:center;font-size:11.5px;font-weight:800;color:var(--sub);padding:0 6px}
+  .lb{display:none;position:fixed;inset:0;background:rgba(12,12,16,.9);z-index:80;align-items:center;justify-content:center}
+  .lb.show{display:flex}
+  .lb img{max-width:min(92vw,1100px);max-height:78vh;border-radius:10px;display:block}
+  .lb .cap{position:absolute;left:0;right:0;bottom:22px;text-align:center;color:#fff;font-size:13px;font-weight:700}
+  .lb .cap em{font-style:normal;color:#B4B4BC;font-weight:600;margin-left:8px}
+  .lb button{position:absolute;border:0;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;
+    border-radius:999px;font:800 22px/1 inherit}
+  .lb button:hover{background:rgba(255,255,255,.26)}
+  .lb .x{top:18px;right:18px;width:42px;height:42px;font-size:20px}
+  .lb .pv{left:16px;top:50%;transform:translateY(-50%);width:46px;height:46px}
+  .lb .nx{right:16px;top:50%;transform:translateY(-50%);width:46px;height:46px}
+
   @media (max-width:900px){
     .page{padding:22px 14px 48px}
+    .galg{grid-template-columns:repeat(2,1fr)}
+    .lb img{max-width:94vw;max-height:68vh}
+    .lb .pv{left:6px;width:40px;height:40px} .lb .nx{right:6px;width:40px;height:40px}
+    .lb .x{top:10px;right:10px;width:38px;height:38px}
     .stats{grid-template-columns:repeat(2,1fr)}
     /* WHY 열 숨김이 아니라 가로 스크롤: 설치형은 단계별 액션 버튼이 처리 수단이라
        잘리면 아예 일을 못 한다. 표는 그대로 두고 보드 안에서만 가로로 넘긴다. */
@@ -192,7 +238,7 @@
       <button data-t="제출하신 사업자 정보와 센터 정보가 일치하지 않아요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.">정보 불일치</button>
       <button data-t="필수 서류(사업자등록증/시설 사진)가 누락되었어요. 서류를 보완해 다시 신청해 주세요.">서류 미비</button>
       <button data-t="현재 센터 운영 상태가 도입 기준을 충족하지 않아요. 자세한 내용은 고객센터로 문의해 주세요.">운영 기준 미충족</button>
-      <button data-t="신청서에 적어주신 현장 정보가 부족해 검토가 어려워요. 평수·출입문·전력 항목을 보완해 다시 신청해 주세요.">현장 정보 부족</button>
+      <button data-t="올려주신 현장 사진만으로는 검토가 어려워요. 안내에 맞춰 사진을 다시 올려 신청해 주세요.">사진 확인 불가</button>
     </div>
     <textarea id="mReason" placeholder="반려 사유를 입력하세요 — 센터 사장님 화면에 이 문구가 그대로 표시됩니다."></textarea>
     <div class="mbtns">
@@ -204,6 +250,15 @@
 
 <!-- 설치형 단계별 액션 모달 -->
 <div class="modal-bg" id="stgBg"><div class="modal" id="stgMo"></div></div>
+
+<!-- 사진 원본 확대 (라이트박스) -->
+<div class="lb" id="lb" role="dialog" aria-label="첨부 사진 원본">
+  <button class="x" id="lbX" aria-label="닫기">×</button>
+  <button class="pv" id="lbPv" aria-label="이전 사진">‹</button>
+  <img id="lbImg" alt="">
+  <button class="nx" id="lbNx" aria-label="다음 사진">›</button>
+  <div class="cap" id="lbCap"></div>
+</div>
 
 <script>
 /* ── 기능 정의 ── */
@@ -255,29 +310,71 @@ const DB = Array.from({length: 48}, (_, i) => {
 });
 
 /* 설치형 신청 목데이터 — 7단계 + 곁가지 2종을 두 기능에 골고루 흩어 각 단계 UI가 다 보이게 한다 */
+/* 2026-07-29 신청서 개편 — 사장님이 확실히 아는 것만 묻고, 현장 판단 근거는 전부 사진으로 받는다.
+   (출입문 형태·전자기기·전력구조·컨트롤러·네트워크 문항은 전부 폐지) */
 const SURVEY_AC = [
   ['센터 평수','431㎡ (약 130평)'],
   ['층수 / 엘리베이터','지상 3층 / 엘리베이터 있음'],
-  ['출입문 형태·개수','자동문(슬라이딩) 1개, 유리문(강화도어) 2개'],
-  ['사용 중인 전자기기','조명 24개, 냉난방기 6개, 환기설비 2개, CCTV 8개'],
-  ['전력구조','삼상(380V) / 30kW'],
   ['희망 시공 시기','1개월 이내'],
   ['현장 담당자','김민수 / 010-2841-7710'],
   ['추가 요청사항','평일 오전(6~9시) 피크타임은 피해서 시공 부탁드립니다.'],
 ];
 const SURVEY_IOT = [
+  ['원격으로 켜고 끄고 싶은 기기','조명 18개, 냉난방기(에어컨·히터) 4개, 환기설비 2개, 간판·사인 1개'],
   ['센터 평수','380㎡ (약 115평)'],
   ['층수 / 엘리베이터','지상 2층 / 엘리베이터 없음'],
-  ['원격제어 대상 기기','조명 18개(릴레이 결선), 냉난방기(에어컨·히터) 4개(적외선(IR) 리모컨), 환기설비 2개(스마트플러그), 간판·사인 1개(스마트플러그)'],
-  ['기존 통합 컨트롤러','있음'],
-  ['기존 컨트롤러 모델','LG 시스템에어컨 AC Ez'],
-  ['인터넷·Wi-Fi 환경','공유기 Wi-Fi 사용중'],
-  ['출입문 형태 (참고)','여닫이문'],
-  ['전력구조','단상(220V) / 12kW'],
   ['희망 시공 시기','1~3개월 이내'],
   ['현장 담당자','이지현 / 010-5520-3382'],
   ['추가 요청사항','2층이라 자재 반입 동선을 사전에 확인 부탁드려요.'],
 ];
+
+/* ── 첨부 사진 슬롯 (member.html PHOTO_SLOTS와 키·라벨 동일) ── */
+const PHOTO_SLOTS = {
+  access_control:[
+    {key:'doorFront',    title:'출입문 정면',                 required:true},
+    {key:'doorLock',     title:'문손잡이·잠금장치 근접',       required:true},
+    {key:'doorSurround', title:'문 주변 벽·천장',             required:true},
+    {key:'counterView',  title:'카운터에서 출입문 쪽',         required:true},
+    {key:'otherDoors',   title:'그 외 잠그고 싶은 문',         required:false, multi:true},
+  ],
+  iot_control:[
+    {key:'roomWide',     title:'실내 전경',                   required:true},
+    {key:'hvac',         title:'에어컨·히터',                 required:false, condNote:'냉난방 선택 시 필수'},
+    {key:'lightSwitch',  title:'조명 스위치 벽면',             required:true},
+    {key:'breaker',      title:'차단기 박스',                 required:true},
+    {key:'existingPanel',title:'이미 쓰고 있는 제어기·조작 패널', required:false, multi:true},
+  ],
+};
+/* 목 이미지 — 저장소 img/ 자산을 슬롯 ①에 재활용하고 나머지는 SVG 플레이스홀더로 채운다 */
+const REAL_SHOT = {access_control:'img/05_access.png', iot_control:'img/07_iot.png'};
+function mockShot(label, hue){
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480">`
+    + `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">`
+    + `<stop offset="0" stop-color="hsl(${hue},16%,88%)"/><stop offset="1" stop-color="hsl(${hue},13%,66%)"/>`
+    + `</linearGradient></defs><rect width="640" height="480" fill="url(#g)"/>`
+    + `<rect x="168" y="84" width="304" height="272" rx="12" fill="rgba(255,255,255,.5)" stroke="rgba(22,22,28,.3)" stroke-width="7"/>`
+    + `<circle cx="432" cy="230" r="15" fill="rgba(22,22,28,.36)"/>`
+    + `<rect x="0" y="398" width="640" height="82" fill="rgba(22,22,28,.62)"/>`
+    + `<text x="26" y="450" font-family="sans-serif" font-size="31" font-weight="700" fill="#ffffff">${label}</text></svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+/* 필수 슬롯 목록 — IoT는 냉난방을 고른 신청건만 hvac이 필수로 승격된다 */
+function requiredSlotKeys(feat, hvac){
+  return PHOTO_SLOTS[feat].filter(s => s.required || (s.key==='hvac' && hvac)).map(s=>s.key);
+}
+/* 목데이터 3종 — 전부 첨부 / 일부만 첨부 / 미첨부 */
+function buildPhotos(feat, mode, hue){
+  if(mode==='none') return {};
+  const slots = PHOTO_SLOTS[feat];
+  const out = {};
+  slots.forEach((s,i)=>{
+    if(mode==='partial' && i>1) return;                 // 앞 2칸만 올린 케이스
+    if(mode==='partial' && !s.required) return;
+    const url = (i===0 && REAL_SHOT[feat]) ? REAL_SHOT[feat] : mockShot(s.title, hue + i*14);
+    out[s.key] = s.multi ? [url, mockShot(s.title + ' ②', hue + i*14 + 30)] : [url];
+  });
+  return out;
+}
 const QUOTE_AC = {lines:[
   {name:'스마트 도어락 컨트롤러',qty:2,unitPrice:280000},
   {name:'전기정(EM Lock) + 브래킷',qty:2,unitPrice:135000},
@@ -304,10 +401,17 @@ const PLAN = [
   ['REJECTED',  0, 6], ['REJECTED',  0,11],
   ['CANCELED',  1, 9], ['CANCELED',  1,14],
 ];
+/* 사진 첨부 상태 — 전부/일부/미첨부 세 경우가 목록·상세에서 모두 보이게 배치 */
+const PHOTO_CASE = ['full','none','partial','full','partial','full','full','full','full',
+                    'full','full','full','full','full','partial','none','full','full'];
+
 PLAN.forEach(([flow, cd, days], i) => {
   const r = DB[i*2 + 1];                       // 48건 중 홀수 인덱스에 배치 → 목록에 자연스럽게 섞인다
   const ac = i % 2 === 0;                      // 두 기능 번갈아
   r.feat = ac ? 'access_control' : 'iot_control';
+  r.hvac = !ac;                                // IoT 신청건은 냉난방 포함 → hvac 사진이 필수
+  r.photoReq = requiredSlotKeys(r.feat, r.hvac);
+  r.photos = buildPhotos(r.feat, PHOTO_CASE[i], ac ? 208 : 28);
   r.flow = flow;
   r.consultDone = !!cd;
   r.stageSince = NOW - days*DAY - 36e5;
@@ -332,7 +436,7 @@ PLAN.forEach(([flow, cd, days], i) => {
     dueDate: new Date(flow === 'INSTALLING' ? NOW + (ac ? 2 : 3)*DAY : r.stageSince).toISOString().slice(0,10),
   } : null;
   r.reason = flow === 'REJECTED'
-    ? '신청서에 적어주신 현장 정보가 부족해 검토가 어려워요. 평수·출입문·전력 항목을 보완해 다시 신청해 주세요.' : null;
+    ? '올려주신 현장 사진만으로는 검토가 어려워요. 안내에 맞춰 사진을 다시 올려 신청해 주세요.' : null;
   r.cancelReason = flow === 'CANCELED'
     ? '현장 확인 결과 기존 설비 구조상 표준 시공이 어려워 신청건이 취소되었어요. 자세한 내용은 담당자에게 문의해 주세요.' : null;
   r.processedAt = ['ACTIVE','REJECTED','CANCELED'].includes(flow) ? r.stageSince : null;
@@ -359,6 +463,24 @@ function bucket(r){
 const isActionable = r => bucket(r)==='PENDING';
 /* 설치형은 단계별 판단이 필요해 일괄 처리 대상에서 제외한다 */
 const bulkEligible = r => isActionable(r) && !r.flow;
+
+/* ── 첨부 사진 상태 ── */
+function photoStatus(r){
+  if(!r.flow) return null;
+  const slots = PHOTO_SLOTS[r.feat] ?? [];
+  const req = new Set(r.photoReq ?? []);
+  const shots = r.photos ?? {};
+  const missing = slots.filter(s => req.has(s.key) && !(shots[s.key]?.length));
+  const total = slots.reduce((n,s)=> n + (shots[s.key]?.length ?? 0), 0);
+  return {slots, req, shots, missing, total};
+}
+/* 라이트박스용 평탄화 — [{label, url}] */
+function photoList(r){
+  const ps = photoStatus(r);
+  if(!ps) return [];
+  return ps.slots.flatMap(s => (ps.shots[s.key] ?? []).map((url,i,a)=>
+    ({label: s.title + (a.length>1 ? ` (${i+1}/${a.length})` : ''), url})));
+}
 
 function quoteTotals(lines){
   const subtotal = lines.reduce((s,l)=> s + (Number(l.qty)||0)*(Number(l.unitPrice)||0), 0);
@@ -454,10 +576,13 @@ function render(){
   rows.innerHTML = list.map(r => {
     const [cc, cl] = r.flow ? FLOW_CHIP[r.flow] : CHIP[r.status];
     const inst = !!r.flow;
+    const ps = photoStatus(r);
+    const miss = ps && ps.missing.length
+      ? `<span class="warnb" title="필수 사진 ${ps.missing.map(s=>s.title).join(' · ')} 미첨부">사진 미비 ${ps.missing.length}칸</span>` : '';
     return `<tr class="${inst?'is-inst':''}">
       <td>${isActionable(r)?`<input type="checkbox" data-sel="${r.id}" ${sel.has(r.id)?'checked':''}>`:''}</td>
       <td class="center">${r.center} <small>${r.branch}</small></td>
-      <td><span class="feat${inst?' inst':''}">${FEATS[r.feat]}</span>${inst?'<span class="tagi">설치·시공형</span>':''}</td>
+      <td><span class="feat${inst?' inst':''}">${FEATS[r.feat]}</span>${inst?'<span class="tagi">설치·시공형</span>':''}${miss}</td>
       <td class="ago">${fmt(r.appliedAt)}</td>
       <td>${waitCell(r)}</td>
       <td><span class="chip ${cc}"><span class="dot"></span>${cl}</span></td>
@@ -557,18 +682,123 @@ function intake(id){
   render();
 }
 
+/* ══════════ 첨부 사진 — 갤러리 · 라이트박스 ══════════ */
+/* WHY: 신청서에서 현장 문항을 전부 걷어냈기 때문에, 견적 판단 근거는 이제 사진뿐이다. */
+function galleryHtml(r){
+  const ps = photoStatus(r);
+  if(!ps) return '';
+  const slot = s => {
+    const shots = ps.shots[s.key] ?? [];
+    const req = ps.req.has(s.key);
+    const tag = req ? '<i class="rq">필수</i>' : `<i>선택</i>${s.condNote?`<i>${s.condNote}</i>`:''}`;
+    const body = shots.length
+      ? `<div class="gshots${shots.length>1?' multi':''}">${shots.map(u=>
+          `<button type="button" class="gshot" data-lb="${encodeURIComponent(u)}"><img src="${u}" alt="${s.title}"></button>`).join('')}</div>`
+      : `<div class="gnone${req?'':' opt'}">${req?'미첨부':'없음'}</div>`;
+    return `<div class="gslot"><div class="gt">${s.title}${tag}</div>${body}</div>`;
+  };
+  return `<div class="gal">
+    <div class="galh">첨부 사진 <span class="n">${ps.total}장</span>
+      ${ps.missing.length?`<span class="miss">필수 ${ps.missing.length}칸 미첨부</span>`:''}</div>
+    <div class="galg">${ps.slots.map(slot).join('')}</div></div>`;
+}
+function stripHtml(r){
+  const list = photoList(r);
+  if(!list.length) return `<div class="gstrip"><span class="sc">첨부된 현장 사진이 없습니다 — 견적 산정 전 [사진 추가 요청]을 보내세요.</span></div>`;
+  return `<div class="gstrip"><span class="sc">현장 사진<br>${list.length}장</span>${list.map(p=>
+    `<button type="button" data-lb="${encodeURIComponent(p.url)}" title="${p.label}"><img src="${p.url}" alt="${p.label}"></button>`).join('')}</div>`;
+}
+/* 갤러리·스트립 어디서 눌러도 같은 라이트박스를 연다 */
+let LB = {list:[], i:0};
+const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap');
+const lbOpen = () => lb.classList.contains('show');
+function lbShow(){
+  const p = LB.list[LB.i];
+  if(!p) return;
+  lbImg.src = p.url; lbImg.alt = p.label;
+  lbCap.innerHTML = `${p.label}<em>${LB.i+1} / ${LB.list.length}</em>`;
+  lb.classList.add('show');
+}
+const lbMove = d => { if(LB.list.length){ LB.i = (LB.i + d + LB.list.length) % LB.list.length; lbShow(); } };
+const lbClose = () => { lb.classList.remove('show'); lbImg.src=''; };
+document.getElementById('lbX').onclick = lbClose;
+document.getElementById('lbPv').onclick = () => lbMove(-1);
+document.getElementById('lbNx').onclick = () => lbMove(1);
+lb.addEventListener('mousedown', e => { if(e.target===lb) lbClose(); });
+document.addEventListener('keydown', e => {
+  if(!lbOpen()) return;
+  if(e.key==='Escape'){ e.stopPropagation(); lbClose(); }
+  if(e.key==='ArrowLeft') lbMove(-1);
+  if(e.key==='ArrowRight') lbMove(1);
+}, true);
+/* 모달 안 썸네일 클릭 위임 — 갤러리·스트립 공통 */
+function bindLightbox(r){
+  const list = photoList(r);
+  stgMo.querySelectorAll('[data-lb]').forEach(b=>b.onclick = () => {
+    const url = decodeURIComponent(b.dataset.lb);
+    LB = {list, i: Math.max(0, list.findIndex(p=>p.url===url))};
+    lbShow();
+  });
+}
+
 /* 신청서 상세 열람 */
 function openSurvey(id){
   const r = find(id);
+  const ps = photoStatus(r);
+  const canAsk = ps && ps.missing.length && !['ACTIVE','REJECTED','CANCELED'].includes(r.flow);
   openStg(`<h3>상담신청서 상세</h3><div class="who">${who(r)} · 신청 ${fmt(r.appliedAt)}</div>
-    <div class="survey"><dl>${r.survey.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>
+    ${galleryHtml(r)}
+    ${r.photoRequest?`<div class="err show" style="margin-top:12px">📷 사진 추가 요청 발송됨 (${r.photoRequest.at}) · 요청 칸: ${r.photoRequest.slots.join(' · ')}</div>`:''}
+    <div class="survey" style="margin-top:14px"><dl>${r.survey.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>
     ${r.consult?`<div class="survey" style="margin-top:12px"><dl>
       <dt>배정 담당자</dt><dd>${r.consult.manager}</dd>
       <dt>현장실사 방문일</dt><dd>${r.consult.visitDate}</dd>
       <dt>통화 메모</dt><dd>${r.consult.callMemo}</dd>
       <dt>현장실사 결과</dt><dd>${r.consult.surveyResult}</dd></dl></div>`:''}
-    <div class="mbtns"><button class="cancel" id="sClose">닫기</button></div>`, true);
+    <div class="mbtns"><button class="cancel" id="sClose">닫기</button>
+      ${canAsk?`<button class="pink" id="sAsk">사진 추가 요청</button>`:''}</div>`, true);
   stgMo.querySelector('#sClose').onclick = closeStg;
+  stgMo.querySelector('#sAsk')?.addEventListener('click', ()=>openPhotoRequest(id));
+  bindLightbox(r);
+}
+
+/* 사진 추가 요청 — 반려가 아니다. 단계는 그대로 두고 센터에 재촬영만 요청한다. */
+function openPhotoRequest(id){
+  const r = find(id);
+  const ps = photoStatus(r);
+  const missKeys = new Set(ps.missing.map(s=>s.key));
+  openStg(`<h3>사진 추가 요청</h3>
+    <div class="who">${who(r)}<br><b>신청건은 반려되지 않습니다.</b> 단계는 «${FLOW_CHIP[r.flow][1]}»에 그대로 머문 채, 센터 화면에 요청 문구와 필요한 칸이 표시됩니다.</div>
+    <div class="f"><label>필요한 사진 칸<i>*</i></label>
+      <div style="margin-top:7px">${ps.slots.map(s=>`
+        <label style="display:flex;gap:8px;align-items:flex-start;padding:7px 0;font-size:12.5px;font-weight:700;cursor:pointer">
+          <input type="checkbox" data-ps="${s.key}" ${missKeys.has(s.key)?'checked':''} style="margin-top:2px;accent-color:var(--pink)">
+          <span>${s.title}${ps.req.has(s.key)?' <b style="color:var(--pink-pressed)">(필수)</b>':''}${(ps.shots[s.key]?.length)?` <span style="color:var(--sub);font-weight:600">— 이미 ${ps.shots[s.key].length}장 있음</span>`:''}</span>
+        </label>`).join('')}</div>
+      <p class="hint">미첨부인 필수 칸이 기본으로 선택돼 있어요. 다시 찍어야 할 칸이 있으면 추가로 골라주세요.</p></div>
+    <div class="tpl">
+      <button data-pt="올려주신 사진만으로는 현장 확인이 어려워요. 아래 칸의 사진을 안내대로 다시 올려주시면 바로 견적을 준비해 드릴게요.">사진 부족</button>
+      <button data-pt="사진이 어둡거나 흔들려서 확인이 어려워요. 밝을 때 정면에서 다시 한 장씩 찍어 올려주세요.">화질 문제</button>
+      <button data-pt="너무 멀리서 찍혀 세부가 보이지 않아요. 두세 걸음 앞에서 다시 찍어 올려주세요.">구도 문제</button>
+    </div>
+    <textarea id="prMemo" placeholder="요청 사유를 입력하세요 — 센터 사장님 화면에 이 문구가 그대로 표시됩니다."></textarea>
+    <div class="err" id="prErr"></div>
+    <div class="mbtns"><button class="cancel" id="prCancel">취소</button>
+      <button class="pink" id="prGo">요청 보내기</button></div>`, true);
+  stgMo.querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>{ stgMo.querySelector('#prMemo').value = b.dataset.pt; });
+  stgMo.querySelector('#prCancel').onclick = closeStg;
+  stgMo.querySelector('#prGo').onclick = () => {
+    const picked = [...stgMo.querySelectorAll('[data-ps]')].filter(c=>c.checked)
+      .map(c => PHOTO_SLOTS[r.feat].find(s=>s.key===c.dataset.ps).title);
+    const memo = stgMo.querySelector('#prMemo').value.trim();
+    const err = stgMo.querySelector('#prErr');
+    if(!picked.length){ err.textContent='필요한 사진 칸을 1개 이상 선택해 주세요.'; err.classList.add('show'); return; }
+    if(!memo){ err.textContent='요청 사유는 필수입니다. 센터 화면에 그대로 표시됩니다.'; err.classList.add('show'); return; }
+    r.photoRequest = {slots: picked, memo, at: new Date().toISOString().slice(0,10)};
+    closeStg();
+    logEl(`📷 [${who(r)}] 사진 추가 요청 ${picked.length}칸 발송 — 단계는 «${FLOW_CHIP[r.flow][1]}» 그대로 유지됩니다(반려 아님).`);
+    render();
+  };
 }
 
 /* ② 담당자 배정 + 상담기록 입력 */
@@ -580,7 +810,7 @@ function openConsult(id){
     <div class="f"><label>현장실사 방문일자<i>*</i></label>
       <input class="in" type="date" id="cDate" value="${new Date(Date.now()+3*DAY).toISOString().slice(0,10)}"></div>
     <div class="f"><label>통화 메모<i>*</i></label>
-      <textarea id="cMemo" placeholder="센터에 연락해 파악한 현장 상황을 적어주세요. (출입문 형태·기존 설비·희망 일정 등)"></textarea></div>
+      <textarea id="cMemo" placeholder="센터에 연락해 파악한 현장 상황을 적어주세요. (첨부 사진에서 확인한 내용·기존 설비·희망 일정 등)"></textarea></div>
     <div class="f"><label>현장실사 결과</label>
       <textarea id="cRes" placeholder="방문 실사 후 확인한 내용. 아직 방문 전이면 비워두세요."></textarea>
       <p class="hint">실사 결과까지 저장하면 «상담완료»로 바뀌고 [견적 입력·발송]이 열립니다.</p></div>
@@ -621,7 +851,9 @@ function openQuoteEditor(id){
   const r = find(id);
   const lines = r.quote ? r.quote.lines : [null, null, null];
   openStg(`<h3>견적 입력 · 발송</h3><div class="who">${who(r)}</div>
-    <p class="hint" style="margin-top:8px">항목·수량·단가를 입력하면 합계·부가세(10%)·총액이 자동 계산됩니다. 발송하면 센터 화면에 견적서가 뜨고 «견적 수락» 버튼이 열립니다.</p>
+    ${stripHtml(r)}
+    <p class="hint" style="margin-top:8px">사진이 곧 견적 근거입니다 — 썸네일을 누르면 원본을 크게 볼 수 있어요(←/→로 이동).
+      항목·수량·단가를 입력하면 합계·부가세(10%)·총액이 자동 계산됩니다. 발송하면 센터 화면에 견적서가 뜨고 «견적 수락» 버튼이 열립니다.</p>
     <table class="qtbl"><thead><tr><th>항목</th><th>수량</th><th>단가</th><th style="text-align:right">합계</th><th></th></tr></thead>
       <tbody id="qBody">${lines.map(qrow).join('')}</tbody></table>
     <button class="addrow" type="button" id="qAdd">+ 항목 추가</button>
@@ -661,7 +893,7 @@ function openQuoteEditor(id){
       b.closest('tr').remove(); recalc();
     });
   };
-  bind(); recalc();
+  bind(); recalc(); bindLightbox(r);
   stgMo.querySelector('#qAdd').onclick = () => { body.insertAdjacentHTML('beforeend', qrow(null)); bind(); recalc(); };
   stgMo.querySelector('#qCancel').onclick = closeStg;
   stgMo.querySelector('#qSend').onclick = () => {

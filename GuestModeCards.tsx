@@ -88,6 +88,20 @@ function FlowStepper({ flow }: { flow: InstallFlow }) {
 function FlowNote({ state }: { state: InstallFeatureState }) {
   const { flow } = state;
 
+  /* 사진 추가 요청은 반려가 아니다 — 단계는 그대로 두고 재촬영만 요청받은 상태.
+     단계 안내보다 먼저 보여야 사장님이 지금 할 일을 놓치지 않는다. */
+  if (state.photoRequest) {
+    return (
+      <div className="gm-note is-quote">
+        <b>사진을 다시 올려주세요</b>· {state.photoRequest.memo}
+        <dl>
+          <dt>필요한 사진</dt>
+          <dd>{state.photoRequest.slots.join(' · ')}</dd>
+        </dl>
+      </div>
+    );
+  }
+
   if (flow === 'NONE') {
     return (
       <div className="gm-note is-muted">

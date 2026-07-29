@@ -190,19 +190,69 @@ POST /api/admin/centers/{centerId}/guest-features/{key}/install-apply
 Content-Type: application/json
 ```
 
-두 기능의 문항이 서로 다릅니다. 스키마 정본 = `guestFeatures.ts`의 `INSTALL_SURVEY_FORMS`.
+> ⚠️ **2026-07-29 전면 재설계 — 폐지 문항 있음.** 아래 7개 문항은 **삭제**되었습니다.
+> `doors` · `devices` · `power` · `controller` · `controllerModel` · `network` · `doorsLite`
+> (백엔드가 이미 만들었다면 수신은 무시하고 컬럼은 nullable 유지 → 과거 신청건 조회 호환)
 
-**공통 필수**: `area`(평수+단위 ㎡/평) · `floor`(층수 + 엘리베이터 유무) · `power`(단상/삼상/모름 + 계약전력 kW) ·
+**설계 원칙**: 센터 사장님은 전기·설비 비전문가입니다. 물어봐도 답을 모르는 항목(출입문 형태·전자기기 종류·전력 구조·기존 컨트롤러·제어방식)은 전부 **현장 사진**으로 대체하고, 전문가가 사진을 보고 판단·견적합니다.
+
+스키마 정본 = `guestFeatures.ts`의 `INSTALL_SURVEY_FORMS` / `INSTALL_PHOTO_SLOTS`.
+
+**공통 필수**: `photos`(§5.4.1) · `area`(평수+단위 ㎡/평) · `floor`(층수 + 엘리베이터 유무) ·
 `preferredPeriod`(희망 시공 시기) · `managerName` · `managerPhone` / **선택**: `etc`(추가 요청사항)
 
 | key | 기능별 문항 |
 |---|---|
-| `access_control` | `doors` **필수** — 출입문 형태(자동문·여닫이·유리문·스피드게이트·기타) 다중선택 + 형태별 개수<br>`devices` **필수** — 사용 중인 전자기기(조명·냉난방·환기·급탕·CCTV·기존 출입통제) 다중선택 + 개수 |
-| `iot_control` | `targetDevices` **필수** — 제어 대상 기기 다중선택 + **기기별 수량 + 제어방식**(스마트플러그/릴레이 결선/적외선(IR)/기존 컨트롤러 연동/모름)<br>`controller` **필수** — 기존 통합 컨트롤러 유무(있음/없음/모름) · `controllerModel` 선택<br>`network` **필수** — 인터넷·Wi-Fi 환경<br>`doorsLite` **선택** — 출입문 형태(참고용 단일선택, 비중 낮음) |
+| `access_control` | 추가 문항 없음 — **현장 사진 4칸(필수) + 1칸(선택)이 판단 근거 전부** |
+| `iot_control` | `targetDevices` **필수** — 제어 대상 기기 다중선택 + **기기별 수량만**(제어방식 select 폐지)<br>옵션: 조명 / 냉난방기(에어컨·히터) / 환기설비 / 급탕·온수 / 제습·가습기 / 음향설비 / 간판·사인 |
 
 응답: `201` + §5.3 단건 객체 (`flow: "APPLIED"`).
 **서버 가드**: 이미 `APPLIED`~`ACTIVE` 사이인 key에 재신청 시 `409 { "code":"ALREADY_APPLIED", "flow":"…" }`.
 `REJECTED`·`CANCELED`에서는 재신청 허용.
+
+## 5.4.1 현장 사진 업로드 (신설)
+
+```
+POST /api/admin/centers/{centerId}/guest-features/{key}/photos
+Content-Type: multipart/form-data
+```
+
+파트명 = **`photos[<slotKey>][]`**. 신청서 제출(`install-apply`) **전에** 먼저 올려 `photoId`를 받고,
+`install-apply` 바디의 `photos: { "<slotKey>": ["<photoId>", …] }` 로 묶는 순서를 권장합니다.
+(단일 요청으로 처리하려면 `install-apply` 자체를 `multipart/form-data`로 받아도 됩니다 — 백엔드 선택.)
+
+**제약** (프론트도 동일 검증: `guestFeatures.ts` 상수)
+
+| 항목 | 값 |
+|---|---|
+| 허용 MIME | `image/jpeg` `image/png` `image/heic` `image/heif` `image/webp` (`PHOTO_ACCEPT`) |
+| 1장당 최대 용량 | 15MB (`PHOTO_MAX_BYTES`) — 초과 시 `413 { "code":"PHOTO_TOO_LARGE" }` |
+| 슬롯당 최대 장수 | `multi:false` 슬롯 1장 / `multi:true` 슬롯 5장 (`PHOTO_MAX_PER_SLOT`) |
+| 서버 저장 | 원본 + 썸네일(긴 변 640px) 2종. 응답에 `url`·`thumbUrl` 모두 포함 |
+
+**슬롯 키 (정본)**
+
+| key | slotKey | 제목 | 필수 |
+|---|---|---|---|
+| `access_control` | `doorFront` | 출입문 정면 | ✅ |
+| | `doorLock` | 문손잡이·잠금장치 근접 | ✅ |
+| | `doorSurround` | 문 주변 벽·천장 | ✅ |
+| | `counterView` | 카운터에서 출입문 쪽 | ✅ |
+| | `otherDoors` | 그 외 잠그고 싶은 문 | ⬜ (multi) |
+| `iot_control` | `roomWide` | 실내 전경 | ✅ |
+| | `hvac` | 에어컨·히터 | **조건부** — `targetDevices`에 `냉난방기(에어컨·히터)`가 포함되면 필수 |
+| | `lightSwitch` | 조명 스위치 벽면 | ✅ |
+| | `breaker` | 차단기 박스 | ✅ |
+| | `existingPanel` | 이미 쓰고 있는 제어기·조작 패널 | ⬜ (multi) |
+
+조건부 필수 계산은 `requiredPhotoSlots(key, checked)` 한 곳으로만 합니다(프론트·서버 규칙 일치).
+
+**응답 예**
+```json
+{ "photos": { "doorFront": [ { "photoId":"ph_01H…", "url":"https://…/o.jpg", "thumbUrl":"https://…/t.jpg", "bytes":2481920 } ] } }
+```
+
+**서버 가드**: 필수 슬롯이 비어 있으면 `install-apply` 시 `422 { "code":"PHOTO_REQUIRED", "slots":["doorLock","breaker"] }`.
 
 ## 5.5 단계 전이 엔드포인트
 
@@ -225,6 +275,13 @@ Content-Type: application/json
 | ④ | 진행상태 업데이트 | `PATCH …/{appId}/progress` | `{ "note", "dueDate" }` | `INSTALLING` 유지 |
 | ④ | 시공완료 처리 | `POST …/{appId}/install-complete` | — | `INSTALLING → INSTALLED` |
 | ⑤ | 최종 사용승인 | `POST …/{appId}/activate` | — | `INSTALLED → ACTIVE` (+ `manageUrl` 개방) |
+| 📷 | **사진 추가 요청 (신설)** | `POST …/{appId}/request-photos` | `{ "slots":["doorLock","breaker"], "memo":"…" }` 둘 다 **필수** | **단계 전이 없음.** 현재 flow 유지(`APPLIED`·`CONSULT`·`QUOTED`) + `photoRequest` 세팅 |
+
+**사진 추가 요청 상세** — 반려(`reject`)와 명확히 구분됩니다.
+- 신청건을 **반려시키지 않습니다.** `flow`·`stageSince` 모두 그대로 두고 `photoRequest`만 채웁니다.
+- 센터 화면: 단계 스텝퍼는 유지된 채 «사진을 다시 올려주세요» 안내 박스 + 요청 칸 목록 + 재업로드 진입.
+- 센터가 §5.4.1로 사진을 다시 올리면 서버가 `photoRequest`를 `null`로 되돌립니다.
+- `ACTIVE`·`REJECTED`·`CANCELED`에서는 `409 { "code":"INVALID_TRANSITION" }`.
 
 **서버측 가드**: 각 전이는 **출발 단계가 정확히 일치할 때만** 허용. 불일치 시 `409 { "code":"INVALID_TRANSITION", "flow":"<현재>" }`.
 전이 시 `stageSince`를 갱신합니다.
@@ -245,7 +302,9 @@ Content-Type: application/json
 
 ## 5.7 프론트 대응 현황
 
-- `guestFeatures.ts` — `InstallFlow` / `INSTALL_FLOW_STEPS` / `flowChipLabel`·`flowChipClass`·`flowCtaLabel`·`flowCtaVariant` / `quoteTotals` / `INSTALL_SURVEY_FORMS` 정의 완료
+- `guestFeatures.ts` — `InstallFlow` / `INSTALL_FLOW_STEPS` / `flowChipLabel`·`flowChipClass`·`flowCtaLabel`·`flowCtaVariant` / `quoteTotals` / `INSTALL_SURVEY_FORMS` / **`INSTALL_PHOTO_SLOTS`·`requiredPhotoSlots`·`PHOTO_MAX_*`·`PHOTO_ACCEPT`** 정의 완료
+- **사진 업로드 UI** — 슬롯 카드 그리드(모바일 2열/데스크톱 3열) + 도식 인라인 SVG + 촬영 가이드 + 필수/선택 배지 + 좋은 예/나쁜 예 대조 팁. 카드 탭 → 카메라(`capture="environment"`), 보조 버튼 → 앨범. 프리뷰는 `URL.createObjectURL` 로컬 미리보기이므로 **실제 업로드는 §5.4.1 붙이면 됨**
+- **관리자 콘솔** — 신청서 상세 사진 갤러리 · 라이트박스(←/→ 이동) · 견적 입력 모달 사진 스트립 · 리스트 «사진 미비 N칸» 배지 · [사진 추가 요청] 모달 구현 완료
 - `GuestModeCards.tsx` — `installStates` prop + 6단계 스텝퍼 + 단계별 안내 박스 + `onApplySurvey`/`onOpenQuote` 콜백 구현 완료
 - `guest-mode-cards.css` — `.gm-steps`/`.gm-step`/`.gm-note`/`.gm-chip.s-quoted`/`.gm-chip.s-canceled` 추가 (기존 팔레트 내)
 - **`installStates` 미전달 시 전 카드 `flow: 'NONE'`으로 정상 렌더** → API 미구현 상태에서도 배포 가능

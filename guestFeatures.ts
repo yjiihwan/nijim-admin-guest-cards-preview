@@ -199,7 +199,7 @@ export type InstallFlow =
 /** 카드 내부 6단계 스텝퍼. NONE·REJECTED·CANCELED는 진행 단계가 아니라 제외 */
 export const INSTALL_FLOW_STEPS: { flow: InstallFlow; label: string; short: string }[] = [
   { flow: 'APPLIED', label: '신청접수', short: '신청' },
-  { flow: 'CONSULT', label: '상담·실사', short: '상담' },
+  { flow: 'CONSULT', label: '현장확인', short: '현장' },
   { flow: 'QUOTED', label: '견적확인', short: '견적' },
   { flow: 'INSTALLING', label: '설치·시공', short: '시공' },
   { flow: 'INSTALLED', label: '시공완료', short: '완료' },
@@ -214,9 +214,9 @@ export function flowStepIndex(flow: InstallFlow): number {
 
 export function flowChipLabel(flow: InstallFlow): string {
   switch (flow) {
-    case 'APPLIED': return '신청접수 · 검토중';
-    case 'CONSULT': return '상담·현장실사 대기';
-    case 'QUOTED': return '견적 도착 · 확인 필요';
+    case 'APPLIED': return '접수 완료 · 검토중';
+    case 'CONSULT': return '상담·현장 확인 예정';
+    case 'QUOTED': return '견적 도착 · 확인해 주세요';
     case 'INSTALLING': return '설치·시공 진행중';
     case 'INSTALLED': return '시공완료 · 승인 대기';
     case 'ACTIVE': return '승인완료 · 사용중';
@@ -334,13 +334,24 @@ export interface InstallFeatureState {
   progress?: InstallProgress | null;
   rejectedReason?: string | null;
   canceledReason?: string | null;
+  /**
+   * 관리자가 보낸 사진 추가 요청. 반려가 아니라 단계를 유지한 채 재촬영만 요청한 상태이므로
+   * flow는 그대로 두고 이 필드만 채워 내려준다. 센터가 사진을 다시 올리면 null로 되돌린다.
+   */
+  photoRequest?: { slots: string[]; memo: string; requestedAt?: string } | null;
+  /** 슬롯별 첨부 사진 URL (관리자 콘솔 갤러리·견적 판단 근거) */
+  photos?: Record<string, string[]> | null;
   manageUrl?: string | null;
 }
 
-/* ── 상담용 신청서 폼 스키마 ──────────────────────────────────────────────
- * 두 기능의 현장 변수가 서로 달라 문항을 각각 맞춘다.
- * - access_control: 출입문 형태·개수가 핵심(도어락/전기정 사양이 여기서 갈림)
- * - iot_control: 제어 대상 기기·기존 컨트롤러 유무가 핵심(출입문 문항은 비중↓)
+/* ── 상담용 신청서 폼 스키마 (2026-07-29 전면 재설계) ────────────────────
+ * 설계 원칙: 센터 사장님은 전기·설비 비전문가다.
+ *   → 본인이 확실히 아는 것(평수·층·연락처·원하는 기기)만 묻는다.
+ *   → 나머지 판단 근거(출입문 형태, 잠금 방식, 전력 구조, 기존 컨트롤러, 배선)는
+ *     전부 현장 사진으로 받아 전문가가 보고 결정한다.
+ *   → 폼 어디에도 전문용어를 노출하지 않는다. 대상을 가리켜야 하면 눈에 보이는
+ *     생김새로 설명한다(예: '차단기 스위치가 여러 개 들어있는 하얀 박스').
+ * 폐지된 문항: doors / devices / power / controller / controllerModel / network / doorsLite
  * ---------------------------------------------------------------------- */
 
 export type SurveyFieldType =
@@ -350,9 +361,8 @@ export type SurveyFieldType =
   | 'radio'
   | 'select'
   | 'checkbox-qty'  // 체크박스 + 수량
-  | 'device-qty'    // 체크박스 + 수량 + 제어방식 select (IoT 전용)
   | 'floor'         // 층수 + 엘리베이터 유무
-  | 'power'         // 단상/삼상 + 계약전력 kW
+  | 'photos'        // 슬롯형 현장 사진 업로드
   | 'textarea';
 
 export interface SurveyField {
@@ -363,9 +373,75 @@ export interface SurveyField {
   hint?: string;
   units?: string[];
   options?: string[];
-  /** device-qty 전용 — 기기별 제어방식 선택지 */
-  methods?: string[];
+  /** photos 전용 — 슬롯 정의 */
+  slots?: PhotoSlot[];
   placeholder?: string;
+}
+
+/* ── 현장 사진 슬롯 ────────────────────────────────────────────────────── */
+
+export interface PhotoSlot {
+  /** 업로드 필드 키 (API 멀티파트 파트명 = `photos[<key>][]`) */
+  key: string;
+  /** 슬롯 제목 */
+  title: string;
+  /** 촬영 가이드 한 줄 — 도식 일러스트와 함께 노출 */
+  guide: string;
+  /** 도식 일러스트 id (프론트 인라인 SVG 키) */
+  art: string;
+  /** 항상 필수 */
+  required?: boolean;
+  /** 여러 장 첨부 가능 */
+  multi?: boolean;
+  /**
+   * 조건부 필수 — 지정한 체크박스 문항의 i번째 옵션이 선택되면 필수로 승격된다.
+   * 예: targetDevices[1]('냉난방기') 선택 → hvac 슬롯 필수
+   */
+  reqIf?: { cb: string; i: number };
+}
+
+/** 슬롯당 최대 장수 (multi가 아니면 1장) */
+export const PHOTO_MAX_PER_SLOT = 5;
+/** 파일 1장당 최대 용량 (byte) */
+export const PHOTO_MAX_BYTES = 15 * 1024 * 1024;
+/** 허용 MIME */
+export const PHOTO_ACCEPT = ['image/jpeg', 'image/png', 'image/heic', 'image/heif', 'image/webp'];
+
+export const INSTALL_PHOTO_SLOTS: Record<InstallFeatureKey, PhotoSlot[]> = {
+  access_control: [
+    { key: 'doorFront', art: 'doorFront', title: '출입문 정면', required: true,
+      guide: '문 전체가 다 나오게, 2~3걸음 뒤에서 찍어주세요.' },
+    { key: 'doorLock', art: 'doorHandle', title: '문손잡이·잠금장치 근접', required: true,
+      guide: '지금 문을 어떻게 잠그는지 보이게 가까이 찍어주세요.' },
+    { key: 'doorSurround', art: 'doorWall', title: '문 주변 벽·천장', required: true,
+      guide: '문 옆 벽과 위쪽 천장이 보이게. 콘센트나 기존 카드 찍는 기계가 있으면 같이 나오게 찍어주세요.' },
+    { key: 'counterView', art: 'counterView', title: '카운터에서 출입문 쪽', required: true,
+      guide: '데스크에 서서 문을 바라보고 한 장 찍어주세요.' },
+    { key: 'otherDoors', art: 'otherDoor', title: '그 외 잠그고 싶은 문', required: false, multi: true,
+      guide: '샤워실·탈의실처럼 따로 통제하고 싶은 문이 있으면 찍어주세요. 여러 장 올려도 돼요.' },
+  ],
+  iot_control: [
+    { key: 'roomWide', art: 'roomWide', title: '실내 전경', required: true,
+      guide: '제어하고 싶은 기기들이 한눈에 보이게 넓게 찍어주세요.' },
+    { key: 'hvac', art: 'aircon', title: '에어컨·히터', required: false, reqIf: { cb: 'targetDevices', i: 1 },
+      guide: '실내기 본체와 리모컨을 같이 찍어주세요. 냉난방을 고르시면 꼭 필요해요.' },
+    { key: 'lightSwitch', art: 'lightSwitch', title: '조명 스위치 벽면', required: true,
+      guide: '스위치 판 전체가 나오게 정면에서 찍어주세요.' },
+    { key: 'breaker', art: 'breaker', title: '차단기 박스', required: true,
+      guide: '차단기 스위치가 여러 개 들어있는 하얀 박스예요. 문을 열고 안이 보이게 한 장. 보통 출입구나 창고 벽 위쪽에 있어요.' },
+    { key: 'existingPanel', art: 'panel', title: '이미 쓰고 있는 제어기·조작 패널', required: false, multi: true,
+      guide: '벽에 붙은 온도조절기나 통합 리모컨 같은 게 있으면 찍어주세요.' },
+  ],
+};
+
+/** 제출 시점의 필수 슬롯 계산 (reqIf 승격 포함) */
+export function requiredPhotoSlots(
+  key: InstallFeatureKey,
+  checked: Record<string, number[]> = {},
+): PhotoSlot[] {
+  return INSTALL_PHOTO_SLOTS[key].filter(
+    (s) => s.required || (s.reqIf ? (checked[s.reqIf.cb] ?? []).includes(s.reqIf.i) : false),
+  );
 }
 
 const CONTACT_FIELDS: SurveyField[] = [
@@ -387,41 +463,28 @@ const FLOOR_FIELD: SurveyField = {
   placeholder: '예) 지상 3층', options: ['있음', '없음'],
 };
 
-const POWER_FIELD: SurveyField = {
-  name: 'power', label: '전력구조', type: 'power', required: true,
-  options: ['단상(220V)', '삼상(380V)', '모름'], hint: '계약전력은 전기요금 고지서에서 확인할 수 있어요.',
-};
+/** 사진 문항 — 두 기능 모두 폼 최상단. 이 신청서의 주인공이다. */
+const photoField = (key: InstallFeatureKey): SurveyField => ({
+  name: 'photos', label: '현장 사진', type: 'photos', required: true,
+  slots: INSTALL_PHOTO_SLOTS[key],
+  hint: '사진을 보고 전문가가 필요한 장비와 시공 방법을 정해드려요. 스마트폰으로 찍은 사진이면 충분해요.',
+});
 
 export const INSTALL_SURVEY_FORMS: Record<InstallFeatureKey, SurveyField[]> = {
   access_control: [
+    photoField('access_control'),
     AREA_FIELD,
     FLOOR_FIELD,
-    { name: 'doors', label: '출입문 형태와 개수', type: 'checkbox-qty', required: true,
-      options: ['자동문(슬라이딩)', '여닫이문', '유리문(강화도어)', '스피드게이트·턴게이트', '기타'],
-      hint: '해당하는 형태를 모두 고르고 개수를 적어주세요. 도어락·전기정 사양이 여기서 갈립니다.' },
-    { name: 'devices', label: '현재 사용 중인 전자기기 종류·개수', type: 'checkbox-qty', required: true,
-      options: ['조명', '냉난방기', '환기설비', '급탕·온수', 'CCTV', '기존 출입통제 장비'] },
-    POWER_FIELD,
     ...CONTACT_FIELDS,
   ],
   iot_control: [
+    photoField('iot_control'),
+    // 제어 방식(스마트플러그/릴레이/IR)은 사장님이 판단할 수 없다 → 사진 보고 전문가가 정한다
+    { name: 'targetDevices', label: '원격으로 켜고 끄고 싶은 기기', type: 'checkbox-qty', required: true,
+      options: ['조명', '냉난방기(에어컨·히터)', '환기설비', '급탕·온수', '제습·가습기', '음향설비', '간판·사인'],
+      hint: '제어하고 싶은 기기를 고르고 개수만 적어주세요. 어떤 방식으로 연결할지는 사진을 보고 전문가가 정해드려요.' },
     AREA_FIELD,
     FLOOR_FIELD,
-    { name: 'targetDevices', label: '원격제어할 대상 기기', type: 'device-qty', required: true,
-      options: ['조명', '냉난방기(에어컨·히터)', '환기설비', '급탕·온수', '제습·가습기', '음향설비', '간판·사인'],
-      methods: ['스마트플러그', '릴레이 결선', '적외선(IR) 리모컨', '기존 컨트롤러 연동', '모름 (상담 필요)'],
-      hint: '기기별로 수량과 원하는 제어 방식을 골라주세요.' },
-    { name: 'controller', label: '기존 통합 컨트롤러 유무', type: 'radio', required: true,
-      options: ['있음 (제조사·모델 아래 기재)', '없음', '모름'],
-      hint: '기존 컨트롤러가 있으면 연동으로 시공비가 크게 줄어듭니다.' },
-    { name: 'controllerModel', label: '기존 컨트롤러 제조사·모델', type: 'text', required: false,
-      placeholder: '예) LG 시스템에어컨 AC Ez / 없으면 비워두세요' },
-    { name: 'network', label: '센터 인터넷·Wi-Fi 환경', type: 'select', required: true,
-      options: ['공유기 Wi-Fi 사용중', '유선 인터넷만 있음', '인터넷 없음', '모름'] },
-    { name: 'doorsLite', label: '출입문 형태 (참고)', type: 'select', required: false,
-      options: ['자동문(슬라이딩)', '여닫이문', '유리문(강화도어)', '기타'],
-      hint: '출입제어는 별도 서비스라 참고용으로만 받습니다. (선택)' },
-    POWER_FIELD,
     ...CONTACT_FIELDS,
   ],
 };
