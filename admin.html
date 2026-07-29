@@ -334,7 +334,7 @@ PLAN.forEach(([flow, cd, days], i) => {
   r.reason = flow === 'REJECTED'
     ? '신청서에 적어주신 현장 정보가 부족해 검토가 어려워요. 평수·출입문·전력 항목을 보완해 다시 신청해 주세요.' : null;
   r.cancelReason = flow === 'CANCELED'
-    ? '현장 실사 결과 기존 설비 구조상 표준 시공이 어려워 신청건이 취소되었어요. 자세한 내용은 담당자에게 문의해 주세요.' : null;
+    ? '현장 확인 결과 기존 설비 구조상 표준 시공이 어려워 신청건이 취소되었어요. 자세한 내용은 담당자에게 문의해 주세요.' : null;
   r.processedAt = ['ACTIVE','REJECTED','CANCELED'].includes(flow) ? r.stageSince : null;
 });
 
@@ -699,7 +699,7 @@ function openCancel(id){
   const r = find(id);
   openStg(`<h3>신청건 취소</h3><div class="who">${who(r)}<br>취소 사유는 센터 화면에 그대로 표시됩니다.</div>
     <div class="tpl">
-      <button data-ct="현장 실사 결과 기존 설비 구조상 표준 시공이 어려워 신청건이 취소되었어요. 자세한 내용은 담당자에게 문의해 주세요.">시공 불가</button>
+      <button data-ct="현장 확인 결과 기존 설비 구조상 표준 시공이 어려워 신청건이 취소되었어요. 자세한 내용은 담당자에게 문의해 주세요.">시공 불가</button>
       <button data-ct="센터 요청으로 도입 신청이 취소되었어요. 언제든 다시 상담신청해 주세요.">센터 요청</button>
       <button data-ct="견적 유효기한까지 회신이 없어 신청건이 자동 취소되었어요. 도입을 원하시면 다시 상담신청해 주세요.">견적 기한 만료</button>
     </div>

@@ -58,7 +58,9 @@
 .gm-card.is-wide{grid-column:1 / -1}
 
 .gm-chd{display:flex;align-items:flex-start;gap:10px}
-.gm-chd h3{margin:0;font-size:18px;font-weight:800;letter-spacing:-.025em;line-height:1.35;flex:1;min-width:0}
+/* WHY keep-all: 상태칩이 길어지면 좁은 화면에서 제목이 어절 중간에서 끊긴다("원격자동제/어") */
+.gm-chd h3{margin:0;font-size:18px;font-weight:800;letter-spacing:-.025em;line-height:1.35;flex:1;min-width:0;
+  word-break:keep-all}
 .gm-badge{flex:none;font-size:11px;font-weight:800;letter-spacing:-.01em;padding:3px 8px;border-radius:6px;
   background:var(--gm-pink-tint);color:var(--gm-pink-pressed);margin-right:2px}
 .gm-badge.is-new{background:var(--gm-sky-tint);color:var(--gm-sky-text)}
@@ -164,6 +166,8 @@
 .gm-note{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--gm-sky-tint);
   border:1px solid #BFE4FF;font-size:12.5px;line-height:1.55;color:#0A5A88}
 .gm-note b{color:var(--gm-sky-text);font-weight:800;margin-right:2px}
+/* WHY strong: b는 박스 머리 라벨 전용(컬러) — 본문 강조는 라벨로 오독되지 않게 본문색 유지 */
+.gm-note strong{color:inherit;font-weight:800}
 .gm-note.is-quote{background:var(--gm-pink-tint);border-color:var(--gm-pink-tint2);color:#8E2A4E}
 .gm-note.is-quote b{color:var(--gm-pink-pressed)}
 .gm-note.is-muted{background:#F4F4F6;border-color:#E3E3E8;color:#55555C}
