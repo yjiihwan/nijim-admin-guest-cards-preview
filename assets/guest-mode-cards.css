@@ -124,3 +124,56 @@
 .gm-reject{margin-top:10px;padding:10px 12px;border-radius:10px;background:#FDECEE;
   border:1px solid #F6C7CD;font-size:12.5px;line-height:1.55;color:#8E2136}
 .gm-reject b{color:#C02440;font-weight:800;margin-right:2px}
+
+/* ===== 설치형 서비스(무인 출입제어 · IoT 원격자동제어) 다단계 파이프라인 =====
+   2026-07-29. WHY 별도 블록: 이 2종은 기기 설치·시공이 선행돼야 하는 서비스라
+   단순 승인/반려(NONE·PENDING·APPROVED·REJECTED)로 표현할 수 없다.
+   나머지 4종(website/payment/subscription/norder)은 위 규칙을 그대로 쓴다. */
+
+/* 추가 상태 칩 — 기존 팔레트(핑크·스카이·그린·레드·그레이) 안에서만 정의 */
+.gm-chip.s-quoted{background:var(--gm-pink-tint);border-color:var(--gm-pink-tint2);color:var(--gm-pink-pressed)}
+.gm-chip.s-quoted .gm-dot{background:var(--gm-pink-strong);box-shadow:0 0 0 3px rgba(252,32,102,.18)}
+.gm-chip.s-canceled{background:#F4F4F6;border-color:#E3E3E8;color:#55555C}
+.gm-chip.s-canceled .gm-dot{background:#8A8A93}
+
+/* 6단계 진행 스텝퍼 */
+.gm-steps{margin-top:16px;padding:14px 8px 12px;border-radius:var(--gm-r-img);
+  background:#FAFAFC;border:1px solid var(--gm-line);
+  display:grid;grid-template-columns:repeat(6,minmax(0,1fr))}
+.gm-steps.is-idle{opacity:.7}
+.gm-step{position:relative;text-align:center;min-width:0}
+.gm-step::before,.gm-step::after{content:"";position:absolute;top:11px;width:50%;height:2px;background:#E3E3E8}
+.gm-step::before{left:0}
+.gm-step::after{left:50%}
+.gm-step:first-child::before,.gm-step:last-child::after{display:none}
+.gm-step.is-done::before,.gm-step.is-done::after,.gm-step.is-cur::before{background:var(--gm-pink-strong)}
+.gm-step i{position:relative;z-index:1;display:block;margin:0 auto;width:24px;height:24px;border-radius:50%;
+  background:#fff;border:2px solid #DCDCE2;color:#9A9AA3;
+  font-style:normal;font-size:11px;font-weight:800;line-height:20px}
+.gm-step.is-done i{background:var(--gm-pink-strong);border-color:var(--gm-pink-strong);color:#fff}
+.gm-step.is-cur i{border-color:var(--gm-pink-strong);color:var(--gm-pink-strong);box-shadow:0 0 0 4px rgba(252,32,102,.14)}
+.gm-step.is-fail i{background:#E23A55;border-color:#E23A55;color:#fff}
+.gm-step b,.gm-step u{display:block;margin-top:7px;font-size:11px;font-weight:700;
+  letter-spacing:-.03em;line-height:1.3;color:#9A9AA3;word-break:keep-all;text-decoration:none}
+.gm-step u{display:none}
+.gm-step.is-done b,.gm-step.is-done u{color:var(--gm-sub)}
+.gm-step.is-cur b,.gm-step.is-cur u{color:var(--gm-pink-strong)}
+.gm-step.is-fail b,.gm-step.is-fail u{color:#C02440}
+
+/* 진행 안내 박스 — 반려 박스(.gm-reject)와 같은 형태, 스카이/그레이 톤 */
+.gm-note{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--gm-sky-tint);
+  border:1px solid #BFE4FF;font-size:12.5px;line-height:1.55;color:#0A5A88}
+.gm-note b{color:var(--gm-sky-text);font-weight:800;margin-right:2px}
+.gm-note.is-quote{background:var(--gm-pink-tint);border-color:var(--gm-pink-tint2);color:#8E2A4E}
+.gm-note.is-quote b{color:var(--gm-pink-pressed)}
+.gm-note.is-muted{background:#F4F4F6;border-color:#E3E3E8;color:#55555C}
+.gm-note.is-muted b{color:#33333A}
+.gm-note dl{margin:6px 0 0;display:grid;grid-template-columns:auto 1fr;gap:3px 10px}
+.gm-note dt{font-weight:700;opacity:.8}
+.gm-note dd{margin:0;font-weight:700}
+
+@media (max-width:900px){
+  .gm-steps{padding:12px 4px 10px}
+  .gm-step b{display:none}
+  .gm-step u{display:block;font-size:10.5px}
+}

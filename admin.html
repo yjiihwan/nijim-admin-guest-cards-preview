@@ -14,64 +14,82 @@
   }
   *{box-sizing:border-box}
   body{margin:0;background:#F7F7F9;font-family:"Pretendard",-apple-system,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
-  .page{padding:34px 40px 64px;max-width:1280px;margin:0 auto}
+  .page{padding:34px 40px 64px;max-width:1320px;margin:0 auto}
   .topnav{display:flex;gap:8px;margin-bottom:18px}
   .topnav a{font:700 12.5px/1 inherit;color:#E42A6B;text-decoration:none;padding:9px 14px;border:1px solid #F6CBDB;border-radius:9px;background:#fff}
   h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.02em}
   .sub{margin:6px 0 0;font-size:13.5px;color:var(--sub)}
 
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:22px}
   .stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:0 1px 2px rgba(22,22,28,.04)}
   .stat .k{font-size:12.5px;color:var(--sub);font-weight:700}
   .stat .v{margin-top:6px;font-size:26px;font-weight:800;letter-spacing:-.02em}
   .stat .v em{font-style:normal;font-size:13px;color:var(--sub);font-weight:700;margin-left:4px}
   .stat.hot .v{color:var(--pink-strong)}
+  .stat.inst .v{color:var(--sky-text)}
 
   .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:26px}
-  .tabs{display:flex;gap:6px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap}
   .tabs button{font:700 13px/1 inherit;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--sub);cursor:pointer}
   .tabs button.on{background:#16161C;border-color:#16161C;color:#fff}
+  .tabs button.inst.on{background:var(--sky-text);border-color:var(--sky-text)}
   .tabs button .n{margin-left:5px;font-size:11.5px;padding:2px 7px;border-radius:999px;background:#F2F2F5;color:var(--sub)}
   .tabs button.on .n{background:rgba(255,255,255,.18);color:#fff}
-  select,input[type=search]{height:40px;border-radius:10px;border:1px solid var(--line);background:#fff;font:600 13px inherit;color:var(--text);padding:0 12px}
-  input[type=search]{width:220px}
+  select,input[type=search],input[type=text],input[type=date],input[type=number]{
+    height:40px;border-radius:10px;border:1px solid var(--line);background:#fff;font:600 13px inherit;color:var(--text);padding:0 12px}
+  input[type=search]{width:200px}
+  select:focus,input:focus,textarea:focus{outline:2px solid var(--pink);outline-offset:1px}
   .spacer{flex:1}
 
-  .bulk{display:none;align-items:center;gap:10px;margin-top:14px;background:#16161C;color:#fff;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700}
+  .bulk{display:none;align-items:center;gap:10px;margin-top:14px;background:#16161C;color:#fff;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;flex-wrap:wrap}
   .bulk.show{display:flex}
   .bulk button{font:700 12.5px/1 inherit;padding:9px 13px;border-radius:9px;border:0;cursor:pointer}
   .bulk .ok{background:var(--ok);color:#fff}
   .bulk .rej{background:var(--red);color:#fff}
   .bulk .clr{background:rgba(255,255,255,.15);color:#fff}
+  .bulk .warn{font-weight:700;font-size:12px;color:#FFD9E5}
 
   .board{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(22,22,28,.04)}
   table{width:100%;border-collapse:collapse;font-size:13.5px}
   thead th{font-size:12px;color:var(--sub);text-align:left;font-weight:700;padding:12px 14px;border-bottom:1px solid var(--line);background:#FBFBFC;white-space:nowrap}
   tbody td{padding:13px 14px;border-bottom:1px solid #F3F3F6;vertical-align:middle}
   tbody tr:hover{background:#FDF7FA}
-  .center{font-weight:800;letter-spacing:-.02em}
+  tbody tr.is-inst{background:#FCFDFF}
+  tbody tr.is-inst:hover{background:#F4FAFF}
+  .center{font-weight:800;letter-spacing:-.02em;white-space:nowrap}
   .center small{display:block;font-weight:600;color:var(--sub);margin-top:2px}
   .feat{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;background:var(--pink-tint);color:var(--pink-pressed);font-size:11.5px;font-weight:800;white-space:nowrap}
+  .feat.inst{background:var(--sky-tint);color:var(--sky-text)}
+  .tagi{display:block;margin-top:4px;font-size:10.5px;font-weight:800;color:var(--sky-text);letter-spacing:-.02em}
   .chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 10px;border-radius:999px;font-size:11.5px;font-weight:700;border:1px solid;white-space:nowrap}
   .chip .dot{width:6px;height:6px;border-radius:50%}
   .chip.p{background:var(--sky-tint);border-color:#BFE4FF;color:var(--sky-text)} .chip.p .dot{background:var(--sky)}
   .chip.a{background:var(--ok-tint);border-color:#B7EFD9;color:var(--ok-text)} .chip.a .dot{background:var(--ok)}
   .chip.r{background:var(--red-tint);border-color:var(--red-line);color:var(--red-text)} .chip.r .dot{background:var(--red)}
+  .chip.q{background:var(--pink-tint);border-color:var(--pink-tint2);color:var(--pink-pressed)} .chip.q .dot{background:var(--pink)}
+  .chip.c{background:#F4F4F6;border-color:#E3E3E8;color:#55555C} .chip.c .dot{background:#8A8A93}
   .ago{color:var(--sub);white-space:nowrap} .ago b{color:var(--pink-strong)}
-  .acts{display:flex;gap:6px;justify-content:flex-end}
-  .acts button{font:700 12.5px/1 inherit;padding:9px 13px;border-radius:9px;cursor:pointer;border:1.5px solid transparent}
+  .ago small{display:block;font-size:11px;color:#A0A0A8;font-weight:600;margin-top:2px;white-space:nowrap}
+  .ago b + small{color:var(--pink-strong)}
+  .acts{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+  .acts button{font:700 12.5px/1 inherit;padding:9px 12px;border-radius:9px;cursor:pointer;border:1.5px solid transparent;white-space:nowrap}
   .acts .ok{background:var(--ok);color:#fff} .acts .ok:hover{filter:brightness(.94)}
   .acts .rej{background:#fff;color:var(--red-text);border-color:var(--red-line)} .acts .rej:hover{background:var(--red-tint)}
+  .acts .go{background:var(--pink-strong);color:#fff} .acts .go:hover{background:var(--pink-pressed)}
+  .acts .ln{background:#fff;color:var(--sky-text);border-color:#BFE4FF} .acts .ln:hover{background:var(--sky-tint)}
+  .acts .gray{background:#fff;color:var(--sub);border-color:var(--line)} .acts .gray:hover{background:#F7F7F9}
   .procinfo{font-size:12px;color:var(--sub);text-align:right;line-height:1.5}
   .procinfo .rr{display:inline-block;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;color:var(--red-text)}
+  .waitnote{font-size:11.5px;color:var(--sub);text-align:right;margin-top:4px;line-height:1.45}
   .empty{padding:46px;text-align:center;color:var(--sub);font-size:13.5px}
   .log{margin-top:16px;font-size:12.5px;color:var(--sub);min-height:18px}
 
-  .modal-bg{display:none;position:fixed;inset:0;background:rgba(22,22,28,.45);z-index:50;align-items:center;justify-content:center}
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(22,22,28,.45);z-index:50;align-items:center;justify-content:center;padding:18px}
   .modal-bg.show{display:flex}
-  .modal{width:min(480px,92vw);background:#fff;border-radius:18px;padding:24px}
+  .modal{width:min(480px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:24px}
+  .modal.wide{width:min(680px,100%)}
   .modal h3{margin:0;font-size:17px;font-weight:800}
-  .modal .who{margin-top:6px;font-size:13px;color:var(--sub)}
+  .modal .who{margin-top:6px;font-size:13px;color:var(--sub);line-height:1.55}
   .tpl{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
   .tpl button{font:600 12px/1 inherit;padding:8px 11px;border-radius:999px;border:1px solid var(--line);background:#FBFBFC;cursor:pointer;color:var(--sub)}
   .tpl button:hover{border-color:var(--red-line);color:var(--red-text);background:var(--red-tint)}
@@ -80,12 +98,51 @@
   .mbtns{display:flex;gap:8px;margin-top:16px}
   .mbtns button{flex:1;height:46px;border-radius:12px;font:700 14.5px inherit;cursor:pointer;border:1.5px solid transparent}
   .mbtns .go{background:var(--red);color:#fff} .mbtns .go:disabled{opacity:.4;cursor:default}
+  .mbtns .pink{background:var(--pink-strong);color:#fff} .mbtns .pink:disabled{opacity:.4;cursor:default}
   .mbtns .cancel{background:#fff;border-color:var(--line);color:var(--sub)}
+
+  /* 단계별 액션 모달 공통 */
+  .f{margin-top:14px}
+  .f > label{display:block;font-size:12.5px;font-weight:800;color:var(--text)}
+  .f > label i{font-style:normal;color:var(--pink-strong);margin-left:3px}
+  .f .in{margin-top:6px;width:100%}
+  .f textarea{margin-top:6px;min-height:72px}
+  .f .hint{margin:5px 0 0;font-size:11.5px;color:#8A8A93}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .err{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--red-tint);border:1px solid var(--red-line);
+    color:var(--red-text);font-size:12.5px;font-weight:700;display:none}
+  .err.show{display:block}
+
+  /* 신청서 상세 */
+  .survey{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .survey dl{margin:0;display:grid;grid-template-columns:minmax(120px,34%) 1fr}
+  .survey dt{padding:10px 12px;background:#FBFBFC;border-bottom:1px solid #F3F3F6;font-size:12px;font-weight:800;color:var(--sub)}
+  .survey dd{margin:0;padding:10px 12px;border-bottom:1px solid #F3F3F6;font-size:12.5px;font-weight:700;line-height:1.55}
+
+  /* 견적 입력 */
+  .qtbl{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}
+  .qtbl th{font-size:11px;color:var(--sub);font-weight:700;text-align:left;padding:6px 4px}
+  .qtbl td{padding:4px 3px}
+  .qtbl input[type=text]{width:100%;height:36px}
+  .qtbl input[type=number]{width:100%;height:36px;text-align:right}
+  .qtbl .amt{text-align:right;font-weight:800;white-space:nowrap;padding-right:6px}
+  .qtbl .del{height:36px;width:34px;border-radius:9px;border:1px solid var(--line);background:#fff;color:#B4B4BC;cursor:pointer;font-weight:800}
+  .qtbl .del:hover{border-color:var(--red-line);color:var(--red-text);background:var(--red-tint)}
+  .addrow{margin-top:8px;font:700 12.5px/1 inherit;padding:9px 13px;border-radius:9px;border:1px dashed #D6D6DD;background:#fff;color:var(--sub);cursor:pointer}
+  .addrow:hover{border-color:var(--pink-strong);color:var(--pink-strong)}
+  .totals{margin-top:12px;padding:12px 14px;border-radius:12px;background:#FBFBFC;border:1px solid var(--line)}
+  .totals div{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--sub);padding:3px 0}
+  .totals div.t{border-top:1.5px solid #16161C;margin-top:7px;padding-top:9px;font-size:16px;font-weight:800;color:var(--text)}
 
   @media (max-width:900px){
     .page{padding:22px 14px 48px}
     .stats{grid-template-columns:repeat(2,1fr)}
-    thead th:nth-child(4),tbody td:nth-child(4){display:none}
+    /* WHY 열 숨김이 아니라 가로 스크롤: 설치형은 단계별 액션 버튼이 처리 수단이라
+       잘리면 아예 일을 못 한다. 표는 그대로 두고 보드 안에서만 가로로 넘긴다. */
+    .board{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table{min-width:940px}
+    .modal{padding:20px 16px}
+    .two{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -95,13 +152,15 @@
     <a href="index.html">Guest mode 화면</a><a href="member.html">입점 센터 화면</a>
   </div>
   <h1>기능 신청 관리 <span style="font-size:13px;color:var(--sub);font-weight:700">최고관리자</span></h1>
-  <p class="sub">전 센터의 기능 도입 신청을 확인하고 승인·반려 처리합니다. 반려 시 사유는 센터 화면에 그대로 표시됩니다.</p>
+  <p class="sub">전 센터의 기능 도입 신청을 확인하고 처리합니다. 반려 사유는 센터 화면에 그대로 표시됩니다.
+    <b style="color:var(--sky-text)">무인 출입제어·IoT 원격제어</b>는 기기 설치·시공이 필요해 단계별로 진행합니다(신청접수 → 상담·실사 → 견적 → 시공 → 사용승인).</p>
 
   <div class="stats" id="stats"></div>
 
   <div class="toolbar">
     <div class="tabs" id="tabs"></div>
     <select id="featSel"><option value="">전체 기능</option></select>
+    <select id="stageSel"><option value="">전체 단계 (설치형)</option></select>
     <input type="search" id="q" placeholder="센터명 검색">
     <div class="spacer"></div>
   </div>
@@ -111,18 +170,20 @@
     <button class="ok" id="bulkOk">일괄 승인</button>
     <button class="rej" id="bulkRej">일괄 반려</button>
     <button class="clr" id="bulkClr">선택 해제</button>
+    <span class="warn" id="bulkWarn"></span>
   </div>
 
   <div class="board"><table>
     <thead><tr>
       <th style="width:34px"><input type="checkbox" id="selAll"></th>
-      <th>센터</th><th>신청 기능</th><th>신청일</th><th>대기</th><th>상태</th><th style="text-align:right">처리</th>
+      <th>센터</th><th>신청 기능</th><th>신청일</th><th>대기 / 단계 경과</th><th>상태</th><th style="text-align:right">처리</th>
     </tr></thead>
     <tbody id="rows"></tbody>
   </table><div class="empty" id="empty" style="display:none">조건에 맞는 신청 건이 없습니다.</div></div>
   <div class="log" id="log"></div>
 </div>
 
+<!-- 반려 모달 (기존 — 전 기능 공용) -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <h3>신청 반려</h3>
@@ -131,6 +192,7 @@
       <button data-t="제출하신 사업자 정보와 센터 정보가 일치하지 않아요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.">정보 불일치</button>
       <button data-t="필수 서류(사업자등록증/시설 사진)가 누락되었어요. 서류를 보완해 다시 신청해 주세요.">서류 미비</button>
       <button data-t="현재 센터 운영 상태가 도입 기준을 충족하지 않아요. 자세한 내용은 고객센터로 문의해 주세요.">운영 기준 미충족</button>
+      <button data-t="신청서에 적어주신 현장 정보가 부족해 검토가 어려워요. 평수·출입문·전력 항목을 보완해 다시 신청해 주세요.">현장 정보 부족</button>
     </div>
     <textarea id="mReason" placeholder="반려 사유를 입력하세요 — 센터 사장님 화면에 이 문구가 그대로 표시됩니다."></textarea>
     <div class="mbtns">
@@ -140,12 +202,31 @@
   </div>
 </div>
 
+<!-- 설치형 단계별 액션 모달 -->
+<div class="modal-bg" id="stgBg"><div class="modal" id="stgMo"></div></div>
+
 <script>
-/* ── 목데이터: 수십 개 센터 규모 재현(고정 시드 — 새로고침해도 동일) ── */
+/* ── 기능 정의 ── */
 const FEATS = {
   website:'온라인 홍보', offline_payment:'비대면결제', subscription:'구독멤버십',
   access_control:'무인 출입제어', norder:'N 오더', iot_control:'IoT 원격제어', daypass:'1일권',
 };
+/* 설치형 2종 — 기기 설치·시공이 선행돼야 해서 단순 승인/반려로 처리할 수 없다 */
+const INSTALL = new Set(['access_control','iot_control']);
+const SIMPLE_FEATS = ['website','offline_payment','subscription','norder','daypass'];
+
+const FLOW_ORDER = ['APPLIED','CONSULT','QUOTED','INSTALLING','INSTALLED','ACTIVE'];
+const FLOW_CHIP = {
+  APPLIED:['p','① 신청접수'], CONSULT:['p','② 상담·실사'], QUOTED:['q','③ 견적발송'],
+  INSTALLING:['p','④ 설치·시공'], INSTALLED:['p','⑤ 시공완료'], ACTIVE:['a','⑥ 사용중'],
+  REJECTED:['r','반려됨'], CANCELED:['c','취소됨'],
+};
+/* 단계별 SLA (일) — 이 일수를 넘기면 강조 */
+const SLA = {APPLIED:3, CONSULT:3, QUOTED:7, INSTALLING:14, INSTALLED:3};
+const SLA_NOTE = {APPLIED:'접수 검토', CONSULT:'상담 대기', QUOTED:'견적 발송 후 무응답',
+  INSTALLING:'시공 진행', INSTALLED:'최종 승인 대기'};
+
+/* ── 목데이터 (고정 시드 — 새로고침해도 동일) ── */
 const NAMES = ['헬스보이짐','아이언짐','머슬팩토리','핏스테이션','바디빌드','스파르타짐','그릿피트니스','펌핑짐','코어짐','라이언피트'];
 const BRANCH = ['강남역점','역삼점','홍대점','합정점','성수점','잠실점','판교점','분당점','일산점','부천점','수원점','동탄점','해운대점','서면점','대전 둔산점','청주점','전주점','광주 상무점','제주점','목동점'];
 const REASONS = [
@@ -157,74 +238,249 @@ let seed = 7;
 const rnd = () => (seed = (seed*1103515245 + 12345) % 2147483648) / 2147483648;
 const pick = a => a[Math.floor(rnd()*a.length)];
 const NOW = Date.now();
+const DAY = 864e5;
+
 const DB = Array.from({length: 48}, (_, i) => {
   const st = rnd() < .58 ? 'PENDING' : (rnd() < .62 ? 'APPROVED' : 'REJECTED');
-  const applied = NOW - Math.floor(rnd()*14*864e5 + 36e5);
+  const applied = NOW - Math.floor(rnd()*14*DAY + 36e5);
   return {
     id: 'ap' + (1000 + i),
     center: pick(NAMES), branch: pick(BRANCH),
-    feat: pick(Object.keys(FEATS)),
+    feat: pick(SIMPLE_FEATS),
     appliedAt: applied, status: st,
-    processedAt: st === 'PENDING' ? null : applied + Math.floor(rnd()*3*864e5),
+    processedAt: st === 'PENDING' ? null : applied + Math.floor(rnd()*3*DAY),
     reason: st === 'REJECTED' ? pick(REASONS) : null,
+    flow: null,
   };
 });
 
+/* 설치형 신청 목데이터 — 7단계 + 곁가지 2종을 두 기능에 골고루 흩어 각 단계 UI가 다 보이게 한다 */
+const SURVEY_AC = [
+  ['센터 평수','431㎡ (약 130평)'],
+  ['층수 / 엘리베이터','지상 3층 / 엘리베이터 있음'],
+  ['출입문 형태·개수','자동문(슬라이딩) 1개, 유리문(강화도어) 2개'],
+  ['사용 중인 전자기기','조명 24개, 냉난방기 6개, 환기설비 2개, CCTV 8개'],
+  ['전력구조','삼상(380V) / 30kW'],
+  ['희망 시공 시기','1개월 이내'],
+  ['현장 담당자','김민수 / 010-2841-7710'],
+  ['추가 요청사항','평일 오전(6~9시) 피크타임은 피해서 시공 부탁드립니다.'],
+];
+const SURVEY_IOT = [
+  ['센터 평수','380㎡ (약 115평)'],
+  ['층수 / 엘리베이터','지상 2층 / 엘리베이터 없음'],
+  ['원격제어 대상 기기','조명 18개(릴레이 결선), 냉난방기(에어컨·히터) 4개(적외선(IR) 리모컨), 환기설비 2개(스마트플러그), 간판·사인 1개(스마트플러그)'],
+  ['기존 통합 컨트롤러','있음'],
+  ['기존 컨트롤러 모델','LG 시스템에어컨 AC Ez'],
+  ['인터넷·Wi-Fi 환경','공유기 Wi-Fi 사용중'],
+  ['출입문 형태 (참고)','여닫이문'],
+  ['전력구조','단상(220V) / 12kW'],
+  ['희망 시공 시기','1~3개월 이내'],
+  ['현장 담당자','이지현 / 010-5520-3382'],
+  ['추가 요청사항','2층이라 자재 반입 동선을 사전에 확인 부탁드려요.'],
+];
+const QUOTE_AC = {lines:[
+  {name:'스마트 도어락 컨트롤러',qty:2,unitPrice:280000},
+  {name:'전기정(EM Lock) + 브래킷',qty:2,unitPrice:135000},
+  {name:'모바일키·QR 출입 리더기',qty:2,unitPrice:190000},
+  {name:'배선·타공 시공비',qty:1,unitPrice:420000},
+],leadTime:'2~3일',validUntil:'2026-08-12'};
+const QUOTE_IOT = {lines:[
+  {name:'IoT 게이트웨이(허브)',qty:1,unitPrice:340000},
+  {name:'스마트 릴레이 모듈 (조명 회로)',qty:6,unitPrice:65000},
+  {name:'에어컨 IR 컨트롤러',qty:4,unitPrice:88000},
+  {name:'전력 계측 센서',qty:1,unitPrice:150000},
+  {name:'결선·시공 및 시운전',qty:1,unitPrice:480000},
+],leadTime:'3~4일',validUntil:'2026-08-12'};
+
+/* [flow, consultDone, 단계 진입 후 경과일] — 경과일은 SLA 초과/미만이 둘 다 보이게 배치 */
+const PLAN = [
+  ['APPLIED',   0, 1], ['APPLIED',   0, 5],
+  ['CONSULT',   0, 2], ['CONSULT',   0, 6],
+  ['CONSULT',   1, 1], ['CONSULT',   1, 4],
+  ['QUOTED',    1, 3], ['QUOTED',    1, 9],
+  ['INSTALLING',1, 4], ['INSTALLING',1,16],
+  ['INSTALLED', 1, 1], ['INSTALLED', 1, 5],
+  ['ACTIVE',    1, 8], ['ACTIVE',    1,22],
+  ['REJECTED',  0, 6], ['REJECTED',  0,11],
+  ['CANCELED',  1, 9], ['CANCELED',  1,14],
+];
+PLAN.forEach(([flow, cd, days], i) => {
+  const r = DB[i*2 + 1];                       // 48건 중 홀수 인덱스에 배치 → 목록에 자연스럽게 섞인다
+  const ac = i % 2 === 0;                      // 두 기능 번갈아
+  r.feat = ac ? 'access_control' : 'iot_control';
+  r.flow = flow;
+  r.consultDone = !!cd;
+  r.stageSince = NOW - days*DAY - 36e5;
+  r.appliedAt = r.stageSince - (FLOW_ORDER.indexOf(flow) + 1) * 2 * DAY;
+  r.status = flow === 'ACTIVE' ? 'APPROVED' : flow === 'REJECTED' ? 'REJECTED' : 'PENDING';
+  r.survey = ac ? SURVEY_AC : SURVEY_IOT;
+  r.consult = cd ? {
+    manager: ac ? '설치기술팀 박준호' : '설치기술팀 이서연',
+    visitDate: new Date(r.stageSince - 2*DAY).toISOString().slice(0,10),
+    callMemo: ac ? '원장님 통화 완료. 자동문 1 + 강화도어 2, 야간 무인운영 희망.'
+                 : '원장님 통화 완료. 조명 회로 2개소 분리 필요, 에어컨은 기존 IR 리모컨 사용중.',
+    surveyResult: ac ? '분전반 여유 회로 2개 확보. 자동문 컨트롤러 교체 필요, 강화도어는 전기정 신설.'
+                     : '기존 컨트롤러(AC Ez) 연동 가능. 릴레이 모듈 6개소, 게이트웨이 1대로 커버 가능.',
+  } : null;
+  r.quote = ['QUOTED','INSTALLING','INSTALLED','ACTIVE'].includes(flow)
+    ? JSON.parse(JSON.stringify(ac ? QUOTE_AC : QUOTE_IOT)) : null;
+  r.progress = ['INSTALLING','INSTALLED','ACTIVE'].includes(flow) ? {
+    note: flow === 'INSTALLING'
+      ? (ac ? '배선 작업 완료 · 도어 컨트롤러 설치중' : '게이트웨이 설치 완료 · 릴레이 결선 진행중')
+      : '전 구간 시공 완료 · 시운전 정상',
+    // 진행중이면 완료 예정일은 앞으로의 날짜, 완료된 건은 실제 완료일
+    dueDate: new Date(flow === 'INSTALLING' ? NOW + (ac ? 2 : 3)*DAY : r.stageSince).toISOString().slice(0,10),
+  } : null;
+  r.reason = flow === 'REJECTED'
+    ? '신청서에 적어주신 현장 정보가 부족해 검토가 어려워요. 평수·출입문·전력 항목을 보완해 다시 신청해 주세요.' : null;
+  r.cancelReason = flow === 'CANCELED'
+    ? '현장 실사 결과 기존 설비 구조상 표준 시공이 어려워 신청건이 취소되었어요. 자세한 내용은 담당자에게 문의해 주세요.' : null;
+  r.processedAt = ['ACTIVE','REJECTED','CANCELED'].includes(flow) ? r.stageSince : null;
+});
+
 /* ── 상태 ── */
-let tab = 'PENDING', feat = '', q = '';
+let tab = 'PENDING', feat = '', stage = '', q = '';
 const sel = new Set();
 const fmt = t => { const d = new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
 const ago = t => { const h = Math.floor((NOW-t)/36e5); return h < 24 ? `${h}시간` : `${Math.floor(h/24)}일`; };
+const days = t => Math.floor((NOW-t)/DAY);
+const won = n => n.toLocaleString('ko-KR');
 const CHIP = { PENDING:['p','검토 대기'], APPROVED:['a','승인완료'], REJECTED:['r','반려됨'] };
 
-function counts(){ const c={PENDING:0,APPROVED:0,REJECTED:0}; DB.forEach(r=>c[r.status]++); return c; }
+/* 설치형은 별도 flow를 쓰므로 탭 필터용 대표 상태로 접어준다 */
+function bucket(r){
+  if(!r.flow) return r.status;
+  if(r.flow==='ACTIVE') return 'APPROVED';
+  if(r.flow==='REJECTED') return 'REJECTED';
+  if(r.flow==='CANCELED') return 'CANCELED';
+  if(r.flow==='APPLIED') return 'PENDING';
+  return 'INSTALL';                       // CONSULT · QUOTED · INSTALLING · INSTALLED
+}
+const isActionable = r => bucket(r)==='PENDING';
+/* 설치형은 단계별 판단이 필요해 일괄 처리 대상에서 제외한다 */
+const bulkEligible = r => isActionable(r) && !r.flow;
+
+function quoteTotals(lines){
+  const subtotal = lines.reduce((s,l)=> s + (Number(l.qty)||0)*(Number(l.unitPrice)||0), 0);
+  const vat = Math.floor(subtotal*0.1);
+  return {subtotal, vat, total: subtotal+vat};
+}
+
+function counts(){
+  const c = {PENDING:0, INSTALL:0, APPROVED:0, REJECTED:0, CANCELED:0};
+  DB.forEach(r => c[bucket(r)]++);
+  return c;
+}
 function filtered(){
   return DB.filter(r =>
-    (tab==='ALL' || r.status===tab) &&
+    (tab==='ALL' || bucket(r)===tab) &&
     (!feat || r.feat===feat) &&
+    (!stage || r.flow===stage) &&
     (!q || (r.center + ' ' + r.branch).includes(q))
-  ).sort((a,b)=> a.status==='PENDING'&&b.status==='PENDING' ? a.appliedAt-b.appliedAt : (b.processedAt??b.appliedAt)-(a.processedAt??a.appliedAt));
+  ).sort((a,b)=> {
+    const aw = isActionable(a), bw = isActionable(b);
+    if(aw && bw) return a.appliedAt - b.appliedAt;
+    return (b.processedAt ?? b.stageSince ?? b.appliedAt) - (a.processedAt ?? a.stageSince ?? a.appliedAt);
+  });
+}
+
+/* ── 단계별 액션 ── */
+function actionsFor(r){
+  if(!r.flow){
+    return isActionable(r)
+      ? `<div class="acts"><button class="ok" data-ok="${r.id}">승인</button><button class="rej" data-rej="${r.id}">반려</button></div>`
+      : procinfo(r);
+  }
+  const b = (cls,attr,label) => `<button class="${cls}" ${attr}="${r.id}">${label}</button>`;
+  const detail = b('gray','data-survey','신청서 상세');
+  switch(r.flow){
+    case 'APPLIED':
+      return `<div class="acts">${detail}${b('ok','data-intake','접수승인')}${b('rej','data-rej','반려')}</div>`;
+    case 'CONSULT':
+      return r.consultDone
+        ? `<div class="acts">${detail}${b('go','data-quote','견적 입력·발송')}${b('rej','data-cancel','신청건 취소')}</div>
+           <div class="waitnote">상담완료 · ${r.consult.manager}</div>`
+        : `<div class="acts">${detail}${b('ln','data-consult','담당자 배정·상담기록')}</div>`;
+    case 'QUOTED': {
+      const t = quoteTotals(r.quote.lines);
+      return `<div class="acts">${b('gray','data-quoteview','견적 보기')}${b('ln','data-quote','견적 수정·재발송')}${b('rej','data-cancel','신청건 취소')}</div>
+        <div class="waitnote">센터 확인 대기 · 총액 ${won(t.total)}원 · 유효 ${r.quote.validUntil}</div>`;
+    }
+    case 'INSTALLING':
+      return `<div class="acts">${b('ln','data-progress','진행상태 업데이트')}${b('ok','data-done','시공완료 처리')}</div>
+        <div class="waitnote">${r.progress.note} · 완료 예정 ${r.progress.dueDate}</div>`;
+    case 'INSTALLED':
+      return `<div class="acts">${b('gray','data-quoteview','견적 보기')}${b('ok','data-final','최종 사용승인')}</div>
+        <div class="waitnote">시공 완료 · 사용승인만 남았습니다</div>`;
+    default:
+      return procinfo(r);
+  }
+}
+function procinfo(r){
+  const note = r.cancelReason ?? r.reason;
+  return `<div class="procinfo">${r.processedAt?fmt(r.processedAt):'—'} · 최고관리자${
+    note?`<br><span class="rr" title="${note}">사유: ${note}</span>`:''}</div>`;
+}
+
+function waitCell(r){
+  if(r.flow){
+    if(['ACTIVE','REJECTED','CANCELED'].includes(r.flow)) return '<span class="ago">—</span>';
+    const d = days(r.stageSince), over = d >= (SLA[r.flow] ?? 99);
+    const body = over ? `<b>${d}일 경과</b>` : `${d}일 경과`;
+    return `<span class="ago">${body}<small>${SLA_NOTE[r.flow]}${over?` · SLA ${SLA[r.flow]}일 초과`:''}</small></span>`;
+  }
+  if(!isActionable(r)) return '<span class="ago">—</span>';
+  return `<span class="ago">${NOW-r.appliedAt > 3*DAY ? `<b>${ago(r.appliedAt)} 경과</b>` : ago(r.appliedAt)+' 경과'}</span>`;
 }
 
 function render(){
   const c = counts();
-  const today = DB.filter(r=>r.processedAt && NOW-r.processedAt < 864e5).length;
+  const today = DB.filter(r=>r.processedAt && NOW-r.processedAt < DAY).length;
   document.getElementById('stats').innerHTML = `
     <div class="stat hot"><div class="k">검토 대기</div><div class="v">${c.PENDING}<em>건</em></div></div>
+    <div class="stat inst"><div class="k">설치형 진행중</div><div class="v">${c.INSTALL}<em>건</em></div></div>
     <div class="stat"><div class="k">오늘 처리</div><div class="v">${today}<em>건</em></div></div>
     <div class="stat"><div class="k">승인완료 (누적)</div><div class="v">${c.APPROVED}<em>건</em></div></div>
-    <div class="stat"><div class="k">반려 (누적)</div><div class="v">${c.REJECTED}<em>건</em></div></div>`;
+    <div class="stat"><div class="k">반려·취소 (누적)</div><div class="v">${c.REJECTED + c.CANCELED}<em>건</em></div></div>`;
 
-  const tabs = [['PENDING','검토 대기',c.PENDING],['APPROVED','승인완료',c.APPROVED],['REJECTED','반려됨',c.REJECTED],['ALL','전체',DB.length]];
-  document.getElementById('tabs').innerHTML = tabs.map(([k,l,n]) =>
-    `<button data-tab="${k}" class="${tab===k?'on':''}">${l}<span class="n">${n}</span></button>`).join('');
+  const tabs = [['PENDING','검토 대기',c.PENDING,''],['INSTALL','설치형 진행중',c.INSTALL,'inst'],
+    ['APPROVED','승인완료',c.APPROVED,''],['REJECTED','반려됨',c.REJECTED,''],['ALL','전체',DB.length,'']];
+  document.getElementById('tabs').innerHTML = tabs.map(([k,l,n,cls]) =>
+    `<button data-tab="${k}" class="${cls} ${tab===k?'on':''}">${l}<span class="n">${n}</span></button>`).join('');
   document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.tab; sel.clear(); render();});
 
   const list = filtered();
   const rows = document.getElementById('rows');
   rows.innerHTML = list.map(r => {
-    const [cc, cl] = CHIP[r.status];
-    const waiting = r.status==='PENDING';
-    return `<tr>
-      <td>${waiting?`<input type="checkbox" data-sel="${r.id}" ${sel.has(r.id)?'checked':''}>`:''}</td>
+    const [cc, cl] = r.flow ? FLOW_CHIP[r.flow] : CHIP[r.status];
+    const inst = !!r.flow;
+    return `<tr class="${inst?'is-inst':''}">
+      <td>${isActionable(r)?`<input type="checkbox" data-sel="${r.id}" ${sel.has(r.id)?'checked':''}>`:''}</td>
       <td class="center">${r.center} <small>${r.branch}</small></td>
-      <td><span class="feat">${FEATS[r.feat]}</span></td>
+      <td><span class="feat${inst?' inst':''}">${FEATS[r.feat]}</span>${inst?'<span class="tagi">설치·시공형</span>':''}</td>
       <td class="ago">${fmt(r.appliedAt)}</td>
-      <td class="ago">${waiting ? (NOW-r.appliedAt > 3*864e5 ? `<b>${ago(r.appliedAt)} 경과</b>` : ago(r.appliedAt)+' 경과') : '—'}</td>
+      <td>${waitCell(r)}</td>
       <td><span class="chip ${cc}"><span class="dot"></span>${cl}</span></td>
-      <td>${waiting
-        ? `<div class="acts"><button class="ok" data-ok="${r.id}">승인</button><button class="rej" data-rej="${r.id}">반려</button></div>`
-        : `<div class="procinfo">${fmt(r.processedAt)} · 최고관리자${r.reason?`<br><span class="rr" title="${r.reason}">사유: ${r.reason}</span>`:''}</div>`}</td>
+      <td>${actionsFor(r)}</td>
     </tr>`;
   }).join('');
   document.getElementById('empty').style.display = list.length ? 'none' : 'block';
 
   rows.querySelectorAll('[data-ok]').forEach(b=>b.onclick=()=>approve([b.dataset.ok]));
   rows.querySelectorAll('[data-rej]').forEach(b=>b.onclick=()=>openReject([b.dataset.rej]));
+  rows.querySelectorAll('[data-intake]').forEach(b=>b.onclick=()=>intake(b.dataset.intake));
+  rows.querySelectorAll('[data-survey]').forEach(b=>b.onclick=()=>openSurvey(b.dataset.survey));
+  rows.querySelectorAll('[data-consult]').forEach(b=>b.onclick=()=>openConsult(b.dataset.consult));
+  rows.querySelectorAll('[data-quote]').forEach(b=>b.onclick=()=>openQuoteEditor(b.dataset.quote));
+  rows.querySelectorAll('[data-quoteview]').forEach(b=>b.onclick=()=>openQuoteView(b.dataset.quoteview));
+  rows.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>openCancel(b.dataset.cancel));
+  rows.querySelectorAll('[data-progress]').forEach(b=>b.onclick=()=>openProgress(b.dataset.progress));
+  rows.querySelectorAll('[data-done]').forEach(b=>b.onclick=()=>installDone(b.dataset.done));
+  rows.querySelectorAll('[data-final]').forEach(b=>b.onclick=()=>finalApprove(b.dataset.final));
   rows.querySelectorAll('[data-sel]').forEach(cb=>cb.onchange=()=>{cb.checked?sel.add(cb.dataset.sel):sel.delete(cb.dataset.sel); syncBulk();});
   document.getElementById('selAll').onchange = e => {
     sel.clear();
-    if (e.target.checked) list.filter(r=>r.status==='PENDING').forEach(r=>sel.add(r.id));
+    if (e.target.checked) list.filter(isActionable).forEach(r=>sel.add(r.id));
     render();
   };
   syncBulk();
@@ -233,24 +489,32 @@ function render(){
 function syncBulk(){
   const bulk = document.getElementById('bulk');
   bulk.classList.toggle('show', sel.size>0);
+  const excluded = [...sel].filter(id => DB.find(x=>x.id===id)?.flow).length;
   document.getElementById('bulkN').textContent = `${sel.size}건 선택됨`;
+  document.getElementById('bulkWarn').textContent = excluded
+    ? `※ 설치형 ${excluded}건은 단계별 판단이 필요해 일괄 처리에서 제외됩니다` : '';
 }
 const logEl = t => document.getElementById('log').textContent = t;
+const find = id => DB.find(x=>x.id===id);
 
+/* ── 기존 4종 승인·반려 (변경 없음) ── */
 function approve(ids){
-  ids.forEach(id => { const r = DB.find(x=>x.id===id); if(r&&r.status==='PENDING'){ r.status='APPROVED'; r.processedAt=Date.now(); } });
+  const targets = ids.map(find).filter(r => r && isActionable(r));
+  const skipped = targets.filter(r => r.flow);
+  const go = targets.filter(r => !r.flow);
+  go.forEach(r => { r.status='APPROVED'; r.processedAt=Date.now(); });
   ids.forEach(id=>sel.delete(id));
-  logEl(`✅ ${ids.length}건 승인 — 센터 화면 칩이 '승인완료 · 사용중'으로 바뀌고 관리 메뉴가 열립니다.`);
+  logEl(`✅ ${go.length}건 승인 — 센터 화면 칩이 '승인완료 · 사용중'으로 바뀌고 관리 메뉴가 열립니다.` +
+    (skipped.length?` ⚠️ 설치형 ${skipped.length}건은 단계별 판단이 필요해 제외했습니다 — 각 건에서 [접수승인]으로 처리하세요.`:''));
   render();
 }
 
-/* 반려 모달 */
 let rejTargets = [];
 function openReject(ids){
   rejTargets = ids;
-  const first = DB.find(x=>x.id===ids[0]);
+  const first = find(ids[0]);
   document.getElementById('mWho').textContent = ids.length===1
-    ? `${first.center} ${first.branch} — ${FEATS[first.feat]}`
+    ? `${first.center} ${first.branch} — ${FEATS[first.feat]}${first.flow?' (설치·시공형 · 신청접수 단계 반려)':''}`
     : `${ids.length}건 일괄 반려 (같은 사유가 모두에게 표시됩니다)`;
   const ta = document.getElementById('mReason');
   ta.value=''; document.getElementById('mGo').disabled = true;
@@ -265,18 +529,264 @@ document.getElementById('mCancel').onclick = () => document.getElementById('moda
 document.getElementById('mGo').onclick = () => {
   const reason = document.getElementById('mReason').value.trim();
   if(!reason) return;
-  rejTargets.forEach(id => { const r=DB.find(x=>x.id===id); if(r&&r.status==='PENDING'){ r.status='REJECTED'; r.processedAt=Date.now(); r.reason=reason; } });
+  rejTargets.forEach(id => {
+    const r = find(id); if(!r || !isActionable(r)) return;
+    r.status='REJECTED'; r.processedAt=Date.now(); r.reason=reason;
+    if(r.flow){ r.flow='REJECTED'; r.stageSince=Date.now(); }
+  });
   rejTargets.forEach(id=>sel.delete(id));
   document.getElementById('modalBg').classList.remove('show');
   logEl(`⛔ ${rejTargets.length}건 반려 — 센터 화면에 '반려됨' 칩과 입력한 사유가 그대로 표시되고, '다시 신청하기'가 열립니다.`);
   render();
 };
 
+/* ══════════ 설치형 단계별 액션 ══════════ */
+const stgBg = document.getElementById('stgBg'), stgMo = document.getElementById('stgMo');
+const closeStg = () => { stgBg.classList.remove('show'); stgMo.innerHTML=''; };
+stgBg.addEventListener('mousedown', e => { if(e.target===stgBg) closeStg(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape' && stgBg.classList.contains('show')) closeStg(); });
+const openStg = (html, wide) => { stgMo.className = 'modal' + (wide?' wide':''); stgMo.innerHTML = html; stgBg.classList.add('show'); stgMo.scrollTop=0; };
+const who = r => `${r.center} ${r.branch} — ${FEATS[r.feat]}`;
+const advance = (r, flow) => { r.flow = flow; r.stageSince = Date.now(); };
+
+/* ① 신청접수 → 접수승인 */
+function intake(id){
+  const r = find(id);
+  advance(r, 'CONSULT'); r.consultDone = false;
+  logEl(`📥 [${who(r)}] 접수 승인 — 단계: 상담·현장실사 대기. 센터 화면에 담당자 연락 예정 안내가 표시됩니다.`);
+  render();
+}
+
+/* 신청서 상세 열람 */
+function openSurvey(id){
+  const r = find(id);
+  openStg(`<h3>상담신청서 상세</h3><div class="who">${who(r)} · 신청 ${fmt(r.appliedAt)}</div>
+    <div class="survey"><dl>${r.survey.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></div>
+    ${r.consult?`<div class="survey" style="margin-top:12px"><dl>
+      <dt>배정 담당자</dt><dd>${r.consult.manager}</dd>
+      <dt>현장실사 방문일</dt><dd>${r.consult.visitDate}</dd>
+      <dt>통화 메모</dt><dd>${r.consult.callMemo}</dd>
+      <dt>현장실사 결과</dt><dd>${r.consult.surveyResult}</dd></dl></div>`:''}
+    <div class="mbtns"><button class="cancel" id="sClose">닫기</button></div>`, true);
+  stgMo.querySelector('#sClose').onclick = closeStg;
+}
+
+/* ② 담당자 배정 + 상담기록 입력 */
+function openConsult(id){
+  const r = find(id);
+  openStg(`<h3>담당자 배정 · 상담기록</h3><div class="who">${who(r)}</div>
+    <div class="f"><label>배정 담당자<i>*</i></label>
+      <input class="in" type="text" id="cMgr" placeholder="예) 설치기술팀 박준호"></div>
+    <div class="f"><label>현장실사 방문일자<i>*</i></label>
+      <input class="in" type="date" id="cDate" value="${new Date(Date.now()+3*DAY).toISOString().slice(0,10)}"></div>
+    <div class="f"><label>통화 메모<i>*</i></label>
+      <textarea id="cMemo" placeholder="센터에 연락해 파악한 현장 상황을 적어주세요. (출입문 형태·기존 설비·희망 일정 등)"></textarea></div>
+    <div class="f"><label>현장실사 결과</label>
+      <textarea id="cRes" placeholder="방문 실사 후 확인한 내용. 아직 방문 전이면 비워두세요."></textarea>
+      <p class="hint">실사 결과까지 저장하면 «상담완료»로 바뀌고 [견적 입력·발송]이 열립니다.</p></div>
+    <div class="err" id="cErr"></div>
+    <div class="mbtns"><button class="cancel" id="cCancel">취소</button>
+      <button class="pink" id="cSave">상담기록 저장</button></div>`);
+  stgMo.querySelector('#cCancel').onclick = closeStg;
+  stgMo.querySelector('#cSave').onclick = () => {
+    const manager = stgMo.querySelector('#cMgr').value.trim();
+    const visitDate = stgMo.querySelector('#cDate').value;
+    const callMemo = stgMo.querySelector('#cMemo').value.trim();
+    const surveyResult = stgMo.querySelector('#cRes').value.trim();
+    const err = stgMo.querySelector('#cErr');
+    if(!manager || !visitDate || !callMemo){
+      err.textContent = '담당자·방문일자·통화 메모는 필수입니다.'; err.classList.add('show'); return;
+    }
+    r.consult = {manager, visitDate, callMemo, surveyResult};
+    r.consultDone = !!surveyResult;
+    r.stageSince = Date.now();
+    closeStg();
+    logEl(r.consultDone
+      ? `📝 [${who(r)}] 상담기록 저장 · 상담완료 — [견적 입력·발송] / [신청건 취소]가 열렸습니다.`
+      : `📝 [${who(r)}] 담당자 배정 (${manager}) · 방문 ${visitDate} — 실사 결과를 저장하면 견적 발송이 열립니다.`);
+    render();
+  };
+}
+
+/* ③ 견적 입력·발송 */
+function qrow(l){
+  return `<tr>
+    <td><input type="text" data-qn placeholder="항목명" value="${l?l.name:''}"></td>
+    <td style="width:64px"><input type="number" min="0" data-qq value="${l?l.qty:1}"></td>
+    <td style="width:104px"><input type="number" min="0" step="1000" data-qp value="${l?l.unitPrice:''}" placeholder="단가"></td>
+    <td class="amt" data-qa>0</td>
+    <td style="width:38px"><button class="del" type="button" data-qd>×</button></td></tr>`;
+}
+function openQuoteEditor(id){
+  const r = find(id);
+  const lines = r.quote ? r.quote.lines : [null, null, null];
+  openStg(`<h3>견적 입력 · 발송</h3><div class="who">${who(r)}</div>
+    <p class="hint" style="margin-top:8px">항목·수량·단가를 입력하면 합계·부가세(10%)·총액이 자동 계산됩니다. 발송하면 센터 화면에 견적서가 뜨고 «견적 수락» 버튼이 열립니다.</p>
+    <table class="qtbl"><thead><tr><th>항목</th><th>수량</th><th>단가</th><th style="text-align:right">합계</th><th></th></tr></thead>
+      <tbody id="qBody">${lines.map(qrow).join('')}</tbody></table>
+    <button class="addrow" type="button" id="qAdd">+ 항목 추가</button>
+    <div class="totals">
+      <div><span>공급가 합계</span><span id="tSub">0원</span></div>
+      <div><span>부가세 (10%)</span><span id="tVat">0원</span></div>
+      <div class="t"><span>총액</span><span id="tTot">0원</span></div>
+    </div>
+    <div class="two">
+      <div class="f"><label>예상 시공기간<i>*</i></label>
+        <input class="in" type="text" id="qLead" placeholder="예) 2~3일" value="${r.quote?r.quote.leadTime:''}"></div>
+      <div class="f"><label>견적 유효기한<i>*</i></label>
+        <input class="in" type="date" id="qValid" value="${r.quote?r.quote.validUntil:new Date(Date.now()+14*DAY).toISOString().slice(0,10)}"></div>
+    </div>
+    <div class="err" id="qErr"></div>
+    <div class="mbtns"><button class="cancel" id="qCancel">취소</button>
+      <button class="pink" id="qSend">${r.quote?'견적 재발송':'견적 발송'}</button></div>`, true);
+
+  const body = stgMo.querySelector('#qBody');
+  const recalc = () => {
+    const ls = readLines();
+    ls.forEach((l,i)=>{ body.rows[i].querySelector('[data-qa]').textContent = won(l.qty*l.unitPrice); });
+    const t = quoteTotals(ls);
+    stgMo.querySelector('#tSub').textContent = won(t.subtotal)+'원';
+    stgMo.querySelector('#tVat').textContent = won(t.vat)+'원';
+    stgMo.querySelector('#tTot').textContent = won(t.total)+'원';
+  };
+  const readLines = () => [...body.rows].map(tr => ({
+    name: tr.querySelector('[data-qn]').value.trim(),
+    qty: Number(tr.querySelector('[data-qq]').value)||0,
+    unitPrice: Number(tr.querySelector('[data-qp]').value)||0,
+  }));
+  const bind = () => {
+    body.querySelectorAll('input').forEach(i=>i.oninput = recalc);
+    body.querySelectorAll('[data-qd]').forEach(b=>b.onclick = () => {
+      if(body.rows.length<=1) return;
+      b.closest('tr').remove(); recalc();
+    });
+  };
+  bind(); recalc();
+  stgMo.querySelector('#qAdd').onclick = () => { body.insertAdjacentHTML('beforeend', qrow(null)); bind(); recalc(); };
+  stgMo.querySelector('#qCancel').onclick = closeStg;
+  stgMo.querySelector('#qSend').onclick = () => {
+    const ls = readLines().filter(l => l.name && l.qty>0 && l.unitPrice>0);
+    const leadTime = stgMo.querySelector('#qLead').value.trim();
+    const validUntil = stgMo.querySelector('#qValid').value;
+    const err = stgMo.querySelector('#qErr');
+    if(!ls.length){ err.textContent='항목명·수량·단가가 모두 채워진 견적 항목이 최소 1개 필요합니다.'; err.classList.add('show'); return; }
+    if(!leadTime || !validUntil){ err.textContent='예상 시공기간과 견적 유효기한을 입력해 주세요.'; err.classList.add('show'); return; }
+    r.quote = {lines: ls, leadTime, validUntil};
+    advance(r, 'QUOTED');
+    closeStg();
+    logEl(`💰 [${who(r)}] 견적 발송 — 총액 ${won(quoteTotals(ls).total)}원 · 단계: 견적확인(센터 확인 대기). 7일 무응답 시 목록에서 강조됩니다.`);
+    render();
+  };
+}
+
+function openQuoteView(id){
+  const r = find(id);
+  const t = quoteTotals(r.quote.lines);
+  openStg(`<h3>발송한 견적서</h3><div class="who">${who(r)}</div>
+    <div class="survey" style="margin-top:12px"><dl>
+      ${r.quote.lines.map(l=>`<dt>${l.name}</dt><dd>${l.qty} × ${won(l.unitPrice)}원 = <b>${won(l.qty*l.unitPrice)}원</b></dd>`).join('')}
+      <dt>공급가 합계</dt><dd>${won(t.subtotal)}원</dd>
+      <dt>부가세 (10%)</dt><dd>${won(t.vat)}원</dd>
+      <dt>총액</dt><dd><b>${won(t.total)}원</b></dd>
+      <dt>예상 시공기간</dt><dd>${r.quote.leadTime}</dd>
+      <dt>견적 유효기한</dt><dd>${r.quote.validUntil}</dd></dl></div>
+    <div class="mbtns"><button class="cancel" id="vClose">닫기</button></div>`, true);
+  stgMo.querySelector('#vClose').onclick = closeStg;
+}
+
+/* ③-b 신청건 취소 (사유 필수) */
+function openCancel(id){
+  const r = find(id);
+  openStg(`<h3>신청건 취소</h3><div class="who">${who(r)}<br>취소 사유는 센터 화면에 그대로 표시됩니다.</div>
+    <div class="tpl">
+      <button data-ct="현장 실사 결과 기존 설비 구조상 표준 시공이 어려워 신청건이 취소되었어요. 자세한 내용은 담당자에게 문의해 주세요.">시공 불가</button>
+      <button data-ct="센터 요청으로 도입 신청이 취소되었어요. 언제든 다시 상담신청해 주세요.">센터 요청</button>
+      <button data-ct="견적 유효기한까지 회신이 없어 신청건이 자동 취소되었어요. 도입을 원하시면 다시 상담신청해 주세요.">견적 기한 만료</button>
+    </div>
+    <textarea id="xReason" placeholder="취소 사유를 입력하세요 — 센터 사장님 화면에 이 문구가 그대로 표시됩니다."></textarea>
+    <div class="err" id="xErr"></div>
+    <div class="mbtns"><button class="cancel" id="xCancel">닫기</button>
+      <button class="go" id="xGo">취소 확정</button></div>`);
+  stgMo.querySelectorAll('[data-ct]').forEach(b=>b.onclick=()=>{ stgMo.querySelector('#xReason').value = b.dataset.ct; });
+  stgMo.querySelector('#xCancel').onclick = closeStg;
+  stgMo.querySelector('#xGo').onclick = () => {
+    const reason = stgMo.querySelector('#xReason').value.trim();
+    const err = stgMo.querySelector('#xErr');
+    if(!reason){ err.textContent='취소 사유는 필수입니다.'; err.classList.add('show'); return; }
+    r.cancelReason = reason; advance(r,'CANCELED'); r.processedAt = Date.now();
+    closeStg();
+    logEl(`🚫 [${who(r)}] 신청건 취소 — 센터 화면에 '신청 취소됨' 칩과 사유가 표시되고 '다시 상담신청하기'가 열립니다.`);
+    render();
+  };
+}
+
+/* ④ 시공 진행상태 업데이트 / 시공완료 */
+function openProgress(id){
+  const r = find(id);
+  openStg(`<h3>시공 진행상태 업데이트</h3><div class="who">${who(r)}</div>
+    <div class="f"><label>진행 상태<i>*</i></label>
+      <textarea id="pNote" placeholder="예) 배선 작업 완료 · 도어 컨트롤러 설치중">${r.progress?r.progress.note:''}</textarea>
+      <p class="hint">이 문구가 센터 화면 «시공 진행중» 안내에 그대로 표시됩니다.</p></div>
+    <div class="f"><label>완료 예정일<i>*</i></label>
+      <input class="in" type="date" id="pDue" value="${r.progress?r.progress.dueDate:new Date(Date.now()+3*DAY).toISOString().slice(0,10)}"></div>
+    <div class="err" id="pErr"></div>
+    <div class="mbtns"><button class="cancel" id="pCancel">취소</button>
+      <button class="pink" id="pSave">업데이트</button></div>`);
+  stgMo.querySelector('#pCancel').onclick = closeStg;
+  stgMo.querySelector('#pSave').onclick = () => {
+    const note = stgMo.querySelector('#pNote').value.trim();
+    const dueDate = stgMo.querySelector('#pDue').value;
+    const err = stgMo.querySelector('#pErr');
+    if(!note || !dueDate){ err.textContent='진행 상태와 완료 예정일은 필수입니다.'; err.classList.add('show'); return; }
+    r.progress = {note, dueDate};
+    closeStg();
+    logEl(`🔧 [${who(r)}] 시공 진행상태 업데이트 — 센터 화면 안내 문구가 갱신됩니다. (단계는 «설치·시공» 유지)`);
+    render();
+  };
+}
+function installDone(id){
+  const r = find(id);
+  r.progress = {note:'전 구간 시공 완료 · 시운전 정상', dueDate:new Date().toISOString().slice(0,10)};
+  advance(r,'INSTALLED');
+  logEl(`🏁 [${who(r)}] 시공완료 처리 — 단계: 시공완료(최종 사용승인 대기). 3일 넘게 승인하지 않으면 목록에서 강조됩니다.`);
+  render();
+}
+/* ⑤ 최종 사용승인 */
+function finalApprove(id){
+  const r = find(id);
+  advance(r,'ACTIVE'); r.status='APPROVED'; r.processedAt=Date.now();
+  logEl(`✅ [${who(r)}] 최종 사용승인 — 센터 화면 칩이 '승인완료 · 사용중'으로 바뀌고 관리 메뉴가 열립니다.`);
+  render();
+}
+
+/* ── 일괄 처리 (설치형 제외) ── */
 document.getElementById('bulkOk').onclick = () => approve([...sel]);
-document.getElementById('bulkRej').onclick = () => openReject([...sel]);
+document.getElementById('bulkRej').onclick = () => {
+  const ids = [...sel];
+  const go = ids.filter(id => bulkEligible(find(id)));
+  const skipped = ids.length - go.length;
+  if(!go.length){
+    logEl(`⚠️ 선택한 ${ids.length}건이 모두 설치형(무인 출입제어·IoT)이라 일괄 반려에서 제외됐습니다 — 각 건에서 [반려]로 사유를 확인해 처리하세요.`);
+    return;
+  }
+  if(skipped) logEl(`⚠️ 설치형 ${skipped}건은 단계별 판단이 필요해 제외하고, 나머지 ${go.length}건만 반려 모달을 엽니다.`);
+  openReject(go);
+};
 document.getElementById('bulkClr').onclick = () => { sel.clear(); render(); };
-document.getElementById('featSel').innerHTML += Object.entries(FEATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+
+document.getElementById('featSel').innerHTML += Object.entries(FEATS)
+  .map(([k,v])=>`<option value="${k}">${v}${INSTALL.has(k)?' (설치형)':''}</option>`).join('');
 document.getElementById('featSel').onchange = e => { feat = e.target.value; render(); };
+document.getElementById('stageSel').innerHTML += [
+  ['APPLIED','① 신청접수'],['CONSULT','② 상담·실사'],['QUOTED','③ 견적발송'],['INSTALLING','④ 설치·시공'],
+  ['INSTALLED','⑤ 시공완료'],['ACTIVE','⑥ 사용중'],['REJECTED','↳ 반려'],['CANCELED','↳ 취소'],
+].map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+document.getElementById('stageSel').onchange = e => {
+  stage = e.target.value;
+  // 단계 필터를 걸면 설치형만 남으므로 탭은 전체로 열어 결과가 사라지지 않게 한다
+  if(stage && tab!=='ALL'){ tab='ALL'; }
+  sel.clear(); render();
+};
 document.getElementById('q').oninput = e => { q = e.target.value.trim(); render(); };
 
 render();

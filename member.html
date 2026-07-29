@@ -8,20 +8,87 @@
 <style>
   body{margin:0;background:#F7F7F9;font-family:"Pretendard",-apple-system,sans-serif}
   .page{padding:34px 40px 56px}
-  .switch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;align-items:center}
+  .switch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
   .switch button{font:700 12.5px/1 inherit;padding:9px 14px;border-radius:9px;border:1px solid #E3E3E8;
     background:#fff;color:#55555c;cursor:pointer}
   .switch button.on{background:#16161C;border-color:#16161C;color:#fff}
   .switch .nav{margin-left:auto;font:700 12.5px/1 inherit;color:#E42A6B;text-decoration:none;
     padding:9px 14px;border:1px solid #F6CBDB;border-radius:9px;background:#fff}
+  .switch .cap{font:700 11.5px/1 inherit;color:#8A8A93;padding:9px 2px 9px 0}
+  .switch.flow{margin-bottom:22px}
+  .switch.flow button.on{background:#D4004E;border-color:#D4004E}
   .log{margin-top:18px;font-size:12.5px;color:#6B6B73;min-height:18px}
   .gm-scope .gm-lead + .gm-grid{margin-bottom:34px}
-  @media (max-width:900px){.page{padding:22px 16px 40px}}
+
+  /* 목업 모달 — 실제 어드민에서는 기존 모달 컴포넌트로 대체 */
+  .mo-bg{display:none;position:fixed;inset:0;background:rgba(22,22,28,.45);z-index:60;
+    align-items:center;justify-content:center;padding:18px}
+  .mo-bg.show{display:flex}
+  .mo{width:min(560px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:24px;
+    box-shadow:0 24px 60px rgba(22,22,28,.24)}
+  .mo h3{margin:0;font-size:18px;font-weight:800;letter-spacing:-.02em;color:#202024}
+  .mo .who{margin:6px 0 0;font-size:13px;color:#6B6B73;line-height:1.55}
+  .fld{margin-top:16px}
+  .fld > label.q{display:block;font-size:13.5px;font-weight:800;color:#202024;letter-spacing:-.02em}
+  .fld > label.q i{font-style:normal;color:#D4004E;margin-left:3px}
+  .fld .hint{margin:4px 0 0;font-size:12px;color:#8A8A93;line-height:1.5}
+  .fld .err{margin:5px 0 0;font-size:12px;font-weight:700;color:#C02440;display:none}
+  .fld.bad .err{display:block}
+  .fld.bad input,.fld.bad select,.fld.bad textarea{border-color:#E23A55}
+  .fld.bad .grp{outline:1.5px solid #F6C7CD;outline-offset:4px;border-radius:8px}
+  input[type=text],input[type=tel],input[type=number],select,textarea{
+    height:40px;border-radius:10px;border:1px solid #ECECEF;background:#fff;
+    font:600 13.5px inherit;color:#202024;padding:0 11px;box-sizing:border-box}
+  textarea{height:auto;min-height:76px;padding:10px 11px;line-height:1.6;resize:vertical;width:100%}
+  input:focus,select:focus,textarea:focus{outline:2px solid #FC2066;outline-offset:1px}
+  .row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .row .grow{flex:1;min-width:120px}
+  .radios{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .radios label{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;
+    border:1px solid #ECECEF;background:#FBFBFC;font-size:12.5px;font-weight:700;color:#55555C;cursor:pointer}
+  .radios label:has(input:checked){border-color:#FC2066;background:#FFF0F5;color:#B00042}
+  .radios input{accent-color:#FC2066}
+  .cbrow{display:flex;gap:8px;align-items:center;margin-top:7px;flex-wrap:wrap}
+  .cbrow label.nm{flex:1;min-width:110px;display:inline-flex;align-items:center;gap:7px;
+    font-size:13px;font-weight:700;color:#33333A;cursor:pointer}
+  .cbrow input[type=checkbox]{width:16px;height:16px;accent-color:#FC2066;flex:none}
+  .cbrow input[type=number]{width:78px}
+  .cbrow select{width:150px;font-size:12.5px}
+  .cbrow input:disabled,.cbrow select:disabled{background:#F7F7F9;color:#B4B4BC}
+  .unit{width:76px}
+  .sumbar{margin-top:16px;padding:11px 13px;border-radius:10px;background:#FDECEE;border:1px solid #F6C7CD;
+    font-size:12.5px;font-weight:700;color:#C02440;display:none}
+  .sumbar.show{display:block}
+  /* WHY sticky 아님: 스크롤 도중 버튼 바가 마지막 입력칸을 덮어 가림 */
+  .mbtns{display:flex;gap:8px;margin-top:20px}
+  .mbtns button{flex:1;height:48px;border-radius:12px;font:700 14.5px inherit;cursor:pointer;border:1.5px solid transparent}
+  .mbtns .go{background:#D4004E;color:#fff}
+  .mbtns .go:hover{background:#B00042}
+  .mbtns .sub{background:#fff;border-color:#ECECEF;color:#6B6B73}
+
+  /* 견적서 */
+  .qt{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px}
+  .qt th{font-size:11.5px;color:#8A8A93;text-align:right;font-weight:700;padding:8px 6px;border-bottom:1px solid #ECECEF}
+  .qt th:first-child{text-align:left}
+  .qt td{padding:10px 6px;border-bottom:1px solid #F3F3F6;text-align:right;font-weight:700}
+  .qt td:first-child{text-align:left;font-weight:700}
+  .qt tfoot td{border-bottom:0;padding:7px 6px;color:#6B6B73;font-weight:700}
+  .qt tfoot tr.tot td{font-size:16px;font-weight:800;color:#202024;padding-top:11px;border-top:1.5px solid #16161C}
+  .qmeta{margin-top:14px;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:13px}
+  .qmeta dt{color:#8A8A93;font-weight:700}
+  .qmeta dd{margin:0;font-weight:800;color:#202024}
+
+  @media (max-width:900px){
+    .page{padding:22px 16px 40px}
+    .mo{padding:20px 16px;border-radius:16px}
+    .cbrow select{width:100%}
+  }
 </style>
 </head>
 <body>
 <div class="page">
   <div class="switch">
+    <span class="cap">공통</span>
     <button data-mode="mixed" class="on">혼합 (기본)</button>
     <button data-mode="NONE">전체 미신청</button>
     <button data-mode="PENDING">전체 검토중</button>
@@ -30,9 +97,15 @@
     <a class="nav" href="index.html">← Guest mode 화면 보기</a>
     <a class="nav" href="admin.html">최고관리자 화면 →</a>
   </div>
+  <div class="switch flow" id="flowSwitch">
+    <span class="cap">설치형 2종 단계</span>
+  </div>
+
   <div id="root"></div>
   <div class="log" id="log"></div>
 </div>
+
+<div class="mo-bg" id="moBg"><div class="mo" id="mo"></div></div>
 
 <script>
 const PENDING_CTA = '신청 검토중 · 평균 1~2영업일';
@@ -54,32 +127,202 @@ const PROMO = [
    image:'10_daypass.png',instant:true,cta:{none:'1일권 판매 신청하기'},manageUrl:'/admin/daypass'},
 ];
 
-/* 섹션 2 — 운영 자동화 (게스트모드와 동일 카드) */
+/* 섹션 2 — 운영 자동화. access_control·iot_control은 기기 설치·시공이 선행돼야 해서
+   install:true → 단순 3상태가 아니라 별도 flow 파이프라인을 탄다 (guestFeatures.ts 참조). */
 const OPS = [
   {key:'access_control',title:'무인 출입제어 시스템',benefitHtml:'회원이 스스로 여는 출입문, <em>상주 인력 0명</em>',
    desc:'회원이 직접 출입문을 열고 닫아요. 직원은 언제 어디서든 누가 출입했는지 확인하고 원격으로 문을 여닫을 수 있어요.',
-   image:'05_access.png',cta:{none:'무인 출입제어 도입신청하기',pending:PENDING_CTA,approved:'출입제어 관리하러 가기'},manageUrl:'/admin/access'},
+   image:'05_access.png',install:true,
+   cta:{none:'무인 출입제어 도입신청하기',pending:PENDING_CTA,approved:'출입제어 관리하러 가기'},manageUrl:'/admin/access'},
   {key:'norder',title:'N 오더',benefitHtml:'센터 안 음료·자물쇠·굿즈를 <em>앱에서 바로 판매</em>',
    desc:'회원이 상품을 확인하고 원터치결제로 클릭 한 번에 주문해요. 무인 판매로 부가 매출이 붙습니다.',
    image:'06_norder.png',cta:{none:'N 오더 이용시작하기',pending:PENDING_CTA,approved:'N 오더 관리하러 가기'},manageUrl:'/admin/norder'},
   {key:'iot_control',title:'IoT 원격자동제어',benefitHtml:'센터에 없어도, <em>조명·냉난방을 앱으로 원격 제어</em>',
    desc:'조명·냉난방·환기 등 센터 설비를 앱에서 원격으로 켜고 끌 수 있어요. 오픈·마감 시간에 맞춰 자동 스케줄을 걸어두면 설비가 알아서 켜지고 꺼져서, 센터에 나가지 않아도 운영 준비가 끝나 있습니다.',
-   image:'07_iot.png',recommended:true,isNew:true,wide:true,
+   image:'07_iot.png',recommended:true,isNew:true,wide:true,install:true,
    cta:{none:'IoT 원격제어 도입신청하기',pending:PENDING_CTA,approved:'IoT 제어판 열기'},manageUrl:'/admin/iot'},
 ];
 
-const MIXED = {subscription:'NONE',access_control:'PENDING',norder:'REJECTED',iot_control:'NONE'};
+const MIXED = {subscription:'NONE',norder:'REJECTED'};
+const REJECT_REASON = '제출하신 사업자 정보와 센터 정보가 일치하지 않아 반려되었어요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.';
 
+/* ── 기존 3상태 로직 (설치형 2종 외 전 카드) — 변경 없음 ── */
 const chipLabel = s => s==='APPROVED'?'승인완료 · 사용중' : s==='PENDING'?'신청됨 · 검토중' : s==='REJECTED'?'반려됨' : '미신청';
 const chipClass = s => s==='APPROVED'?'s-approved' : s==='PENDING'?'s-pending' : s==='REJECTED'?'s-rejected' : 's-none';
 const ctaVariant = (s,rec) => s==='APPROVED'?'done' : s==='PENDING'?'wait' : s==='REJECTED'?'fill' : (rec?'fill':'line');
-const REJECT_REASON = '제출하신 사업자 정보와 센터 정보가 일치하지 않아 반려되었어요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.';
+
+/* ══════════ 설치형 2종 파이프라인 ══════════ */
+const FLOW_STEPS = [
+  {flow:'APPLIED',label:'신청접수',short:'신청'},
+  {flow:'CONSULT',label:'상담·실사',short:'상담'},
+  {flow:'QUOTED',label:'견적확인',short:'견적'},
+  {flow:'INSTALLING',label:'설치·시공',short:'시공'},
+  {flow:'INSTALLED',label:'시공완료',short:'완료'},
+  {flow:'ACTIVE',label:'사용중',short:'사용'},
+];
+const flowStepIndex = f => f==='REJECTED' ? 0 : FLOW_STEPS.findIndex(s=>s.flow===f);
+const flowChipLabel = f => ({APPLIED:'신청접수 · 검토중',CONSULT:'상담·현장실사 대기',QUOTED:'견적 도착 · 확인 필요',
+  INSTALLING:'설치·시공 진행중',INSTALLED:'시공완료 · 승인 대기',ACTIVE:'승인완료 · 사용중',
+  REJECTED:'반려됨',CANCELED:'신청 취소됨'}[f] ?? '미신청');
+const flowChipClass = f => ({APPLIED:'s-pending',CONSULT:'s-pending',INSTALLING:'s-pending',INSTALLED:'s-pending',
+  QUOTED:'s-quoted',ACTIVE:'s-approved',REJECTED:'s-rejected',CANCELED:'s-canceled'}[f] ?? 's-none');
+const flowCtaLabel = (d,f) => ({APPLIED:'신청서 접수됨 · 검토중',CONSULT:'담당자 배정중 · 연락 예정',
+  QUOTED:'견적서 확인하기',INSTALLING:'설치·시공 진행중',INSTALLED:'최종 사용승인 대기중',
+  ACTIVE:d.cta.approved,REJECTED:'다시 신청하기',CANCELED:'다시 상담신청하기'}[f] ?? '도입 상담신청하기');
+const flowCtaVariant = f => f==='ACTIVE' ? 'done'
+  : (f==='QUOTED'||f==='REJECTED'||f==='CANCELED'||f==='NONE'||f===undefined) ? 'fill' : 'wait';
+const flowCtaDisabled = f => ['APPLIED','CONSULT','INSTALLING','INSTALLED'].includes(f);
+
+const won = n => n.toLocaleString('ko-KR');
+const dstr = d => `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+const dplus = n => dstr(new Date(Date.now() + n*864e5));
+const quoteTotals = lines => {
+  const subtotal = lines.reduce((s,l)=> s + (Number(l.qty)||0)*(Number(l.unitPrice)||0), 0);
+  const vat = Math.floor(subtotal*0.1);
+  return {subtotal, vat, total: subtotal+vat};
+};
+
+/* 목업 견적 — 실제로는 최고관리자가 상담 후 입력해 발송한 값 */
+const DEMO_QUOTE = {
+  access_control:{lines:[
+    {name:'스마트 도어락 컨트롤러',qty:2,unitPrice:280000},
+    {name:'전기정(EM Lock) + 브래킷',qty:2,unitPrice:135000},
+    {name:'모바일키·QR 출입 리더기',qty:2,unitPrice:190000},
+    {name:'배선·타공 시공비',qty:1,unitPrice:420000},
+  ],leadTime:'2~3일',validUntil:dplus(14)},
+  iot_control:{lines:[
+    {name:'IoT 게이트웨이(허브)',qty:1,unitPrice:340000},
+    {name:'스마트 릴레이 모듈 (조명 회로)',qty:6,unitPrice:65000},
+    {name:'에어컨 IR 컨트롤러',qty:4,unitPrice:88000},
+    {name:'전력 계측 센서',qty:1,unitPrice:150000},
+    {name:'결선·시공 및 시운전',qty:1,unitPrice:480000},
+  ],leadTime:'3~4일',validUntil:dplus(14)},
+};
+const DEMO_CONSULT = {
+  access_control:{manager:'설치기술팀 박준호',visitDate:dplus(3)},
+  iot_control:{manager:'설치기술팀 이서연',visitDate:dplus(2)},
+};
+const DEMO_PROGRESS = {
+  access_control:{note:'배선 작업 완료 · 도어 컨트롤러 설치중',dueDate:dplus(2)},
+  iot_control:{note:'게이트웨이 설치 완료 · 릴레이 결선 진행중',dueDate:dplus(3)},
+};
+const DEMO_REJECT = '제출하신 사업자 정보와 센터 정보가 일치하지 않아 반려되었어요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.';
+const DEMO_CANCEL = '현장 실사 결과 기존 설비 구조상 표준 시공이 어려워 신청건이 취소되었어요. 자세한 내용은 담당자에게 문의해 주세요.';
+
+/* 설치형 2종 현재 상태 (목업 로컬 상태) */
+const FLOW = {
+  access_control:{flow:'QUOTED'},
+  iot_control:{flow:'NONE'},
+};
+
+/* ── 상담용 신청서 폼 스키마 — 두 기능의 현장 변수가 달라 문항을 각각 맞춘다 ── */
+const CONTACT_FIELDS = [
+  {name:'preferredPeriod',label:'희망 시공 시기',type:'select',required:true,
+   options:['1개월 이내','1~3개월 이내','3개월 이후','아직 미정 (상담 후 결정)']},
+  {name:'managerName',label:'현장 담당자 이름',type:'text',required:true,placeholder:'예) 김민수'},
+  {name:'managerPhone',label:'현장 담당자 연락처',type:'tel',required:true,placeholder:'010-0000-0000'},
+  {name:'etc',label:'추가 요청사항',type:'textarea',required:false,
+   placeholder:'현장 상황 중 미리 알려주실 내용이 있으면 적어주세요. (선택)'},
+];
+const AREA_FIELD  = {name:'area',label:'센터 평수',type:'number-unit',required:true,units:['㎡','평'],hint:'전용 면적 기준으로 적어주세요.'};
+const FLOOR_FIELD = {name:'floor',label:'층수 및 엘리베이터 유무',type:'floor',required:true,placeholder:'예) 지상 3층',options:['있음','없음']};
+const POWER_FIELD = {name:'power',label:'전력구조',type:'power',required:true,options:['단상(220V)','삼상(380V)','모름'],
+  hint:'계약전력은 전기요금 고지서에서 확인할 수 있어요. (모름 선택 시 상담 때 함께 확인해 드려요)'};
+
+const FORMS = {
+  access_control:[
+    AREA_FIELD, FLOOR_FIELD,
+    {name:'doors',label:'출입문 형태와 개수',type:'checkbox-qty',required:true,
+     options:['자동문(슬라이딩)','여닫이문','유리문(강화도어)','스피드게이트·턴게이트','기타'],
+     hint:'해당하는 형태를 모두 고르고 개수를 적어주세요. 도어락·전기정 사양이 여기서 갈립니다.'},
+    {name:'devices',label:'현재 사용 중인 전자기기 종류·개수',type:'checkbox-qty',required:true,
+     options:['조명','냉난방기','환기설비','급탕·온수','CCTV','기존 출입통제 장비']},
+    POWER_FIELD, ...CONTACT_FIELDS,
+  ],
+  iot_control:[
+    AREA_FIELD, FLOOR_FIELD,
+    {name:'targetDevices',label:'원격제어할 대상 기기',type:'device-qty',required:true,
+     options:['조명','냉난방기(에어컨·히터)','환기설비','급탕·온수','제습·가습기','음향설비','간판·사인'],
+     methods:['제어방식 선택','스마트플러그','릴레이 결선','적외선(IR) 리모컨','기존 컨트롤러 연동','모름 (상담 필요)'],
+     hint:'기기별로 수량과 원하는 제어 방식을 골라주세요. 이 문항이 견적의 대부분을 결정합니다.'},
+    {name:'controller',label:'기존 통합 컨트롤러 유무',type:'radio',required:true,
+     options:['있음','없음','모름'],hint:'기존 컨트롤러가 있으면 연동으로 시공비가 크게 줄어듭니다.'},
+    {name:'controllerModel',label:'기존 컨트롤러 제조사·모델',type:'text',required:false,
+     placeholder:'예) LG 시스템에어컨 AC Ez / 없으면 비워두세요'},
+    {name:'network',label:'센터 인터넷·Wi-Fi 환경',type:'select',required:true,
+     options:['공유기 Wi-Fi 사용중','유선 인터넷만 있음','인터넷 없음','모름']},
+    {name:'doorsLite',label:'출입문 형태 (참고)',type:'select',required:false,
+     options:['자동문(슬라이딩)','여닫이문','유리문(강화도어)','기타'],
+     hint:'출입제어는 별도 서비스라 참고용으로만 받습니다. (선택)'},
+    POWER_FIELD, ...CONTACT_FIELDS,
+  ],
+};
+
+/* ── 렌더 ── */
+function stepper(flow){
+  const idx = flowStepIndex(flow);
+  const fail = flow==='REJECTED';
+  const idle = flow==='NONE' || flow==='CANCELED';
+  const steps = FLOW_STEPS.map((s,i)=>{
+    let cls='', mark = i+1;
+    if(fail){ if(i===0){cls='is-fail'; mark='!';} }
+    else if(!idle){ if(i<idx){cls='is-done'; mark='✓';} else if(i===idx){cls='is-cur';} }
+    return `<div class="gm-step ${cls}"><i>${mark}</i><b>${s.label}</b><u>${s.short}</u></div>`;
+  }).join('');
+  return `<div class="gm-steps${idle?' is-idle':''}" role="list" aria-label="도입 진행 단계">${steps}</div>`;
+}
+
+function flowNote(key, st){
+  const f = st.flow;
+  if(f==='NONE') return `<div class="gm-note is-muted"><b>도입 절차</b>· 이 서비스는 센터에 기기를 설치·시공해야 사용할 수 있어요. 신청서를 넣으시면 담당자가 연락드려 현장을 확인하고 견적을 안내해 드립니다.</div>`;
+  if(f==='APPLIED') return `<div class="gm-note"><b>접수 완료</b>· 신청서가 접수됐어요. 담당자가 내용을 확인한 뒤 1~2영업일 안에 접수 결과를 알려드려요.</div>`;
+  if(f==='CONSULT'){
+    const c = st.consult ?? DEMO_CONSULT[key];
+    return `<div class="gm-note"><b>상담 대기</b>· 접수가 승인됐어요. 담당자가 등록하신 연락처로 연락드려 현장 상황(평수·출입문·전력)을 확인하고 방문 실사 일정을 잡습니다.
+      <dl><dt>배정 담당자</dt><dd>${c.manager}</dd><dt>방문 실사 예정</dt><dd>${c.visitDate}</dd></dl></div>`;
+  }
+  if(f==='QUOTED'){
+    const q = st.quote ?? DEMO_QUOTE[key];
+    const t = quoteTotals(q.lines);
+    return `<div class="gm-note is-quote"><b>견적 도착</b>· 상담·현장실사 결과를 반영한 견적이 확정됐어요. 내용을 확인하고 수락하시면 시공 일정을 잡아드립니다.
+      <dl><dt>총액 (VAT 포함)</dt><dd>${won(t.total)}원</dd><dt>예상 시공기간</dt><dd>${q.leadTime}</dd><dt>견적 유효기한</dt><dd>${q.validUntil}</dd></dl></div>`;
+  }
+  if(f==='INSTALLING'){
+    const p = st.progress ?? DEMO_PROGRESS[key];
+    return `<div class="gm-note"><b>시공 진행중</b>· 시공 당일에는 담당자가 현장에 방문해요. 영업시간과 겹치지 않게 일정 조정이 필요하면 담당자에게 알려주세요.
+      <dl><dt>진행 상태</dt><dd>${p.note}</dd><dt>완료 예정일</dt><dd>${p.dueDate}</dd></dl></div>`;
+  }
+  if(f==='INSTALLED') return `<div class="gm-note"><b>시공 완료</b>· 설치·시공이 끝났어요. 최고관리자 최종 사용승인이 나면 바로 사용하실 수 있습니다(보통 1영업일 이내). 승인되면 앱으로 알려드려요.</div>`;
+  if(f==='REJECTED') return `<div class="gm-reject"><b>반려 사유</b>· ${st.rejectedReason ?? DEMO_REJECT}</div>`;
+  if(f==='CANCELED') return `<div class="gm-note is-muted"><b>취소 사유</b>· ${st.canceledReason ?? DEMO_CANCEL}</div>`;
+  return '';
+}
 
 function card(d, st, wide){
+  const install = !!d.install;
   const instant = !!d.instant;
-  const v = instant ? 'fill' : ctaVariant(st, d.recommended);
   const badge = d.isNew ? '<span class="gm-badge is-new">NEW</span>'
     : (d.recommended ? '<span class="gm-badge">추천</span>' : '');
+
+  if(install){
+    const s = FLOW[d.key];
+    const f = s.flow;
+    const v = flowCtaVariant(f);
+    return `<article class="gm-card${d.recommended?' is-rec':''}${wide?' is-wide':''}" data-key="${d.key}">
+      <div class="gm-chd"><h3>${badge}${d.title}</h3>
+        <span class="gm-chip ${flowChipClass(f)}"><span class="gm-dot"></span>${flowChipLabel(f)}</span></div>
+      <p class="gm-ben">${d.benefitHtml}</p>
+      <p class="gm-desc">${d.desc}</p>
+      ${stepper(f)}
+      ${flowNote(d.key, s)}
+      <div class="gm-thumb"><img src="img/${d.image}" alt=""></div>
+      <div class="gm-spacer"></div>
+      <button type="button" class="gm-cta v-${v}" data-flowkey="${d.key}" data-flow="${f}"
+        ${flowCtaDisabled(f)?'disabled aria-disabled="true"':''}>${flowCtaLabel(d,f)}</button>
+    </article>`;
+  }
+
+  const v = instant ? 'fill' : ctaVariant(st, d.recommended);
   const chip = instant ? '' :
     `<span class="gm-chip ${chipClass(st)}"><span class="gm-dot"></span>${chipLabel(st)}</span>`;
   const label = instant ? d.cta.none
@@ -96,8 +339,9 @@ function card(d, st, wide){
   </article>`;
 }
 
-function render(mode){
-  const stOf = d => d.instant ? 'NONE' : (mode==='mixed' ? (MIXED[d.key]??'NONE') : mode);
+let MODE = 'mixed';
+function render(){
+  const stOf = d => d.instant ? 'NONE' : (MODE==='mixed' ? (MIXED[d.key]??'NONE') : MODE);
   const promo = PROMO.map(d=>card(d, stOf(d), false)).join('');
   const ops = OPS.map((d,i)=>card(d, stOf(d), !!d.wide && OPS.length%2===1 && i===OPS.length-1)).join('');
   document.getElementById('root').innerHTML =
@@ -107,33 +351,252 @@ function render(mode){
         <p>쿠폰·이벤트·상품을 열면 앱에서 우리 센터가 강조 표시되고 상위노출 확률이 올라가요.</p></div>
       <div class="gm-grid">${promo}</div>
       <div class="gm-lead"><h2>센터 운영을 더 스마트하게 해보세요</h2>
-        <p>신청하시면 검토 후 승인해 드려요. 승인되면 바로 사용하실 수 있습니다.</p></div>
+        <p>신청하시면 검토 후 승인해 드려요. 설치가 필요한 서비스는 담당자가 현장을 확인한 뒤 견적·시공을 안내해 드립니다.</p></div>
       <div class="gm-grid">${ops}</div>
     </div>`;
 
-  document.querySelectorAll('.gm-cta').forEach(b=>{
+  document.querySelectorAll('.gm-cta[data-key]').forEach(b=>{
     b.addEventListener('click',()=>{
       const {key,status,url} = b.dataset;
-      const log = document.getElementById('log');
-      if(status==='PENDING'){ log.textContent = '검토중 — 클릭 무시됨(중복 신청 차단)'; return; }
-      log.textContent = (status==='APPROVED'||status==='INSTANT')
-        ? `[라우팅] ${key} → ${url}`
-        : status==='REJECTED'
-          ? `[신청 모달] ${key} 재신청 폼 열기 (반려 사유 안내 포함)`
-          : `[신청 모달] ${key} 신청 폼 열기`;
+      if(status==='PENDING'){ logEl('검토중 — 클릭 무시됨(중복 신청 차단)'); return; }
+      logEl((status==='APPROVED'||status==='INSTANT') ? `[라우팅] ${key} → ${url}`
+        : status==='REJECTED' ? `[신청 모달] ${key} 재신청 폼 열기 (반려 사유 안내 포함)`
+        : `[신청 모달] ${key} 신청 폼 열기`);
     });
   });
+  document.querySelectorAll('.gm-cta[data-flowkey]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const key = b.dataset.flowkey, f = b.dataset.flow;
+      if(flowCtaDisabled(f)){ logEl('진행중 단계 — 센터가 할 수 있는 행동이 없어 CTA를 비활성화했습니다.'); return; }
+      if(f==='ACTIVE'){ logEl(`[라우팅] ${key} → ${OPS.find(d=>d.key===key).manageUrl}`); return; }
+      if(f==='QUOTED'){ openQuote(key); return; }
+      openSurvey(key);
+    });
+  });
+  syncFlowSwitch();
+}
+const logEl = t => document.getElementById('log').textContent = t;
+
+/* ══════════ 모달 ══════════ */
+const moBg = document.getElementById('moBg'), mo = document.getElementById('mo');
+const closeMo = () => { moBg.classList.remove('show'); mo.innerHTML=''; };
+moBg.addEventListener('mousedown', e => { if(e.target===moBg) closeMo(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape' && moBg.classList.contains('show')) closeMo(); });
+/* WHY gm-scope: 모달 안에서도 카드와 같은 토큰(.gm-note/.gm-reject 색상 변수)을 쓴다 */
+const openMo = html => { mo.className = 'mo gm-scope'; mo.innerHTML = html; moBg.classList.add('show'); mo.scrollTop = 0; };
+
+/* ── 상담용 신청서 폼 ── */
+function fieldHtml(f){
+  const req = f.required ? '<i aria-hidden="true">*</i>' : '';
+  const hint = f.hint ? `<p class="hint">${f.hint}</p>` : '';
+  let body = '';
+  if(f.type==='number-unit'){
+    body = `<div class="row"><input class="grow" type="number" min="1" data-v="${f.name}" placeholder="숫자만 입력">
+      <select class="unit" data-v="${f.name}_unit">${f.units.map(u=>`<option>${u}</option>`).join('')}</select></div>`;
+  } else if(f.type==='floor'){
+    body = `<div class="row"><input class="grow" type="text" data-v="${f.name}" placeholder="${f.placeholder}"></div>
+      <div class="radios grp">${f.options.map((o,i)=>`<label><input type="radio" name="${f.name}_elev" value="${o}">엘리베이터 ${o}</label>`).join('')}</div>`;
+  } else if(f.type==='power'){
+    body = `<div class="radios grp">${f.options.map(o=>`<label><input type="radio" name="${f.name}_type" value="${o}">${o}</label>`).join('')}</div>
+      <div class="row"><input type="number" min="1" data-v="${f.name}_kw" placeholder="계약전력" style="width:130px"><span style="font-size:13px;font-weight:700;color:#6B6B73">kW</span></div>`;
+  } else if(f.type==='checkbox-qty'){
+    body = `<div class="grp">${f.options.map((o,i)=>`<div class="cbrow">
+      <label class="nm"><input type="checkbox" data-cb="${f.name}" data-i="${i}">${o}</label>
+      <input type="number" min="1" value="1" data-qty="${f.name}" data-i="${i}" disabled aria-label="${o} 개수">
+      <span style="font-size:12px;color:#8A8A93;font-weight:700">개</span></div>`).join('')}</div>`;
+  } else if(f.type==='device-qty'){
+    body = `<div class="grp">${f.options.map((o,i)=>`<div class="cbrow">
+      <label class="nm"><input type="checkbox" data-cb="${f.name}" data-i="${i}">${o}</label>
+      <input type="number" min="1" value="1" data-qty="${f.name}" data-i="${i}" disabled aria-label="${o} 개수">
+      <select data-method="${f.name}" data-i="${i}" disabled aria-label="${o} 제어방식">${f.methods.map(m=>`<option>${m}</option>`).join('')}</select>
+      </div>`).join('')}</div>`;
+  } else if(f.type==='radio'){
+    body = `<div class="radios grp">${f.options.map(o=>`<label><input type="radio" name="${f.name}" value="${o}">${o}</label>`).join('')}</div>`;
+  } else if(f.type==='select'){
+    body = `<div class="row"><select class="grow" data-v="${f.name}"><option value="">선택해 주세요</option>${f.options.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+  } else if(f.type==='textarea'){
+    body = `<textarea data-v="${f.name}" placeholder="${f.placeholder??''}"></textarea>`;
+  } else {
+    body = `<div class="row"><input class="grow" type="${f.type==='tel'?'tel':'text'}" data-v="${f.name}" placeholder="${f.placeholder??''}"></div>`;
+  }
+  return `<div class="fld" data-f="${f.name}"><label class="q">${f.label}${req}</label>${hint}${body}
+    <p class="err" data-err="${f.name}"></p></div>`;
 }
 
-document.querySelectorAll('.switch button').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.switch button').forEach(b=>b.classList.remove('on'));
-    btn.classList.add('on');
-    document.getElementById('log').textContent='';
-    render(btn.dataset.mode);
+function openSurvey(key){
+  const d = OPS.find(x=>x.key===key);
+  const st = FLOW[key];
+  const again = st.flow==='REJECTED' || st.flow==='CANCELED';
+  const prev = st.flow==='REJECTED'
+    ? `<div class="gm-reject" style="margin-top:12px"><b>지난 반려 사유</b>· ${st.rejectedReason ?? DEMO_REJECT}</div>`
+    : st.flow==='CANCELED'
+      ? `<div class="gm-note is-muted" style="margin-top:12px"><b>지난 취소 사유</b>· ${st.canceledReason ?? DEMO_CANCEL}</div>`
+      : '';
+  openMo(`<h3>${d.title} — 도입 상담신청서</h3>
+    <p class="who">이 서비스는 센터 현장에 기기를 설치·시공해야 사용할 수 있어요. 평수·출입문·전자기기·전력구조에 따라 시공 내용이 달라져서, 아래 내용을 먼저 알려주시면 담당자가 정확한 견적을 준비해 연락드립니다. <b>제출한다고 비용이 발생하지 않아요.</b></p>
+    ${prev}
+    ${FORMS[key].map(fieldHtml).join('')}
+    <div class="sumbar" id="sumbar"></div>
+    <div class="mbtns"><button class="sub" data-close>취소</button>
+      <button class="go" id="submitSurvey">${again?'다시 상담신청하기':'상담신청 제출하기'}</button></div>`);
+
+  mo.querySelectorAll('[data-cb]').forEach(cb=>{
+    cb.addEventListener('change',()=>{
+      const n = cb.dataset.cb, i = cb.dataset.i;
+      const qty = mo.querySelector(`[data-qty="${n}"][data-i="${i}"]`);
+      const met = mo.querySelector(`[data-method="${n}"][data-i="${i}"]`);
+      if(qty) qty.disabled = !cb.checked;
+      if(met) met.disabled = !cb.checked;
+    });
+  });
+  mo.querySelector('[data-close]').onclick = closeMo;
+  mo.querySelector('#submitSurvey').onclick = () => submitSurvey(key);
+}
+
+function submitSurvey(key){
+  const fields = FORMS[key];
+  mo.querySelectorAll('.fld').forEach(el=>el.classList.remove('bad'));
+  const bad = [], data = {};
+  const setErr = (name,msg) => {
+    const fld = mo.querySelector(`.fld[data-f="${name}"]`);
+    fld.classList.add('bad');
+    fld.querySelector(`[data-err="${name}"]`).textContent = msg;
+    bad.push(fld);
+  };
+  const val = n => (mo.querySelector(`[data-v="${n}"]`)?.value ?? '').trim();
+  const radio = n => mo.querySelector(`input[name="${n}"]:checked`)?.value ?? '';
+
+  fields.forEach(f=>{
+    if(f.type==='number-unit'){
+      const v = val(f.name);
+      if(f.required && !(Number(v)>0)) return setErr(f.name,'평수를 숫자로 입력해 주세요.');
+      data[f.name] = v ? `${v}${val(f.name+'_unit')}` : '';
+    } else if(f.type==='floor'){
+      const v = val(f.name), e = radio(f.name+'_elev');
+      if(f.required && !v) return setErr(f.name,'층수를 입력해 주세요.');
+      if(f.required && !e) return setErr(f.name,'엘리베이터 유무를 선택해 주세요.');
+      data[f.name] = `${v} / 엘리베이터 ${e}`;
+    } else if(f.type==='power'){
+      const t = radio(f.name+'_type'), kw = val(f.name+'_kw');
+      if(f.required && !t) return setErr(f.name,'전력구조를 선택해 주세요.');
+      if(f.required && t!=='모름' && !(Number(kw)>0)) return setErr(f.name,'계약전력(kW)을 입력해 주세요. 모르시면 «모름»을 선택하세요.');
+      data[f.name] = `${t}${kw?` / ${kw}kW`:''}`;
+    } else if(f.type==='checkbox-qty' || f.type==='device-qty'){
+      const picked = [];
+      mo.querySelectorAll(`[data-cb="${f.name}"]`).forEach(cb=>{
+        if(!cb.checked) return;
+        const i = cb.dataset.i;
+        const q = Number(mo.querySelector(`[data-qty="${f.name}"][data-i="${i}"]`).value)||0;
+        const m = mo.querySelector(`[data-method="${f.name}"][data-i="${i}"]`);
+        picked.push({name:f.options[i], qty:q, method:m?m.value:null, bad:q<1 || (m && m.selectedIndex===0)});
+      });
+      if(f.required && !picked.length) return setErr(f.name,'해당하는 항목을 1개 이상 선택해 주세요.');
+      if(picked.some(p=>p.bad)) return setErr(f.name, f.type==='device-qty'
+        ? '선택한 기기의 수량(1 이상)과 제어 방식을 모두 지정해 주세요.'
+        : '선택한 항목의 개수를 1 이상으로 입력해 주세요.');
+      data[f.name] = picked.map(p=>`${p.name} ${p.qty}개${p.method?` (${p.method})`:''}`).join(', ');
+    } else if(f.type==='radio'){
+      const v = radio(f.name);
+      if(f.required && !v) return setErr(f.name,'항목을 선택해 주세요.');
+      data[f.name] = v;
+    } else {
+      const v = val(f.name);
+      if(f.required && !v) return setErr(f.name,'필수 입력 항목이에요.');
+      if(f.type==='tel' && v && !/^[0-9-+ ]{9,}$/.test(v)) return setErr(f.name,'연락처 형식을 확인해 주세요. (예: 010-0000-0000)');
+      data[f.name] = v;
+    }
+  });
+
+  const sum = document.getElementById('sumbar');
+  if(bad.length){
+    sum.textContent = `필수 문항 ${bad.length}개를 확인해 주세요.`;
+    sum.classList.add('show');
+    bad[0].scrollIntoView({block:'center',behavior:'smooth'});
+    (bad[0].querySelector('input,select,textarea'))?.focus({preventScroll:true});
+    return;
+  }
+  FLOW[key] = {flow:'APPLIED', survey:data};
+  closeMo();
+  logEl(`✅ [${OPS.find(d=>d.key===key).title}] 상담신청서 접수 — 단계: 신청접수 · 검토중 (POST …/install-apply)`);
+  render();
+}
+
+/* ── 견적서 확인 ── */
+function openQuote(key){
+  const d = OPS.find(x=>x.key===key);
+  const q = FLOW[key].quote ?? DEMO_QUOTE[key];
+  const t = quoteTotals(q.lines);
+  openMo(`<h3>${d.title} — 견적서</h3>
+    <p class="who">현장 실사 결과를 반영한 확정 견적이에요. 수락하시면 담당자가 시공 일정을 잡아 연락드립니다.</p>
+    <table class="qt"><thead><tr><th>항목</th><th>수량</th><th>단가</th><th>합계</th></tr></thead>
+    <tbody>${q.lines.map(l=>`<tr><td>${l.name}</td><td>${l.qty}</td><td>${won(l.unitPrice)}</td><td>${won(l.qty*l.unitPrice)}</td></tr>`).join('')}</tbody>
+    <tfoot>
+      <tr><td colspan="3">공급가 합계</td><td>${won(t.subtotal)}</td></tr>
+      <tr><td colspan="3">부가세 (10%)</td><td>${won(t.vat)}</td></tr>
+      <tr class="tot"><td colspan="3">총액</td><td>${won(t.total)}원</td></tr>
+    </tfoot></table>
+    <dl class="qmeta"><dt>예상 시공기간</dt><dd>${q.leadTime}</dd><dt>견적 유효기한</dt><dd>${q.validUntil}</dd></dl>
+    <div class="mbtns"><button class="sub" id="qHold">보류 · 문의하기</button>
+      <button class="go" id="qAccept">견적 수락</button></div>`);
+  mo.querySelector('#qHold').onclick = () => {
+    closeMo();
+    logEl(`💬 [${d.title}] 견적 보류·문의 접수 — 담당자에게 전달됐고 단계는 «견적확인»에 그대로 머뭅니다.`);
+  };
+  mo.querySelector('#qAccept').onclick = () => {
+    FLOW[key] = {...FLOW[key], flow:'INSTALLING', quote:q, progress:DEMO_PROGRESS[key]};
+    closeMo();
+    logEl(`✅ [${d.title}] 견적 수락 — 단계: 설치·시공 진행중 (POST …/quote/accept)`);
+    render();
+  };
+}
+
+/* ══════════ 목업 컨트롤 ══════════ */
+const FLOW_MODES = [
+  ['NONE','① 미신청'],['APPLIED','② 신청접수'],['CONSULT','③ 상담대기'],['QUOTED','④ 견적도착'],
+  ['INSTALLING','⑤ 시공중'],['INSTALLED','⑥ 시공완료'],['ACTIVE','⑦ 사용중'],
+  ['REJECTED','↳ 반려'],['CANCELED','↳ 취소'],
+];
+function setFlow(f){
+  ['access_control','iot_control'].forEach(k=>{
+    FLOW[k] = {flow:f,
+      consult:DEMO_CONSULT[k], quote:DEMO_QUOTE[k], progress:DEMO_PROGRESS[k],
+      rejectedReason:DEMO_REJECT, canceledReason:DEMO_CANCEL};
+  });
+  logEl(`설치형 2종 단계 → ${f}`);
+  render();
+}
+function syncFlowSwitch(){
+  const cur = FLOW.access_control.flow===FLOW.iot_control.flow ? FLOW.access_control.flow : null;
+  document.querySelectorAll('#flowSwitch button').forEach(b=>b.classList.toggle('on', b.dataset.flow===cur));
+}
+document.getElementById('flowSwitch').insertAdjacentHTML('beforeend',
+  FLOW_MODES.map(([f,l])=>`<button data-flow="${f}">${l}</button>`).join('') +
+  `<button data-flow="__step">다음 단계 ▶</button>`);
+document.querySelectorAll('#flowSwitch button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    if(b.dataset.flow==='__step'){
+      const order = FLOW_STEPS.map(s=>s.flow);
+      const cur = FLOW.access_control.flow;
+      const i = order.indexOf(cur);
+      setFlow(i<0 ? 'APPLIED' : order[(i+1)%order.length]);
+      return;
+    }
+    setFlow(b.dataset.flow);
   });
 });
-render('mixed');
+document.querySelectorAll('.switch:not(.flow) button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.switch:not(.flow) button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    MODE = btn.dataset.mode;
+    logEl('');
+    // 공통 전환은 설치형 2종에도 대응 단계를 매핑해 함께 보여준다
+    const map = {NONE:'NONE', PENDING:'APPLIED', APPROVED:'ACTIVE', REJECTED:'REJECTED'};
+    if(map[MODE]) setFlow(map[MODE]);
+    else { FLOW.access_control = {flow:'QUOTED'}; FLOW.iot_control = {flow:'NONE'}; render(); }
+  });
+});
+render();
 </script>
 </body>
 </html>

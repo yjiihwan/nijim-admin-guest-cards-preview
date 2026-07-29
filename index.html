@@ -47,13 +47,13 @@ const FEATURES = [
    image:'04_subscription.png',recommended:true,cta:{none:'구독멤버십 도입신청하기',pending:PENDING_CTA,approved:'구독멤버십 관리하러 가기'},manageUrl:'/admin/subscription'},
   {key:'access_control',title:'무인 출입제어 시스템',benefitHtml:'회원이 스스로 여는 출입문, <em>상주 인력 0명</em>',
    desc:'회원이 직접 출입문을 열고 닫아요. 직원은 언제 어디서든 누가 출입했는지 확인하고 원격으로 문을 여닫을 수 있어요.',
-   image:'05_access.png',cta:{none:'무인 출입제어 도입신청하기',pending:PENDING_CTA,approved:'출입제어 관리하러 가기'},manageUrl:'/admin/access'},
+   image:'05_access.png',install:true,cta:{none:'무인 출입제어 도입신청하기',pending:PENDING_CTA,approved:'출입제어 관리하러 가기'},manageUrl:'/admin/access'},
   {key:'norder',title:'N 오더',benefitHtml:'센터 안 음료·자물쇠·굿즈를 <em>앱에서 바로 판매</em>',
    desc:'회원이 상품을 확인하고 원터치결제로 클릭 한 번에 주문해요. 무인 판매로 부가 매출이 붙습니다.',
    image:'06_norder.png',cta:{none:'N 오더 이용시작하기',pending:PENDING_CTA,approved:'N 오더 관리하러 가기'},manageUrl:'/admin/norder'},
   {key:'iot_control',title:'IoT 원격자동제어',benefitHtml:'센터에 없어도, <em>조명·냉난방을 앱으로 원격 제어</em>',
    desc:'조명·냉난방·환기 등 센터 설비를 앱에서 원격으로 켜고 끌 수 있어요. 오픈·마감 시간에 맞춰 자동 스케줄을 걸어두면 설비가 알아서 켜지고 꺼져서, 센터에 나가지 않아도 운영 준비가 끝나 있습니다.',
-   image:'07_iot.png',recommended:true,isNew:true,wide:true,
+   image:'07_iot.png',recommended:true,isNew:true,wide:true,install:true,
    cta:{none:'IoT 원격제어 도입신청하기',pending:PENDING_CTA,approved:'IoT 제어판 열기'},manageUrl:'/admin/iot'},
 ];
 const MIXED = {website:'APPROVED',offline_payment:'NONE',subscription:'NONE',
@@ -64,6 +64,15 @@ const chipClass = s => s==='APPROVED'?'s-approved' : s==='PENDING'?'s-pending' :
 const ctaVariant = (s,rec) => s==='APPROVED'?'done' : s==='PENDING'?'wait' : s==='REJECTED'?'fill' : (rec?'fill':'line');
 const ctaLabel = (d,s) => s==='APPROVED'?d.cta.approved : s==='PENDING'?d.cta.pending : s==='REJECTED'?'다시 신청하기' : d.cta.none;
 const REJECT_REASON = '제출하신 사업자 정보와 센터 정보가 일치하지 않아 반려되었어요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.';
+
+/* install:true(무인 출입제어·IoT 원격제어)는 승인만으로 쓸 수 없고 설치·시공이 따르는 서비스라
+   칩·CTA 문구만 상담 흐름에 맞춘다. 구조·상태 로직은 그대로 (전체 흐름은 member.html) */
+const chipLabelOf = (d,s) => (d.install && s==='PENDING') ? '신청접수 · 상담 진행중' : chipLabel(s);
+const ctaLabelOf  = (d,s) => !d.install ? ctaLabel(d,s)
+  : s==='NONE' ? '도입 상담신청하기'
+  : s==='PENDING' ? '상담·설치 진행중 · 담당자 연락 예정'
+  : s==='REJECTED' ? '다시 상담신청하기'
+  : ctaLabel(d,s);
 
 function render(mode){
   const total = FEATURES.length;
@@ -76,7 +85,7 @@ function render(mode){
     return `<article class="gm-card${d.recommended?' is-rec':''}${wide?' is-wide':''}" data-key="${d.key}">
       <div class="gm-chd">
         <h3>${badge}${d.title}</h3>
-        <span class="gm-chip ${chipClass(st)}"><span class="gm-dot"></span>${chipLabel(st)}</span>
+        <span class="gm-chip ${chipClass(st)}"><span class="gm-dot"></span>${chipLabelOf(d,st)}</span>
       </div>
       <p class="gm-ben">${d.benefitHtml}</p>
       <p class="gm-desc">${d.desc}</p>
@@ -84,7 +93,7 @@ function render(mode){
       <div class="gm-thumb"><img src="img/${d.image}" alt=""></div>
       <div class="gm-spacer"></div>
       <button type="button" class="gm-cta v-${v}" data-key="${d.key}" data-status="${st}"
-        data-url="${d.manageUrl}" ${st==='PENDING'?'disabled aria-disabled="true"':''}>${ctaLabel(d,st)}</button>
+        data-url="${d.manageUrl}" ${st==='PENDING'?'disabled aria-disabled="true"':''}>${ctaLabelOf(d,st)}</button>
     </article>`;
   }).join('');
 
