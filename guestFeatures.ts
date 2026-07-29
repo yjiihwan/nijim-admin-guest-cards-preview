@@ -374,6 +374,8 @@ export interface SurveyField {
   /** checkbox-qty 전용 — 이 옵션명을 고르면 기기 이름을 직접 입력받는다 */
   other?: string;
   otherPlaceholder?: string;
+  /** 기타 자유입력 글자수 상한 — 실측 산출값(OTHER_NAME_MAX_LENGTH) */
+  otherMaxLength?: number;
   /** photos 전용 — 슬롯 정의 */
   slots?: PhotoSlot[];
   placeholder?: string;
@@ -400,6 +402,20 @@ export interface PhotoSlot {
    */
   reqIf?: { cb: string; i: number };
 }
+
+/**
+ * '기타' 기기 이름 자유입력 글자수 상한 — 추정치 아님, 실측 산출값.
+ *
+ *   최소 지원 폭 320px → .cbrow input.othernm 실측 박스 252px
+ *   내부 가용 폭 = 252 − border(1+1) − padding(11+11) = 228px
+ *   한글 1자 평균 폭 = 11.53px(현재 렌더 폰트) / 11.67px(설계 의도 13.5px·600)
+ *   floor(228 / 11.67) = 19자  ← 실입력 이진탐색(scrollWidth<=clientWidth)과 일치
+ *   19 − 여유 2자 = 17
+ *
+ * 한글 기준이라 영문·숫자는 17자보다 여유 있게 들어간다.
+ * 측정 스크립트: brands/nijim/measure_othernm.mjs
+ */
+export const OTHER_NAME_MAX_LENGTH = 17;
 
 /** 슬롯당 최대 장수 (multi가 아니면 1장) */
 export const PHOTO_MAX_PER_SLOT = 5;
@@ -478,6 +494,7 @@ export const INSTALL_SURVEY_FORMS: Record<InstallFeatureKey, SurveyField[]> = {
     { name: 'targetDevices', label: '원격으로 켜고 끄고 싶은 기기', type: 'checkbox-qty', required: true,
       options: ['조명', '냉난방기(에어컨·히터)', '환기설비', '급탕·온수', '제습·가습기', '음향설비', '간판·사인', '기타'],
       other: '기타', otherPlaceholder: '어떤 기기인지 적어주세요 (예: 제빙기)',
+      otherMaxLength: OTHER_NAME_MAX_LENGTH,
       hint: '제어하고 싶은 기기를 고르고 개수만 적어주세요. 어떤 방식으로 연결할지는 사진을 보고 전문가가 정해드려요.' },
     FLOOR_FIELD,
     ...CONTACT_FIELDS,

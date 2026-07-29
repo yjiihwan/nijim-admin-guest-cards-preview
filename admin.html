@@ -117,7 +117,10 @@
   .survey{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
   .survey dl{margin:0;display:grid;grid-template-columns:minmax(120px,34%) 1fr}
   .survey dt{padding:10px 12px;background:#FBFBFC;border-bottom:1px solid #F3F3F6;font-size:12px;font-weight:800;color:var(--sub)}
-  .survey dd{margin:0;padding:10px 12px;border-bottom:1px solid #F3F3F6;font-size:12.5px;font-weight:700;line-height:1.55}
+  /* WHY overflow-wrap:anywhere — '기타' 기기 이름은 사장님 자유입력(최대 17자)이라
+     띄어쓰기 없는 긴 이름이 들어올 수 있다. 좁은 셀에서 가로로 삐져나가는 걸 막는다. */
+  .survey dd{margin:0;padding:10px 12px;border-bottom:1px solid #F3F3F6;font-size:12.5px;font-weight:700;
+    line-height:1.55;overflow-wrap:anywhere}
 
   /* 견적 입력 */
   .qtbl{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}

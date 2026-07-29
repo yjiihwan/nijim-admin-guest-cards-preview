@@ -55,7 +55,13 @@
     font-size:13px;font-weight:700;color:#33333A;cursor:pointer}
   .cbrow input[type=checkbox]{width:16px;height:16px;accent-color:#FC2066;flex:none}
   .cbrow input[type=number]{width:78px}
+  /* WHY 100% 한 줄 차지: 기기 이름은 라벨·개수칸과 같은 줄에 두면 320px에서 다 잘린다 */
   .cbrow input.othernm{flex:1 1 100%;min-width:0}
+  /* WHY 카운터: maxlength 로 막히면 사장님은 "왜 더 안 써지지?" 하고 멈춘다. 남은 칸을 미리 보여준다.
+     input 폭을 뺏지 않도록 아래 한 줄을 통째로 쓰고 우측 정렬만 한다(실측 maxlength 전제 유지). */
+  .cbrow .othcnt{flex:1 1 100%;margin-top:-4px;text-align:right;
+    font-size:11px;font-weight:700;color:#8A8A93;font-variant-numeric:tabular-nums}
+  .cbrow .othcnt.is-max{color:#C02440}
   .cbrow select{width:150px;font-size:12.5px}
   .cbrow input:disabled,.cbrow select:disabled{background:#F7F7F9;color:#B4B4BC}
   .unit{width:76px}
@@ -325,6 +331,13 @@ const PHOTO_SLOTS = {
      guide:'벽에 붙은 온도조절기나 통합 리모컨 같은 게 있으면 찍어주세요.'},
   ],
 };
+/* '기타' 기기 이름 글자수 상한 — 추정 아님, 320px 실측 산출값.
+   내부 가용 폭 = 252(박스) − border(1+1) − padding(11+11) = 228px
+   한글 1자 평균 = 11.53px(현재 렌더) / 11.67px(설계 의도 13.5px·600)
+   floor(228 / 11.67) = 19자  ← 실입력 이진탐색 결과와 일치 → 여유 2자 빼고 17.
+   한글 기준이라 영문·숫자는 더 들어간다. 측정: brands/nijim/measure_othernm.mjs */
+const OTHER_NAME_MAX_LENGTH = 17;
+
 const photoField = key => ({name:'photos',label:'현장 사진',type:'photos',required:true,slots:PHOTO_SLOTS[key],
   hint:'사진을 보고 전문가가 필요한 장비와 시공 방법을 정해드려요. 스마트폰으로 찍은 사진이면 충분해요.'});
 
@@ -338,7 +351,7 @@ const FORMS = {
     /* '기타'는 반드시 배열 맨 뒤 — hvac 슬롯 reqIf가 인덱스 1(냉난방기)을 참조한다 */
     {name:'targetDevices',label:'원격으로 켜고 끄고 싶은 기기',type:'checkbox-qty',required:true,
      options:['조명','냉난방기(에어컨·히터)','환기설비','급탕·온수','제습·가습기','음향설비','간판·사인','기타'],
-     other:'기타',otherPlaceholder:'어떤 기기인지 적어주세요 (예: 제빙기)',
+     other:'기타',otherPlaceholder:'어떤 기기인지 적어주세요 (예: 제빙기)',otherMaxLength:OTHER_NAME_MAX_LENGTH,
      hint:'제어하고 싶은 기기를 고르고 개수만 적어주세요. 어떤 방식으로 연결할지는 사진을 보고 전문가가 정해드려요.'},
     FLOOR_FIELD, ...CONTACT_FIELDS,
   ],
@@ -587,7 +600,10 @@ function fieldHtml(f){
       <input type="number" min="1" value="1" data-qty="${f.name}" data-i="${i}" disabled aria-label="${o} 개수">
       <span style="font-size:12px;color:#8A8A93;font-weight:700">개</span>${
         f.other===o ? `<input type="text" class="othernm" data-other="${f.name}" data-i="${i}" disabled hidden
-        placeholder="${f.otherPlaceholder??'어떤 기기인지 적어주세요'}" aria-label="기타 기기 이름">` : ''}</div>`).join('')}</div>`;
+        maxlength="${f.otherMaxLength ?? OTHER_NAME_MAX_LENGTH}"
+        placeholder="${f.otherPlaceholder??'어떤 기기인지 적어주세요'}" aria-label="기타 기기 이름"
+        aria-describedby="othcnt-${f.name}-${i}"><span class="othcnt" id="othcnt-${f.name}-${i}"
+        data-othcnt="${f.name}" data-i="${i}" hidden aria-live="polite">0/${f.otherMaxLength ?? OTHER_NAME_MAX_LENGTH}</span>` : ''}</div>`).join('')}</div>`;
   } else if(f.type==='radio'){
     body = `<div class="radios grp">${f.options.map(o=>`<label><input type="radio" name="${f.name}" value="${o}">${o}</label>`).join('')}</div>`;
   } else if(f.type==='select'){
@@ -599,6 +615,14 @@ function fieldHtml(f){
   }
   return `<div class="fld" data-f="${f.name}"><label class="q">${f.label}${req}</label>${hint}${body}
     <p class="err" data-err="${f.name}"></p></div>`;
+}
+
+/* 상한에 닿으면 색을 바꿔 "더 못 쓰는 이유"를 알려준다 */
+function paintOtherCount(inp, cnt){
+  const max = Number(inp.getAttribute('maxlength')) || OTHER_NAME_MAX_LENGTH;
+  const n = [...inp.value].length;
+  cnt.textContent = n >= max ? `${n}/${max} 최대예요` : `${n}/${max}`;
+  cnt.classList.toggle('is-max', n >= max);
 }
 
 function openSurvey(key){
@@ -627,9 +651,18 @@ function openSurvey(key){
       const qty = mo.querySelector(`[data-qty="${n}"][data-i="${i}"]`);
       if(qty) qty.disabled = !cb.checked;
       const oth = mo.querySelector(`[data-other="${n}"][data-i="${i}"]`);
-      if(oth){ oth.disabled = !cb.checked; oth.hidden = !cb.checked; if(!cb.checked) oth.value=''; }
+      if(oth){
+        oth.disabled = !cb.checked; oth.hidden = !cb.checked;
+        if(!cb.checked) oth.value='';
+        const cnt = mo.querySelector(`[data-othcnt="${n}"][data-i="${i}"]`);
+        if(cnt){ cnt.hidden = !cb.checked; paintOtherCount(oth, cnt); }
+      }
       updateSlotBadges();   // 냉난방 체크 → 에어컨 사진 슬롯이 필수로 승격
     });
+  });
+  mo.querySelectorAll('input.othernm').forEach(oth=>{
+    const cnt = mo.querySelector(`[data-othcnt="${oth.dataset.other}"][data-i="${oth.dataset.i}"]`);
+    if(cnt) oth.addEventListener('input', () => paintOtherCount(oth, cnt));
   });
   mo.querySelector('[data-close]').onclick = closeMo;
   mo.querySelector('#submitSurvey').onclick = () => submitSurvey(key);
