@@ -11,7 +11,8 @@ export type GuestFeatureKey =
   | 'norder'
   | 'iot_control';
 
-/** 백엔드가 내려주는 신청 상태. REJECTED는 별도 칩('반려됨')+사유 노출+재신청 허용 (2026-07-28 확정). */
+/** 백엔드가 내려주는 신청 상태. REJECTED는 별도 칩('반려됨')+사유 노출+재신청 허용 (2026-07-28 확정).
+ *  N 오더는 이 4상태를 쓰지 않는다 → InstantFeatureStatus(미사용·사용중 2개) 참조 (2026-09-27). */
 export type GuestFeatureStatus = 'NONE' | 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface GuestFeatureDef {
@@ -29,7 +30,8 @@ export interface GuestFeatureDef {
   wide?: boolean;
   cta: {
     none: string;
-    pending: string;
+    /** 즉시형(N 오더)은 검토 단계가 없어 비워 둔다 */
+    pending?: string;
     approved: string;
   };
   /** 승인완료 CTA가 이동할 어드민 관리 화면 (API의 manageUrl이 오면 그 값이 우선) */
@@ -100,8 +102,7 @@ export const GUEST_FEATURES: GuestFeatureDef[] = [
     desc: '회원이 상품을 확인하고 원터치결제로 클릭 한 번에 주문해요. 무인 판매로 부가 매출이 붙습니다.',
     image: '06_norder.png',
     cta: {
-      none: 'N 오더 이용시작하기',
-      pending: PENDING_CTA,
+      none: 'N 오더 바로 시작하기',
       approved: 'N 오더 관리하러 가기',
     },
     manageUrl: '/admin/norder',
@@ -150,9 +151,50 @@ export function chipClass(status: GuestFeatureStatus): string {
 
 export function ctaLabel(def: GuestFeatureDef, status: GuestFeatureStatus): string {
   if (status === 'APPROVED') return def.cta.approved;
-  if (status === 'PENDING') return def.cta.pending;
+  if (status === 'PENDING') return def.cta.pending ?? PENDING_CTA;
   if (status === 'REJECTED') return '다시 신청하기';
   return def.cta.none;
+}
+
+/* ============================================================================
+ * 즉시형 기능 — 누르면 바로 사용 (2026-09-27 신설)
+ *
+ * WHY: N 오더는 운영팀 승인을 없앴다. 센터가 «N 오더 바로 시작하기»를 누르는 즉시
+ * 사용중이 되고, 최고관리자 승인 목록에는 들어가지 않는다(검토중·반려 없음).
+ * 식당 입점 심사는 N 오더 안에서 그대로 유지되며, 없어진 것은 제휴·사용에 대한 운영팀 승인뿐이다.
+ * 제휴는 받는 쪽(센터 또는 식당)이 수락하면 바로 시작된다 — 기준: N 오더 staging 6ebca53.
+ * ========================================================================== */
+
+export const INSTANT_FEATURE_KEYS = ['norder'] as const;
+export type InstantFeatureKey = (typeof INSTANT_FEATURE_KEYS)[number];
+
+export function isInstantFeature(key: GuestFeatureKey): key is InstantFeatureKey {
+  return (INSTANT_FEATURE_KEYS as readonly string[]).includes(key);
+}
+
+/** 즉시형 상태는 2개뿐 — 미사용(NONE) · 사용중(ACTIVE) */
+export type InstantFeatureStatus = 'NONE' | 'ACTIVE';
+
+/** 서버가 옛 값(APPROVED/PENDING/REJECTED)을 내려줘도 안전하게 2상태로 접는다. APPROVED만 사용중으로 본다 */
+export function toInstantStatus(raw: string | null | undefined): InstantFeatureStatus {
+  return raw === 'ACTIVE' || raw === 'APPROVED' ? 'ACTIVE' : 'NONE';
+}
+
+export function instantChipLabel(status: InstantFeatureStatus): string {
+  return status === 'ACTIVE' ? '사용중' : '미사용';
+}
+
+export function instantChipClass(status: InstantFeatureStatus): string {
+  return status === 'ACTIVE' ? 's-approved' : 's-none';
+}
+
+export function instantCtaLabel(def: GuestFeatureDef, status: InstantFeatureStatus): string {
+  return status === 'ACTIVE' ? def.cta.approved : def.cta.none;
+}
+
+/** 미사용이면 누를 일(바로 시작)이 있으니 항상 채움 CTA */
+export function instantCtaVariant(status: InstantFeatureStatus): CtaVariant {
+  return status === 'ACTIVE' ? 'done' : 'fill';
 }
 
 /** 홀수 장일 때만 마지막 카드를 풀폭으로. 8장이 되면 자동으로 2열 복귀 */
@@ -174,7 +216,8 @@ export const DEFAULT_REJECT_REASON =
  * 담당자 확인 → 현장 상담 → 견적 협의 → 시공 → 사용승인의 실물 절차를 탄다.
  *
  * 그래서 이 2종만 기존 `status`(GuestFeatureStatus)와 **분리된 `flow` 상태**를 쓴다.
- * 나머지 4종(website/offline_payment/subscription/norder)은 기존 3상태 로직 그대로.
+ * 나머지 3종(website/offline_payment/subscription)은 기존 신청→승인 로직 그대로,
+ * norder는 즉시형 2상태(위 «즉시형 기능» 참조).
  * ========================================================================== */
 
 export const INSTALL_FEATURE_KEYS = ['access_control', 'iot_control'] as const;

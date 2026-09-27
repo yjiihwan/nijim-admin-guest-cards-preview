@@ -269,11 +269,12 @@
 /* ── 기능 정의 ── */
 const FEATS = {
   website:'온라인 홍보', offline_payment:'비대면결제', subscription:'구독멤버십',
-  access_control:'무인 출입제어', norder:'N 오더', iot_control:'IoT 원격제어', daypass:'1일권',
+  access_control:'무인 출입제어', iot_control:'IoT 원격제어', daypass:'1일권',
 };
+/* 09-27: N 오더는 센터가 누르면 바로 사용중(운영팀 승인 폐지) → 승인 목록·기능 필터에 넣지 않는다 */
 /* 설치형 2종 — 기기 설치·시공이 선행돼야 해서 단순 승인/반려로 처리할 수 없다 */
 const INSTALL = new Set(['access_control','iot_control']);
-const SIMPLE_FEATS = ['website','offline_payment','subscription','norder','daypass'];
+const SIMPLE_FEATS = ['website','offline_payment','subscription','daypass'];
 
 const FLOW_ORDER = ['APPLIED','CONSULT','QUOTED','INSTALLING','INSTALLED','ACTIVE'];
 const FLOW_CHIP = {

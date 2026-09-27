@@ -2,6 +2,8 @@
 
 **작성: 개발봇 | 2026-07-23 | 대상: 니짐내짐 사장님 어드민 (ngym.co.kr)**
 
+> **2026-09-27 변경 — N 오더(`norder`)는 신청·승인 대상에서 빠졌습니다.** 센터가 누르면 바로 «사용중»이 되고, 최고관리자 승인 목록에 들어가지 않습니다. 상태는 `NONE`(미사용) · `ACTIVE`(사용중) 2개뿐입니다 → **§6**. 나머지 기능의 신청·승인 흐름은 변경 없음. 변경 이력: `CHANGELOG.md`
+
 ## 0. 왜 신설 제안인가 (백엔드 필드 존재 여부 확인 결과)
 
 design봇 요청 ②·⑥에 따라 기존 백엔드 필드/신청 플로우 존재 여부를 확인하려 했으나,
@@ -29,7 +31,7 @@ Authorization: (기존 어드민 세션)
   "features": [
     {
       "key": "offline_payment",       // enum, 아래 §3
-      "status": "PENDING",            // NONE | PENDING | APPROVED | REJECTED
+      "status": "PENDING",            // NONE | PENDING | APPROVED | REJECTED  (norder만 NONE | ACTIVE — §6)
       "appliedAt": "2026-07-20T04:12:00Z",  // nullable
       "approvedAt": null,                    // nullable
       "rejectedReason": null,                // nullable, REJECTED일 때만
@@ -67,6 +69,7 @@ Content-Type: application/json
 **서버측 필수 가드 (프론트 비활성만으로는 부족)**
 - 이미 `PENDING` 또는 `APPROVED`인 key에 재신청 시 `409 Conflict`
 - 응답 바디 `{ "code": "ALREADY_APPLIED", "status": "PENDING" }` → 프론트가 최신 상태로 리렌더
+- `norder`는 이 엔드포인트를 쓰지 않습니다(신청 접수·승인 대기 없음). 들어오면 `400 { "code": "USE_ACTIVATE" }` — §6의 `activate`로 처리
 
 ## 3. 기능 key enum (7종)
 
@@ -77,7 +80,7 @@ Content-Type: application/json
 | `online_ads` | 온라인광고 | 〃 |
 | `subscription` | 월 정기결제 구독멤버십 | 〃 |
 | `access_control` | 무인 출입제어 시스템 | 〃 |
-| `norder` | N 오더 | 〃 |
+| `norder` | N 오더 | **즉시형(2026-09-27)** — 신청·승인 없음, 누르면 바로 사용중. §6 |
 | `iot_control` | **IoT 원격자동제어 (신규)** | **❓ 백엔드 처리 플로우 존재 여부 확인 필요 (요청 ⑥)** |
 
 ### ⑥ IoT 카드 관련 — 백엔드에 확인해야 할 항목
@@ -99,7 +102,8 @@ Content-Type: application/json
 # 5. 설치형 서비스 다단계 파이프라인 (2026-07-29 신설)
 
 **대상 2종만**: `access_control`(무인 출입제어) · `iot_control`(IoT 원격자동제어)
-**나머지 5종**(`website`/`offline_payment`/`online_ads`/`subscription`/`norder`)은 §1~§4의 3상태 로직을 그대로 씁니다. 변경 없음.
+**나머지 4종**(`website`/`offline_payment`/`online_ads`/`subscription`)은 §1~§4의 신청→승인 로직을 그대로 씁니다. 변경 없음.
+`norder`는 2026-09-27부터 즉시형 2상태(§6)입니다.
 
 ## 5.0 왜 분리했나
 
@@ -310,3 +314,45 @@ Content-Type: multipart/form-data
 - `GuestModeCards.tsx` — `installStates` prop + 6단계 스텝퍼 + 단계별 안내 박스 + `onApplySurvey`/`onOpenQuote` 콜백 구현 완료
 - `guest-mode-cards.css` — `.gm-steps`/`.gm-step`/`.gm-note`/`.gm-chip.s-quoted`/`.gm-chip.s-canceled` 추가 (기존 팔레트 내)
 - **`installStates` 미전달 시 전 카드 `flow: 'NONE'`으로 정상 렌더** → API 미구현 상태에서도 배포 가능
+
+---
+
+# 6. 즉시형 — N 오더 (2026-09-27 신설)
+
+**대상**: `norder` 1종. **바뀐 규칙**: 운영팀(최고관리자) 승인이 없어졌습니다. 센터가 «N 오더 바로 시작하기»를 누르는 즉시 사용중이 됩니다.
+
+- 기준: N 오더 테스트서버 `6ebca53` — 센터의 N 오더 사용은 누르는 즉시 시작, 제휴는 **받는 쪽(센터 또는 식당)이 수락하면 바로 시작**
+- **그대로 유지**: 식당의 N 오더 입점 심사(식당 가입 → 심사 통과 후 제휴 신청 가능). 없앤 것은 제휴·사용에 대한 운영팀 승인뿐입니다
+- 운영팀에는 «이 센터가 N 오더를 시작했다»는 알림만 갑니다(화면 알림). 승인·반려할 일은 없습니다
+
+## 6.1 상태 (2개)
+
+| status | 상태 칩 | CTA |
+|---|---|---|
+| `NONE` | 미사용(회색) | 채움 `#D4004E` «N 오더 바로 시작하기» → §6.2 `activate` 호출(신청 모달 없음) |
+| `ACTIVE` | 사용중(그린) | «N 오더 관리하러 가기» → `manageUrl` 라우팅 |
+
+- `PENDING`·`REJECTED`(검토중·반려) **없음**. `appliedAt`·`approvedAt`·`rejectedReason`은 `norder`에서 쓰지 않습니다(`activatedAt`만 사용)
+- 옛 데이터 호환: 서버가 `APPROVED`를 주면 프론트는 사용중으로, `PENDING`/`REJECTED`를 주면 미사용으로 보여 줍니다(`toInstantStatus`). 전환할 때 옛 `PENDING` 건은 `ACTIVE`로 바꾸거나 `NONE`으로 되돌리는 정리가 필요합니다 — 어느 쪽으로 할지는 운영 결정
+
+```jsonc
+{ "key": "norder", "status": "ACTIVE", "activatedAt": "2026-09-27T05:00:00Z", "manageUrl": "/admin/norder" }
+```
+
+## 6.2 바로 시작
+
+```
+POST /api/admin/centers/{centerId}/guest-features/norder/activate
+```
+
+- 응답 `200` + §6.1 단건 객체(`status: "ACTIVE"`)
+- **멱등**: 이미 `ACTIVE`면 그대로 `200`(두 번 눌러도 안전)
+- 입점을 마치지 않은 센터(게스트)는 `403 { "code": "NOT_A_MEMBER_CENTER" }` — 게스트 화면은 «입점 후 사용 가능» + 입점 신청으로 안내
+- **최고관리자 승인 목록(신청 큐)에 행을 만들지 않습니다.** 최고관리자 콘솔의 기능 필터에도 N 오더가 없습니다
+
+## 6.3 프론트 대응 현황
+
+- `guestFeatures.ts` — `INSTANT_FEATURE_KEYS`·`isInstantFeature`·`InstantFeatureStatus`·`toInstantStatus`·`instantChipLabel/Class`·`instantCtaLabel/Variant`. `norder`의 `cta.pending` 삭제, `cta.none` = «N 오더 바로 시작하기»
+- `GuestModeCards.tsx` — 즉시형 분기 + `onActivate` 콜백(누르면 `activate` 호출 → 상태 다시 받아 넘기기). 비활성 버튼·반려 박스 없음
+- 최고관리자 미리보기 `admin.html` — 승인 목록·기능 필터에서 N 오더 제거
+- 입점 센터 미리보기 `member.html` — 누르면 바로 사용중(`assets/norder-feature.js`)

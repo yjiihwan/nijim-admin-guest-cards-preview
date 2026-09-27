@@ -13,16 +13,23 @@ import {
   flowCtaLabel,
   flowCtaVariant,
   flowStepIndex,
+  instantChipClass,
+  instantChipLabel,
+  instantCtaLabel,
+  instantCtaVariant,
   isFlowCtaDisabled,
   isInstallFeature,
+  isInstantFeature,
   isWide,
   quoteTotals,
+  toInstantStatus,
   type GuestFeatureDef,
   type GuestFeatureKey,
   type GuestFeatureStatus,
   type InstallFeatureKey,
   type InstallFeatureState,
   type InstallFlow,
+  type InstantFeatureStatus,
 } from './guestFeatures';
 
 const won = (n: number) => n.toLocaleString('ko-KR');
@@ -30,7 +37,8 @@ const won = (n: number) => n.toLocaleString('ko-KR');
 /** API가 내려주는 기능별 신청 상태 (API_SPEC.md) */
 export interface GuestFeatureState {
   key: GuestFeatureKey;
-  status: GuestFeatureStatus;
+  /** norder는 'NONE' | 'ACTIVE' 2개만 온다 (API_SPEC.md §6) */
+  status: GuestFeatureStatus | InstantFeatureStatus;
   appliedAt?: string | null;
   approvedAt?: string | null;
   /** 승인완료 CTA 라우팅 목적지. 없으면 정적 정의의 manageUrl 사용 */
@@ -51,6 +59,11 @@ export interface GuestModeCardsProps {
   imageBase: string;
   /** 미신청 CTA 클릭 → 신청 모달 열기 */
   onApply: (feature: GuestFeatureDef) => void;
+  /**
+   * 즉시형(N 오더) «바로 시작하기» → POST …/activate 호출 후 states를 다시 받아 넘겨 주면 된다.
+   * 신청 모달·승인 대기 없음. 미지정이면 onApply 폴백
+   */
+  onActivate?: (feature: GuestFeatureDef) => void;
   /** 설치형 상담신청서 모달 (INSTALL_SURVEY_FORMS 스키마로 렌더). 미지정시 onApply 폴백 */
   onApplySurvey?: (feature: GuestFeatureDef, state: InstallFeatureState) => void;
   /** 설치형 QUOTED 상태에서 견적서 확인 모달 열기 */
@@ -181,6 +194,7 @@ export function GuestModeCards({
   installStates = [],
   imageBase,
   onApply,
+  onActivate,
   onApplySurvey,
   onOpenQuote,
   onNavigate,
@@ -199,7 +213,7 @@ export function GuestModeCards({
       <h1 className="gm-h1">Guest mode</h1>
       <div className="gm-lead">
         <h2>센터 운영을 더 스마트하게 해보세요</h2>
-        <p>신청하시면 검토 후 승인해 드려요. 승인되면 바로 사용하실 수 있습니다.</p>
+        <p>신청하시면 검토 후 승인해 드려요. 승인되면 바로 사용하실 수 있습니다. (N 오더는 검토 없이 바로 시작)</p>
       </div>
 
       <div className="gm-grid">
@@ -264,10 +278,57 @@ export function GuestModeCards({
             );
           }
 
-          /* ── 나머지 4종 — 기존 3상태 로직 그대로 ── */
+          /* ── 즉시형(N 오더) — 누르면 바로 사용중. 검토중·반려·승인 목록 없음 (2026-09-27) ── */
+          if (isInstantFeature(def.key)) {
+            const ins = byKey.get(def.key);
+            const st = toInstantStatus(ins?.status);
+            const label = instantCtaLabel(def, st);
+
+            return (
+              <article key={def.key} className={baseClass}>
+                <div className="gm-chd">
+                  <h3>{badge}{def.title}</h3>
+                  <span className={`gm-chip ${instantChipClass(st)}`}>
+                    <span className="gm-dot" aria-hidden="true" />
+                    {instantChipLabel(st)}
+                  </span>
+                </div>
+
+                <p className="gm-ben" dangerouslySetInnerHTML={{ __html: def.benefitHtml }} />
+                <p className="gm-desc">{def.desc}</p>
+
+                {st === 'NONE' && (
+                  <div className="gm-note">
+                    <b>누르면 바로 시작</b>· 따로 신청하거나 기다릴 필요 없어요. 버튼을 누르는 즉시 쓸 수 있어요.
+                  </div>
+                )}
+
+                <div className="gm-thumb">
+                  <img src={`${imageBase}/${def.image}`} alt="" loading="lazy" />
+                </div>
+
+                <div className="gm-spacer" />
+
+                <button
+                  type="button"
+                  className={`gm-cta v-${instantCtaVariant(st)}`}
+                  aria-label={`${def.title} — ${instantChipLabel(st)} — ${label}`}
+                  onClick={() => {
+                    if (st === 'ACTIVE') return navigate(ins?.manageUrl || def.manageUrl, def);
+                    return onActivate ? onActivate(def) : onApply(def);
+                  }}
+                >
+                  {label}
+                </button>
+              </article>
+            );
+          }
+
+          /* ── 나머지 3종 — 기존 신청→승인 로직 그대로 ── */
           const state = byKey.get(def.key);
           // REJECTED는 별도 칩+사유 노출+재신청 허용 (2026-07-28 확정)
-          const status: GuestFeatureStatus = state?.status ?? 'NONE';
+          // 'ACTIVE'는 즉시형 전용이라 위에서 이미 걸러졌다
+          const status = (state?.status ?? 'NONE') as GuestFeatureStatus;
           const rejectReason = state?.rejectedReason || DEFAULT_REJECT_REASON;
           const variant = ctaVariant(status, def.recommended);
           const wide = isWide(i, total, def);
