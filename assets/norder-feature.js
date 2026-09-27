@@ -3,6 +3,8 @@
    용어·사실관계 정본 = 센터용 랜딩 enter-norder.html(#more 포함) + N오더 staging(~/norder_app) copy-*.ts.
    09-27 형: 센터 니즈 = «우리 센터 회원만 받는 제휴식당 할인 → 멤버십 가치». «앱을 열 이유» 같은 앱 사용 유도 문구 금지, 할인율 숫자 금지.
    09-27 형 시정: «센터가 얻는 것»엔 확정된 센터 이득만 — ①회원 전용 할인→멤버십 가치 ②재고 없는 부가수익 ③식당 신청·센터 승인 후 식사권만 올림·자동 정산. 식당 이득을 센터 이득처럼 쓰지 말 것.
+   09-27 결정: ①식당 제휴 = 센터가 수락하면 즉시 시작(운영팀 승인 없음) ②센터 N오더 = 누르는 즉시 사용(운영팀 검토·승인 없음). N오더 staging 6ebca53.
+   → 입점 센터 카드는 2상태(미사용·사용중)만. «검토중·승인 대기·영업일» 문구 금지. 식당 «입점 심사»는 별개로 남아 있음(copy-partner.ts).
    ⛔ 쓰지 않는 것: 수수료율·배달비·최소주문금액(확정값 없음), «N오더 미사용 센터 제휴신청»(dev 개발 중). */
 
 const NORDER_FEATURE = {
@@ -11,7 +13,7 @@ const NORDER_FEATURE = {
   benefitHtml:'근처 제휴 식당 할인, <em>우리 센터 회원만</em>',
   desc:'근처 제휴 식당을 우리 센터 회원만 할인가로 이용하게 해요. 회원은 식당 계산대의 QR을 자기 폰으로 스캔해 사용하고, 식사권이 쓰일 때마다 판매 수수료가 센터 몫으로 정산돼요.',
   image:'11_norder_restaurant.jpg',
-  cta:{none:'N 오더 이용시작하기',pending:'신청 검토중 · 평균 1~2영업일',approved:'N 오더 관리하러 가기'},
+  cta:{none:'N 오더 바로 시작하기',approved:'N 오더 관리하러 가기'},
   manageUrl:'/admin/norder',
   /* 게스트 → 입점 신청으로 보냄. 실제 경로는 기존 어드민의 입점 신청 화면으로 연결(개발 확인). */
   joinUrl:'/admin/join',
@@ -53,7 +55,7 @@ function nfGain(){
     <div class="nf-gain">
       <div class="nf-g"><b>새 매출</b><p>쌓아둘 재고 없이, 식사권이 쓰일 때마다 판매 수수료가 센터 몫으로 들어와요.</p></div>
       <div class="nf-g"><b>멤버십 가치 상승</b><p>다른 곳에선 받을 수 없는 제휴 식당 할인을 우리 센터 회원만 받아요. 회원 전용 혜택이 멤버십의 가치를 높여 줘요.</p></div>
-      <div class="nf-g"><b>승인 한 번이면 시작</b><p>식당이 먼저 신청하고, 센터는 승인한 뒤 판매할 식사권만 올리면 돼요. 정산은 자동이에요.</p></div>
+      <div class="nf-g"><b>식당 신청을 수락하면 시작</b><p>식당이 먼저 신청하고, 센터는 수락한 뒤 판매할 식사권만 올리면 돼요. 정산은 자동이에요.</p></div>
     </div></div>`;
 }
 
@@ -80,20 +82,17 @@ function norderGuestCard(){
   </article>`;
 }
 
-/* 입점 센터 — 기존 3상태(NONE·PENDING·APPROVED·REJECTED) 로직 유지.
-   승인 전에는 3단계 버튼을 잠그고, 카드 하단 CTA(신청)는 기존 그대로 둔다. */
-function norderMemberCard(st, rejectReason){
+/* 입점 센터 — 09-27 결정②: 운영팀 검토·승인 없이 누르는 즉시 사용. 상태는 2개뿐(미사용·사용중).
+   예전 PENDING·REJECTED가 들어와도 «미사용»으로 본다. 3단계 버튼은 처음부터 열려 있고, 미사용 때 누르면 사용 시작과 함께 해당 메뉴로 간다. */
+function norderMemberCard(st){
   const d = NORDER_FEATURE;
-  const ok = st==='APPROVED';
-  const chip = `<span class="gm-chip ${chipClass(st)}"><span class="gm-dot"></span>${chipLabel(st)}</span>`;
+  const on = st==='APPROVED';
+  const chip = on ? '<span class="gm-chip s-approved"><span class="gm-dot"></span>사용중</span>'
+    : '<span class="gm-chip s-none"><span class="gm-dot"></span>미사용</span>';
   const steps = NF_START.map((s,i)=>`<div class="nf-s"><span class="nf-k">${s.k}</span><b>${s.t}</b><p>${s.p}</p>
-      <button type="button" class="nf-go nf-act" data-act="menu" data-i="${i}" ${ok?'':'disabled aria-disabled="true"'}>${s.btn}</button></div>`).join('');
-  const note = ok ? ''
-    : st==='REJECTED' ? `<div class="gm-reject"><b>반려 사유</b>· ${rejectReason}</div>`
-    : st==='PENDING' ? '<div class="gm-note"><b>검토중</b>· 사용 승인이 나면 아래 3단계 버튼이 열려요. 지금은 따로 하실 일이 없어요.</div>'
-    : '<div class="gm-note is-muted"><b>먼저 이용 신청</b>· 아래 버튼으로 N 오더 이용을 신청하고 승인되면, 3단계 버튼으로 바로 시작할 수 있어요.</div>';
-  const v = ok ? 'done' : st==='PENDING' ? 'wait' : 'fill';
-  const label = ok ? d.cta.approved : st==='PENDING' ? d.cta.pending : st==='REJECTED' ? '다시 신청하기' : d.cta.none;
+      <button type="button" class="nf-go nf-act" data-act="menu" data-i="${i}" data-on="${on?1:0}">${s.btn}</button></div>`).join('');
+  const note = on ? ''
+    : '<div class="gm-note"><b>누르면 바로 시작</b>· 따로 신청하거나 기다릴 필요 없어요. 아래 버튼을 누르는 즉시 N 오더를 쓸 수 있어요.</div>';
   return `<article class="gm-card is-wide is-norder" data-key="${d.key}">
     ${nfHead(chip)}
     ${nfUnderstand()}
@@ -103,9 +102,15 @@ function norderMemberCard(st, rejectReason){
       <div class="nf-start"${note?' style="margin-top:10px"':''}>${steps}</div>
     </div>
     <div class="gm-spacer"></div>
-    <button type="button" class="gm-cta v-${v} nf-act" data-act="main" data-status="${st}"
-      ${st==='PENDING'?'disabled aria-disabled="true"':''}>${label}</button>
+    <button type="button" class="gm-cta v-${on?'done':'fill'} nf-act" data-act="main" data-on="${on?1:0}">${on?d.cta.approved:d.cta.none}</button>
   </article>`;
+}
+
+/* 목업: 미사용 카드에서 시작하면 카드를 «사용중»으로 바꿔 다시 그린다 */
+function nfActivate(btn){
+  const card = btn.closest('.gm-card.is-norder');
+  card.outerHTML = norderMemberCard('APPROVED');
+  bindNorderCard();
 }
 
 /* 이동 안내 — 목업이라 실제 이동 대신 목적지를 토스트 + 로그로 보여준다 */
@@ -125,11 +130,12 @@ function bindNorderCard(){
       const act = b.dataset.act;
       if(act==='join') return nfToast('[라우팅] 입점 신청 화면으로 이동', NORDER_FEATURE.joinUrl);
       if(act==='menu'){ const s = NF_START[+b.dataset.i];
-        return nfToast(`[라우팅] N 오더 관리자 «${s.menu}» 메뉴로 이동`, s.url); }
-      const st = b.dataset.status;
-      if(st==='PENDING') return nfToast('검토중 — 클릭 무시됨(중복 신청 차단)');
-      if(st==='APPROVED') return nfToast('[라우팅] N 오더 관리자 대시보드로 이동', NORDER_FEATURE.manageUrl);
-      nfToast(st==='REJECTED' ? '[신청 모달] N 오더 재신청 폼 열기 (반려 사유 안내 포함)' : '[신청 모달] N 오더 이용 신청 폼 열기');
+        nfToast(`[라우팅] N 오더 관리자 «${s.menu}» 메뉴로 이동`, (b.dataset.on==='1'?'':'N 오더 사용 바로 시작 · ')+s.url);
+        if(b.dataset.on!=='1') nfActivate(b);
+        return; }
+      if(b.dataset.on==='1') return nfToast('[라우팅] N 오더 관리자 대시보드로 이동', NORDER_FEATURE.manageUrl);
+      nfToast('N 오더를 바로 시작했어요 — 지금부터 사용중', '운영팀 승인 없이 즉시 사용');
+      nfActivate(b);
     });
   });
 }

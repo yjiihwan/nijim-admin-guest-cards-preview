@@ -207,8 +207,9 @@ const OPS = [
    cta:{none:'IoT 원격제어 도입신청하기',pending:PENDING_CTA,approved:'IoT 제어판 열기'},manageUrl:'/admin/iot'},
 ];
 
-/* 09-27 norder 기본값 REJECTED → APPROVED: 기본 화면에서 «바로 시작하기 3단계»가 열린 상태를 보여준다(반려는 «전체 반려»로 확인) */
-const MIXED = {subscription:'NONE',norder:'APPROVED'};
+/* 09-27 norder 기본값 APPROVED → NONE: 운영팀 승인 없이 즉시 사용(결정②) — 기본 화면에서 «N 오더 바로 시작하기»를 보여준다.
+   N 오더는 미사용·사용중 2상태뿐이라 «전체 검토중·전체 반려»에서도 «미사용»으로 보인다. */
+const MIXED = {subscription:'NONE',norder:'NONE'};
 const REJECT_REASON = '제출하신 사업자 정보와 센터 정보가 일치하지 않아 반려되었어요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.';
 
 /* ── 기존 3상태 로직 (설치형 2종 외 전 카드) — 변경 없음 ── */
@@ -450,7 +451,7 @@ function render(){
   const promo = PROMO.map(d=>card(d, stOf(d), false)).join('');
   /* 홀수 판정은 일반 카드만 센다 — N 오더 카드는 원래 한 줄 전체라 짝 맞춤에서 빠진다 */
   const opsNormal = OPS.filter(d=>!d.feature).length;
-  const ops = OPS.map((d,i)=> d.feature ? norderMemberCard(stOf(d), REJECT_REASON)
+  const ops = OPS.map((d,i)=> d.feature ? norderMemberCard(stOf(d))
     : card(d, stOf(d), !!d.wide && opsNormal%2===1 && i===OPS.length-1)).join('');
   document.getElementById('root').innerHTML =
     `<div class="gm-scope">
@@ -459,7 +460,7 @@ function render(){
         <p>쿠폰·이벤트·상품을 열면 앱에서 우리 센터가 강조 표시되고 상위노출 확률이 올라가요.</p></div>
       <div class="gm-grid">${promo}</div>
       <div class="gm-lead"><h2>센터 운영을 더 스마트하게 해보세요</h2>
-        <p>신청하시면 검토 후 승인해 드려요. 설치가 필요한 서비스는 담당자가 현장을 확인한 뒤 견적·시공을 안내해 드립니다.</p></div>
+        <p>신청하시면 검토 후 승인해 드려요(N 오더는 검토 없이 바로 시작). 설치가 필요한 서비스는 담당자가 현장을 확인한 뒤 견적·시공을 안내해 드립니다.</p></div>
       <div class="gm-grid">${ops}</div>
     </div>`;
 
