@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <title>Guest mode 카드 — 구현본 미리보기 (상태 전환 가능)</title>
 <link rel="stylesheet" href="assets/guest-mode-cards.css">
+<link rel="stylesheet" href="assets/norder-feature.css">
+<script src="assets/norder-feature.js"></script>
 <style>
   body{margin:0;background:#F7F7F9;font-family:"Pretendard Variable","Pretendard",-apple-system,sans-serif}
   .page{padding:34px 40px 56px}
@@ -50,9 +52,9 @@ const FEATURES = [
   {key:'access_control',title:'무인 출입제어 시스템',benefitHtml:'회원이 스스로 여는 출입문, <em>상주 인력 0명</em>',
    desc:'회원이 직접 출입문을 열고 닫아요. 직원은 언제 어디서든 누가 출입했는지 확인하고 원격으로 문을 여닫을 수 있어요.',
    image:'05_access.png',install:true,cta:{none:'무인 출입제어 도입신청하기',pending:PENDING_CTA,approved:'출입제어 관리하러 가기'},manageUrl:'/admin/access'},
-  {key:'norder',title:'N 오더',benefitHtml:'센터 안 음료·자물쇠·굿즈를 <em>앱에서 바로 판매</em>',
-   desc:'회원이 상품을 확인하고 원터치결제로 클릭 한 번에 주문해요. 무인 판매로 부가 매출이 붙습니다.',
-   image:'06_norder.png',cta:{none:'N 오더 이용시작하기',pending:PENDING_CTA,approved:'N 오더 관리하러 가기'},manageUrl:'/admin/norder'},
+  /* 09-27 N 오더 식당 연계 개편 — 같은 자리(access_control 다음)에서 가로 전체 폭 카드로 확장.
+     게스트는 입점 전이라 신청 상태 대신 «입점 후 사용 가능»으로 고정 (렌더: assets/norder-feature.js) */
+  {key:'norder',feature:true},
   {key:'iot_control',title:'IoT 원격자동제어',benefitHtml:'센터에 없어도, <em>조명·냉난방을 앱으로 원격 제어</em>',
    desc:'조명·냉난방·환기 등 센터 설비를 앱에서 원격으로 켜고 끌 수 있어요. 오픈·마감 시간에 맞춰 자동 스케줄을 걸어두면 설비가 알아서 켜지고 꺼져서, 센터에 나가지 않아도 운영 준비가 끝나 있습니다.',
    image:'07_iot.png',recommended:true,isNew:true,wide:true,install:true,
@@ -78,9 +80,12 @@ const ctaLabelOf  = (d,s) => !d.install ? ctaLabel(d,s)
 
 function render(mode){
   const total = FEATURES.length;
+  /* 홀수 판정은 일반 카드만 센다 — N 오더 카드는 원래 한 줄 전체라 짝 맞춤에서 빠진다 */
+  const normal = FEATURES.filter(d=>!d.feature).length;
   const cards = FEATURES.map((d,i)=>{
+    if(d.feature) return norderGuestCard();
     const st = mode==='mixed' ? MIXED[d.key] : mode;
-    const wide = !!d.wide && total%2===1 && i===total-1;
+    const wide = !!d.wide && normal%2===1 && i===total-1;
     const v = ctaVariant(st,d.recommended);
     const badge = d.isNew ? '<span class="gm-badge is-new">NEW</span>'
       : (d.recommended ? '<span class="gm-badge">추천</span>' : '');
@@ -107,7 +112,8 @@ function render(mode){
       <div class="gm-grid">${cards}</div>
     </div>`;
 
-  document.querySelectorAll('.gm-cta').forEach(b=>{
+  bindNorderCard();
+  document.querySelectorAll('.gm-cta[data-key]').forEach(b=>{
     b.addEventListener('click',()=>{
       const {key,status,url} = b.dataset;
       const log = document.getElementById('log');

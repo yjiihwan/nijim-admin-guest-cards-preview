@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <title>입점 센터 화면 — 구현본 미리보기 (상태 전환 가능)</title>
 <link rel="stylesheet" href="assets/guest-mode-cards.css">
+<link rel="stylesheet" href="assets/norder-feature.css">
+<script src="assets/norder-feature.js"></script>
 <style>
   body{margin:0;background:#F7F7F9;font-family:"Pretendard Variable","Pretendard",-apple-system,sans-serif}
   .page{padding:34px 40px 56px}
@@ -191,20 +193,22 @@ const PROMO = [
 /* 섹션 2 — 운영 자동화. access_control·iot_control은 기기 설치·시공이 선행돼야 해서
    install:true → 단순 3상태가 아니라 별도 flow 파이프라인을 탄다 (guestFeatures.ts 참조). */
 const OPS = [
+  /* 09-27 N 오더 식당 연계 개편 — 가로 전체 폭 카드로 확장해 섹션 맨 앞에 둔다.
+     원래 자리(출입제어 다음)에 두면 출입제어 카드가 한 줄에 혼자 남아서 순서만 옮겼다.
+     렌더·3단계 바로가기: assets/norder-feature.js */
+  {key:'norder',feature:true},
   {key:'access_control',title:'무인 출입제어 시스템',benefitHtml:'회원이 스스로 여는 출입문, <em>상주 인력 0명</em>',
    desc:'회원이 직접 출입문을 열고 닫아요. 직원은 언제 어디서든 누가 출입했는지 확인하고 원격으로 문을 여닫을 수 있어요.',
    image:'05_access.png',install:true,
    cta:{none:'무인 출입제어 도입신청하기',pending:PENDING_CTA,approved:'출입제어 관리하러 가기'},manageUrl:'/admin/access'},
-  {key:'norder',title:'N 오더',benefitHtml:'센터 안 음료·자물쇠·굿즈를 <em>앱에서 바로 판매</em>',
-   desc:'회원이 상품을 확인하고 원터치결제로 클릭 한 번에 주문해요. 무인 판매로 부가 매출이 붙습니다.',
-   image:'06_norder.png',cta:{none:'N 오더 이용시작하기',pending:PENDING_CTA,approved:'N 오더 관리하러 가기'},manageUrl:'/admin/norder'},
   {key:'iot_control',title:'IoT 원격자동제어',benefitHtml:'센터에 없어도, <em>조명·냉난방을 앱으로 원격 제어</em>',
    desc:'조명·냉난방·환기 등 센터 설비를 앱에서 원격으로 켜고 끌 수 있어요. 오픈·마감 시간에 맞춰 자동 스케줄을 걸어두면 설비가 알아서 켜지고 꺼져서, 센터에 나가지 않아도 운영 준비가 끝나 있습니다.',
    image:'07_iot.png',recommended:true,isNew:true,wide:true,install:true,
    cta:{none:'IoT 원격제어 도입신청하기',pending:PENDING_CTA,approved:'IoT 제어판 열기'},manageUrl:'/admin/iot'},
 ];
 
-const MIXED = {subscription:'NONE',norder:'REJECTED'};
+/* 09-27 norder 기본값 REJECTED → APPROVED: 기본 화면에서 «바로 시작하기 3단계»가 열린 상태를 보여준다(반려는 «전체 반려»로 확인) */
+const MIXED = {subscription:'NONE',norder:'APPROVED'};
 const REJECT_REASON = '제출하신 사업자 정보와 센터 정보가 일치하지 않아 반려되었어요. 정보를 확인해 수정하신 뒤 다시 신청해 주세요.';
 
 /* ── 기존 3상태 로직 (설치형 2종 외 전 카드) — 변경 없음 ── */
@@ -444,7 +448,10 @@ let MODE = 'mixed';
 function render(){
   const stOf = d => d.instant ? 'NONE' : (MODE==='mixed' ? (MIXED[d.key]??'NONE') : MODE);
   const promo = PROMO.map(d=>card(d, stOf(d), false)).join('');
-  const ops = OPS.map((d,i)=>card(d, stOf(d), !!d.wide && OPS.length%2===1 && i===OPS.length-1)).join('');
+  /* 홀수 판정은 일반 카드만 센다 — N 오더 카드는 원래 한 줄 전체라 짝 맞춤에서 빠진다 */
+  const opsNormal = OPS.filter(d=>!d.feature).length;
+  const ops = OPS.map((d,i)=> d.feature ? norderMemberCard(stOf(d), REJECT_REASON)
+    : card(d, stOf(d), !!d.wide && opsNormal%2===1 && i===OPS.length-1)).join('');
   document.getElementById('root').innerHTML =
     `<div class="gm-scope">
       <h1 class="gm-h1">입점 센터 홈</h1>
@@ -456,6 +463,7 @@ function render(){
       <div class="gm-grid">${ops}</div>
     </div>`;
 
+  bindNorderCard();
   document.querySelectorAll('.gm-cta[data-key]').forEach(b=>{
     b.addEventListener('click',()=>{
       const {key,status,url} = b.dataset;

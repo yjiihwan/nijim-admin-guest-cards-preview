@@ -1,0 +1,76 @@
+/* ===== N 오더 · 식당 연계 카드 (2026-09-27) =====
+   WHY 별도 파일: 07-30 인계본(guest-mode-cards.css)은 건드리지 않고 이 카드 전용 규칙만 얹는다.
+   기존 gm- 팔레트(핑크·스카이·그레이)와 카드 틀(gm-card is-wide) 안에서만 정의한다.
+   구성 = ① 이해(흐름 3칸) → ② 욕구(센터가 얻는 것 3가지) → ③ 시작(게스트: 입점 안내 / 입점: 3단계 바로가기) */
+
+.gm-card.is-norder{border-color:var(--gm-pink-tint2)}
+.gm-card.is-norder:hover{transform:none}
+.gm-card.is-norder .gm-thumb{aspect-ratio:32/9}
+/* WHY keep-all: 이 카드는 문장이 길어 모바일에서 어절 중간 줄바꿈(«회/원은»)이 난다 */
+.gm-card.is-norder .gm-desc,.gm-card.is-norder .gm-ben,.gm-card.is-norder .gm-note,.gm-card.is-norder .gm-reject{word-break:keep-all}
+.gm-card.is-norder .gm-thumb img{object-position:50% 55%}
+
+.nf-sec{margin-top:18px}
+.nf-sec > h4{margin:0 0 10px;font-size:13px;font-weight:800;letter-spacing:-.02em;color:var(--gm-text);
+  display:flex;align-items:center;gap:7px}
+.nf-sec > h4 .nf-n{flex:none;width:20px;height:20px;border-radius:50%;background:var(--gm-text);color:#fff;
+  font-size:11px;line-height:20px;text-align:center}
+
+/* ① 흐름 3칸 — 화살표로 이어지는 가로 3단(모바일 세로) */
+.nf-flow{display:grid;grid-template-columns:1fr 18px 1fr 18px 1fr;align-items:stretch}
+.nf-step{border:1px solid var(--gm-line);border-radius:14px;background:#FAFAFC;padding:13px 14px;min-width:0}
+.nf-step .nf-ic{width:34px;height:34px;border-radius:10px;background:#fff;border:1px solid var(--gm-line);
+  display:flex;align-items:center;justify-content:center}
+.nf-step .nf-ic svg{width:20px;height:20px}
+.nf-step b{display:block;margin-top:9px;font-size:14px;font-weight:800;letter-spacing:-.025em;color:var(--gm-text)}
+.nf-step b small{font-size:11px;font-weight:800;color:var(--gm-pink-strong);margin-right:5px}
+.nf-step p{margin:4px 0 0;font-size:12.5px;line-height:1.55;color:var(--gm-sub);letter-spacing:-.015em;word-break:keep-all}
+.nf-arr{display:flex;align-items:center;justify-content:center;color:#C4C4CC;font-size:14px;font-weight:800}
+
+/* ② 얻는 것 3가지 */
+.nf-gain{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.nf-g{border-radius:14px;background:var(--gm-pink-tint);border:1px solid var(--gm-pink-tint2);padding:13px 14px;min-width:0}
+.nf-g b{display:block;font-size:14px;font-weight:800;letter-spacing:-.025em;color:var(--gm-pink-pressed)}
+.nf-g p{margin:4px 0 0;font-size:12.5px;line-height:1.55;color:#6E2A45;letter-spacing:-.015em;word-break:keep-all}
+
+/* ③-입점: 바로 시작 3단계 — 각 단계에 해당 메뉴 버튼 */
+.nf-start{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.nf-s{border:1px solid var(--gm-line);border-radius:14px;background:#fff;padding:13px 14px;display:flex;flex-direction:column;min-width:0}
+.nf-s .nf-k{font-size:11px;font-weight:800;color:var(--gm-pink-strong);letter-spacing:-.01em}
+.nf-s b{display:block;margin-top:3px;font-size:14px;font-weight:800;letter-spacing:-.025em;color:var(--gm-text)}
+.nf-s p{margin:4px 0 12px;font-size:12.5px;line-height:1.55;color:var(--gm-sub);letter-spacing:-.015em;word-break:keep-all}
+.nf-s .nf-go{margin-top:auto}
+.nf-go{display:block;width:100%;height:40px;margin-top:12px;border-radius:10px;border:1.5px solid var(--gm-pink-strong);
+  background:#fff;color:var(--gm-pink-strong);font-weight:700;font-size:13.5px;font-family:inherit;letter-spacing:-.02em;
+  cursor:pointer;text-align:center;text-decoration:none;line-height:37px}
+.nf-go:hover{background:var(--gm-pink-tint)}
+.nf-go:disabled{border-color:var(--gm-line);color:#A9A9B2;background:#FAFAFC;cursor:default}
+.nf-s:has(.nf-go:disabled){background:#FCFCFD}
+
+/* ③-게스트: 입점 안내 + 버튼 2개 */
+.nf-cta2{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-top:14px}
+.nf-cta2 .gm-cta{margin:0}
+
+/* 입점 전 칩 — 신청 상태가 아니라 «조건» 표시라 스카이 계열 테두리형으로 구분 */
+.gm-chip.s-member{background:#fff;border-color:#BFE4FF;color:var(--gm-sky-text)}
+.gm-chip.s-member .gm-dot{background:var(--gm-sky)}
+
+/* 이동 안내 토스트 — 프로토타입에서 «버튼이 어디로 가는지» 눈으로 확인하는 용도 */
+.nf-toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  max-width:min(560px,calc(100% - 32px));background:#16161C;color:#fff;border-radius:12px;padding:12px 16px;
+  font-size:13px;font-weight:700;line-height:1.5;letter-spacing:-.015em;box-shadow:0 12px 30px rgba(22,22,28,.25);
+  transition:.2s;z-index:80;word-break:keep-all}
+.nf-toast.show{opacity:1;transform:translate(-50%,0)}
+.nf-toast small{display:block;font-size:11.5px;font-weight:600;color:#B9B9C2;margin-top:2px;word-break:break-all}
+
+@media (max-width:900px){
+  .gm-card.is-norder .gm-thumb{aspect-ratio:16/9}
+  .nf-flow{grid-template-columns:1fr}
+  .nf-arr{height:14px;transform:rotate(90deg);font-size:12px}
+  /* 모바일: 아이콘을 왼쪽에 두어 칸 높이를 줄인다 */
+  .nf-step{display:grid;grid-template-columns:34px 1fr;column-gap:11px;padding:11px 12px}
+  .nf-step .nf-ic{grid-row:1 / span 2}
+  .nf-step b{margin-top:0}
+  .nf-gain,.nf-start{grid-template-columns:1fr}
+  .nf-cta2{grid-template-columns:1fr}
+}
