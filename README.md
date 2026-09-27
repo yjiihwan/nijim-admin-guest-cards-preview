@@ -2,7 +2,7 @@
 
 ⚠️ 이 저장소는 **UI 미리보기 전용**입니다. 실서비스 어드민(ngym.co.kr)이 아닙니다.
 
-- 공개 미리보기(07-30 인계본, main): https://yjiihwan.github.io/nijim-admin-guest-cards-preview/
+- 공개 미리보기(main): https://yjiihwan.github.io/nijim-admin-guest-cards-preview/ — 09-27부터 아래 N 오더 반영본과 같은 내용. **07-30 인계본 원본은 태그 `handover-0730-original`**
 - N 오더 식당 연계 개선본(09-27, 브랜치 `norder-restaurant-link`): https://yjiihwan.github.io/nijim-admin-norder-preview/ — 추가 파일 `assets/norder-feature.css·js`, `img/11_norder_restaurant.jpg`
 - 구현 소스(드롭인 패키지): `GuestModeCards.tsx` / `guestFeatures.ts` / `guest-mode-cards.css`
 - API 규격 제안: `API_SPEC.md`
