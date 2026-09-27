@@ -1,13 +1,14 @@
 /* ===== N 오더 · 식당 연계 카드 — 게스트(index)·입점(member) 공용 렌더러 (2026-09-27) =====
    WHY 공용: 두 화면의 ①이해·②욕구 문구가 달라지면 안 된다. ③시작 블록만 화면별로 갈린다.
    용어·사실관계 정본 = 센터용 랜딩 enter-norder.html(#more 포함) + N오더 staging(~/norder_app) copy-*.ts.
+   09-27 형: 센터 니즈 = «우리 센터 회원만 받는 제휴식당 할인 → 멤버십 가치». «앱을 열 이유» 같은 앱 사용 유도 문구 금지, 할인율 숫자 금지.
    ⛔ 쓰지 않는 것: 수수료율·배달비·최소주문금액(확정값 없음), «N오더 미사용 센터 제휴신청»(dev 개발 중). */
 
 const NORDER_FEATURE = {
   key:'norder',
   title:'N 오더 · 식당 연계',
-  benefitHtml:'근처 식당 식사권까지, <em>우리 센터 앱에서 판매</em>',
-  desc:'제휴 식당의 식사권을 우리 센터 앱에서 대신 판매하고, 회원은 식당 계산대의 QR을 자기 폰으로 스캔해 사용해요. 식사권이 쓰일 때마다 판매 수수료가 센터 몫으로 정산돼요.',
+  benefitHtml:'근처 제휴 식당 할인, <em>우리 센터 회원만</em>',
+  desc:'근처 제휴 식당을 우리 센터 회원만 할인가로 이용하게 해요. 회원은 식당 계산대의 QR을 자기 폰으로 스캔해 사용하고, 식사권이 쓰일 때마다 판매 수수료가 센터 몫으로 정산돼요.',
   image:'11_norder_restaurant.jpg',
   cta:{none:'N 오더 이용시작하기',pending:'신청 검토중 · 평균 1~2영업일',approved:'N 오더 관리하러 가기'},
   manageUrl:'/admin/norder',
@@ -35,8 +36,8 @@ const NF_START = [
 function nfUnderstand(){
   return `<div class="nf-sec"><h4><span class="nf-n">1</span>이렇게 돌아가요</h4>
     <div class="nf-flow">
-      <div class="nf-step"><span class="nf-ic">${NF_ICON.store}</span><b><small>01</small>센터가 판매</b>
-        <p>제휴 식당의 식사권을 우리 센터 앱 스토어에 올려요.</p></div>
+      <div class="nf-step"><span class="nf-ic">${NF_ICON.store}</span><b><small>01</small>회원 전용 판매</b>
+        <p>제휴 식당의 할인 식사권을 센터 스토어에 올려요. 우리 센터 회원만 살 수 있어요.</p></div>
       <span class="nf-arr" aria-hidden="true">→</span>
       <div class="nf-step"><span class="nf-ic">${NF_ICON.qr}</span><b><small>02</small>회원이 QR로 사용</b>
         <p>식당 계산대에 붙은 QR을 회원이 자기 폰으로 스캔하면 끝. 식당 직원은 조작할 게 없어요.</p></div>
@@ -50,7 +51,7 @@ function nfGain(){
   return `<div class="nf-sec"><h4><span class="nf-n">2</span>센터가 얻는 것</h4>
     <div class="nf-gain">
       <div class="nf-g"><b>새 매출</b><p>쌓아둘 재고 없이, 식사권이 쓰일 때마다 판매 수수료가 센터 몫으로 들어와요.</p></div>
-      <div class="nf-g"><b>회원 혜택·만족도</b><p>운동 끝나고 식사까지 우리 센터 앱에서. 회원이 앱을 열 이유가 하나 더 생겨요.</p></div>
+      <div class="nf-g"><b>멤버십 가치 상승</b><p>다른 곳에선 받을 수 없는 제휴 식당 할인을 우리 센터 회원만 받아요. 회원 전용 혜택이 멤버십의 가치를 높여 줘요.</p></div>
       <div class="nf-g"><b>함께 파는 상품</b><p>보충제·음료 같은 일반상품은 센터 픽업으로, 제휴 식당 배달상품은 센터 인포데스크 수령으로 함께 팔 수 있어요.</p></div>
     </div></div>`;
 }
