@@ -1,0 +1,44 @@
+/* ===== 체험권 이벤트 카드 (2026-10-20) =====
+   N 오더 카드(is-wide is-norder)와 같은 틀·같은 nf- 블록을 그대로 쓰고, 이 카드에만 필요한 조건 목록·현황 칸만 더한다.
+   07-30 인계본 CSS(guest-mode-cards.css)·norder-feature.css는 건드리지 않는다. 그림자·그라데이션 등 효과 없음. */
+
+/* 썸네일 = 앱 칸 캡처(가운데 정렬 구성) — 모바일 16:9에서도 패널이 잘리지 않게 가운데 기준 */
+.gm-card.is-trial .gm-thumb img{object-position:50% 50%}
+
+/* 썸네일 설명 한 줄 — 이미지 안 글자 대신 */
+.tc-cap{margin:8px 0 0;font-size:12.5px;font-weight:600;line-height:1.5;color:var(--gm-pink-pressed);letter-spacing:-.015em;word-break:keep-all;text-align:center}
+
+/* 앱에 보이는 조건 */
+.tc-cond{list-style:none;margin:0;padding:0;border:1px solid var(--gm-line);border-radius:14px;background:#fff}
+.tc-cond li{display:grid;grid-template-columns:24px 1fr auto;column-gap:11px;align-items:start;padding:12px 14px}
+.tc-cond li + li{border-top:1px solid var(--gm-line)}
+.tc-cond i{font-style:normal;width:22px;height:22px;border-radius:50%;border:1.5px solid #D6D6DD;color:#8A8A93;
+  font-size:11px;font-weight:800;line-height:19px;text-align:center;margin-top:1px}
+.tc-cond li.is-done i{background:var(--gm-ok);border-color:var(--gm-ok);color:#fff}
+.tc-cond b{display:block;font-size:14px;font-weight:800;letter-spacing:-.025em;color:var(--gm-text)}
+.tc-cond p{margin:3px 0 0;font-size:12.5px;line-height:1.55;color:var(--gm-sub);letter-spacing:-.015em;word-break:keep-all}
+.tc-st{font-size:11.5px;font-weight:800;color:#8A8A93;padding-top:2px;white-space:nowrap}
+.tc-cond li.is-done .tc-st{color:#00795A}
+
+/* 지금 운영 중인 체험권 — 이름·기간 한 줄 + 현황 3칸 */
+.tc-now{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px}
+.tc-now b{font-size:17px;font-weight:800;letter-spacing:-.03em;color:var(--gm-pink-strong)}
+.tc-now span{font-size:13px;font-weight:600;color:var(--gm-sub)}
+.tc-now .tc-dd{font-size:11.5px;font-weight:800;color:#fff;background:var(--gm-pink-strong);border-radius:6px;padding:2px 7px}
+.tc-kpi{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:10px;border:1px solid var(--gm-line);border-radius:14px;background:#fff}
+.tc-kpi > div{padding:13px 14px;min-width:0}
+.tc-kpi > div + div{border-left:1px solid var(--gm-line)}
+.tc-kpi span{display:block;font-size:12px;font-weight:700;color:var(--gm-sub)}
+.tc-kpi b{display:block;margin-top:3px;font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--gm-text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tc-kpi b small{font-size:13px;font-weight:700;margin-left:2px;color:var(--gm-sub)}
+.tc-kpi em{display:block;margin-top:2px;font-style:normal;font-size:12px;font-weight:600;color:#8A8A93}
+.tc-kpi .is-zero b{color:#C02440}
+
+@media (max-width:900px){
+  .tc-kpi b{font-size:19px}
+  .tc-kpi > div{padding:12px 11px}
+}
+@media (max-width:400px){
+  .tc-kpi{grid-template-columns:1fr 1fr}
+  .tc-kpi > div:last-child{grid-column:1 / -1;border-left:0;border-top:1px solid var(--gm-line)}
+}

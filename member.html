@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="assets/guest-mode-cards.css">
 <link rel="stylesheet" href="assets/norder-feature.css">
 <script src="assets/norder-feature.js"></script>
+<link rel="stylesheet" href="assets/trial-card.css">
+<script src="assets/trial-card.js"></script>
 <style>
   body{margin:0;background:#F7F7F9;font-family:"Pretendard Variable","Pretendard",-apple-system,sans-serif}
   .page{padding:34px 40px 56px}
@@ -160,6 +162,7 @@
     <a class="nav" href="index.html">← Guest mode 화면 보기</a>
     <a class="nav" href="admin.html">최고관리자 화면 →</a>
   </div>
+  <div class="switch flow" id="trialSwitch" style="margin-bottom:10px"></div>
   <div class="switch flow" id="flowSwitch">
     <span class="cap">설치형 2종 단계</span>
   </div>
@@ -446,9 +449,17 @@ function card(d, st, wide){
 }
 
 let MODE = 'mixed';
+let TRIAL = trialInitState('AD_ON_NONE');
+function paintTrialSwitch(){
+  const el = document.getElementById('trialSwitch');
+  el.innerHTML = trialSwitchHtml(TRIAL);
+  el.querySelectorAll('button[data-trial]').forEach(b=>b.addEventListener('click',()=>{ TRIAL = b.dataset.trial; paintTrialSwitch(); render(); }));
+}
 function render(){
   const stOf = d => d.instant ? 'NONE' : (MODE==='mixed' ? (MIXED[d.key]??'NONE') : MODE);
-  const promo = PROMO.map(d=>card(d, stOf(d), false)).join('');
+  /* 10-20 체험권 이벤트 카드 — 판촉 섹션 맨 끝 = N 오더 카드 바로 위. 상태는 센터 상태로 갈린다(assets/trial-card.js).
+     센터 홈 기본값 = B(온라인광고 진행 중 · 체험권 없음) */
+  const promo = PROMO.map(d=>card(d, stOf(d), false)).join('') + trialCard(TRIAL);
   /* 홀수 판정은 일반 카드만 센다 — N 오더 카드는 원래 한 줄 전체라 짝 맞춤에서 빠진다 */
   const opsNormal = OPS.filter(d=>!d.feature).length;
   const ops = OPS.map((d,i)=> d.feature ? norderMemberCard(stOf(d))
@@ -465,7 +476,8 @@ function render(){
     </div>`;
 
   bindNorderCard();
-  document.querySelectorAll('.gm-cta[data-key]').forEach(b=>{
+  bindTrialCard();
+  document.querySelectorAll('.gm-cta[data-key]:not(.tc-act)').forEach(b=>{
     b.addEventListener('click',()=>{
       const {key,status,url} = b.dataset;
       if(status==='PENDING'){ logEl('검토중 — 클릭 무시됨(중복 신청 차단)'); return; }
@@ -826,6 +838,7 @@ document.querySelectorAll('.switch:not(.flow) button').forEach(btn=>{
     else { FLOW.access_control = {flow:'QUOTED'}; FLOW.iot_control = {flow:'NONE'}; render(); }
   });
 });
+paintTrialSwitch();
 render();
 </script>
 </body>

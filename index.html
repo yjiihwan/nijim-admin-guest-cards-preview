@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="assets/guest-mode-cards.css">
 <link rel="stylesheet" href="assets/norder-feature.css">
 <script src="assets/norder-feature.js"></script>
+<link rel="stylesheet" href="assets/trial-card.css">
+<script src="assets/trial-card.js"></script>
 <style>
   body{margin:0;background:#F7F7F9;font-family:"Pretendard Variable","Pretendard",-apple-system,sans-serif}
   .page{padding:34px 40px 56px}
@@ -18,6 +20,8 @@
   .switch button.on{background:#16161C;border-color:#16161C;color:#fff}
   .switch .nav{margin-left:auto;font-weight:700;font-size:12.5px;line-height:1;font-family:inherit;color:#E42A6B;text-decoration:none;
     padding:9px 14px;border:1px solid #F6CBDB;border-radius:9px;background:#fff}
+  .switch .cap{font-weight:700;font-size:11.5px;line-height:1;font-family:inherit;color:#8A8A93;padding:9px 2px 9px 0}
+  #trialSwitch button.on{background:#D4004E;border-color:#D4004E}
   .log{margin-top:18px;font-size:12.5px;color:#6B6B73;min-height:18px}
   @media (max-width:900px){.page{padding:22px 16px 40px}}
 </style>
@@ -33,6 +37,7 @@
     <a class="nav" href="member.html">입점 센터 화면 보기 →</a>
     <a class="nav" href="admin.html">최고관리자 화면 →</a>
   </div>
+  <div class="switch" id="trialSwitch" style="margin-top:-12px"></div>
   <div id="root"></div>
   <div class="log" id="log"></div>
 </div>
@@ -54,6 +59,9 @@ const FEATURES = [
    image:'05_access.png',install:true,cta:{none:'무인 출입제어 도입신청하기',pending:PENDING_CTA,approved:'출입제어 관리하러 가기'},manageUrl:'/admin/access'},
   /* 09-27 N 오더 식당 연계 개편 — 같은 자리(access_control 다음)에서 가로 전체 폭 카드로 확장.
      게스트는 입점 전이라 신청 상태 대신 «입점 후 사용 가능»으로 고정 (렌더: assets/norder-feature.js) */
+  /* 10-20 체험권 이벤트 카드 — N 오더 카드 바로 위, 같은 가로 전체 폭 틀. 상태는 센터 상태로 갈린다(assets/trial-card.js).
+     Guest mode 기본값 = A(온라인광고 미진행) */
+  {key:'trial_event',trial:true},
   {key:'norder',feature:true},
   {key:'iot_control',title:'IoT 원격자동제어',benefitHtml:'센터에 없어도, <em>조명·냉난방을 앱으로 원격 제어</em>',
    desc:'조명·냉난방·환기 등 센터 설비를 앱에서 원격으로 켜고 끌 수 있어요. 오픈·마감 시간에 맞춰 자동 스케줄을 걸어두면 설비가 알아서 켜지고 꺼져서, 센터에 나가지 않아도 운영 준비가 끝나 있습니다.',
@@ -81,10 +89,13 @@ const ctaLabelOf  = (d,s) => !d.install ? ctaLabel(d,s)
 function render(mode){
   const total = FEATURES.length;
   /* 홀수 판정은 일반 카드만 센다 — N 오더 카드는 원래 한 줄 전체라 짝 맞춤에서 빠진다 */
-  const normal = FEATURES.filter(d=>!d.feature).length;
+  const normal = FEATURES.filter(d=>!d.feature&&!d.trial).length;
   const cards = FEATURES.map((d,i)=>{
+    if(d.trial) return trialCard(TRIAL);
     if(d.feature) return norderGuestCard();
-    const st = mode==='mixed' ? MIXED[d.key] : mode;
+    /* 10-20 «온라인 홍보»(= 실서버 «온라인광고») 카드는 혼합 보기에서 체험권 카드의 센터 상태를 따른다
+       — A(온라인광고 미진행)면 미신청, B·C면 승인완료. 두 카드가 서로 다른 말을 하지 않게 */
+    const st = mode==='mixed' ? (d.key==='website' ? (TRIAL==='AD_OFF'?'NONE':'APPROVED') : MIXED[d.key]) : mode;
     const wide = !!d.wide && normal%2===1 && i===total-1;
     const v = ctaVariant(st,d.recommended);
     const badge = d.isNew ? '<span class="gm-badge is-new">NEW</span>'
@@ -113,7 +124,8 @@ function render(mode){
     </div>`;
 
   bindNorderCard();
-  document.querySelectorAll('.gm-cta[data-key]').forEach(b=>{
+  bindTrialCard();
+  document.querySelectorAll('.gm-cta[data-key]:not(.tc-act)').forEach(b=>{
     b.addEventListener('click',()=>{
       const {key,status,url} = b.dataset;
       const log = document.getElementById('log');
@@ -127,14 +139,23 @@ function render(mode){
   });
 }
 
-document.querySelectorAll('.switch button').forEach(btn=>{
+document.querySelectorAll('.switch:not(#trialSwitch) button').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('.switch button').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('.switch:not(#trialSwitch) button').forEach(b=>b.classList.remove('on'));
     btn.classList.add('on');
     document.getElementById('log').textContent='';
+    CUR_MODE = btn.dataset.mode;
     render(btn.dataset.mode);
   });
 });
+let TRIAL = trialInitState('AD_OFF');
+let CUR_MODE = 'mixed';
+function paintTrialSwitch(){
+  const el = document.getElementById('trialSwitch');
+  el.innerHTML = trialSwitchHtml(TRIAL);
+  el.querySelectorAll('button[data-trial]').forEach(b=>b.addEventListener('click',()=>{ TRIAL = b.dataset.trial; paintTrialSwitch(); render(CUR_MODE); }));
+}
+paintTrialSwitch();
 render('mixed');
 </script>
 </body>
