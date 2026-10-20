@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
-<title>입점 센터 화면 — 구현본 미리보기 (상태 전환 가능)</title>
+<title>온라인광고 센터 화면 — 구현본 미리보기 (상태 전환 가능)</title>
 <link rel="stylesheet" href="assets/guest-mode-cards.css">
 <link rel="stylesheet" href="assets/norder-feature.css">
 <script src="assets/norder-feature.js"></script>
@@ -466,7 +466,7 @@ function render(){
     : card(d, stOf(d), !!d.wide && opsNormal%2===1 && i===OPS.length-1)).join('');
   document.getElementById('root').innerHTML =
     `<div class="gm-scope">
-      <h1 class="gm-h1">입점 센터 홈</h1>
+      <h1 class="gm-h1">온라인광고 센터 홈</h1>
       <div class="gm-lead"><h2>다양한 세팅으로 내 센터를 더 돋보이게 만들어보세요</h2>
         <p>쿠폰·이벤트·상품을 열면 앱에서 우리 센터가 강조 표시되고 상위노출 확률이 올라가요.</p></div>
       <div class="gm-grid">${promo}</div>

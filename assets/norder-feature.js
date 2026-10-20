@@ -67,15 +67,15 @@ const nfHead = (chip) => `<div class="gm-chd"><h3>${NORDER_FEATURE.title}</h3>${
 /* 게스트(미입점) — 신청 상태와 무관하게 «입점하면 사용 가능». 버튼은 입점 신청 + 자세히 보기 */
 function norderGuestCard(){
   const d = NORDER_FEATURE;
-  const chip = '<span class="gm-chip s-member"><span class="gm-dot"></span>입점 후 사용 가능</span>';
+  const chip = '<span class="gm-chip s-member"><span class="gm-dot"></span>온라인광고 진행 후 사용 가능</span>';
   return `<article class="gm-card is-wide is-norder" data-key="${d.key}">
     ${nfHead(chip)}
     ${nfUnderstand()}
     ${nfGain()}
     <div class="nf-sec"><h4><span class="nf-n">3</span>시작하려면</h4>
-      <div class="gm-note"><b>입점하면 바로 쓸 수 있어요</b>· N 오더는 니짐내짐에 입점한 센터가 쓰는 기능이에요. 입점을 마치면 입점 센터 홈에서 식당 제휴 → 상품 등록 → 판매 순서로 바로 시작할 수 있어요.</div>
+      <div class="gm-note"><b>온라인광고를 진행하면 바로 쓸 수 있어요</b>· N 오더는 니짐내짐에서 온라인광고를 진행하는 센터가 쓰는 기능이에요. 온라인광고를 시작하면 온라인광고 센터 홈에서 식당 제휴 → 상품 등록 → 판매 순서로 바로 시작할 수 있어요.</div>
       <div class="nf-cta2">
-        <button type="button" class="gm-cta v-fill nf-act" data-act="join">입점 신청하기</button>
+        <button type="button" class="gm-cta v-fill nf-act" data-act="join">온라인광고 신청하기</button>
         <a class="gm-cta v-line" href="${d.learnUrl}" target="_blank" rel="noopener">N 오더 식당 연계 자세히 보기</a>
       </div>
     </div>
@@ -128,7 +128,7 @@ function bindNorderCard(){
   document.querySelectorAll('.gm-card.is-norder .nf-act').forEach(b=>{
     b.addEventListener('click',()=>{
       const act = b.dataset.act;
-      if(act==='join') return nfToast('[라우팅] 입점 신청 화면으로 이동', NORDER_FEATURE.joinUrl);
+      if(act==='join') return nfToast('[라우팅] 온라인광고 신청 화면으로 이동', NORDER_FEATURE.joinUrl);
       if(act==='menu'){ const s = NF_START[+b.dataset.i];
         nfToast(`[라우팅] N 오더 관리자 «${s.menu}» 메뉴로 이동`, (b.dataset.on==='1'?'':'N 오더 사용 바로 시작 · ')+s.url);
         if(b.dataset.on!=='1') nfActivate(b);
