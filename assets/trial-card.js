@@ -15,7 +15,8 @@ const TRIAL_CARD = {
   key:'trial_event',
   title:'체험권 이벤트',
   section:'지금 체험권 이벤트 중인 센터',   // 앱 홈 칸 제목 그대로(SPEC.md)
-  /* 11-10 썸네일 비주얼 교체: 힉스필드 «휴대폰 든 손» 사진 + 화면엔 실제 앱(v6.1) 체험권 칸 캡처 합성. 글자는 이미지에 넣지 않음(캡션 tc-cap).
+  /* 11-10 v2: 휴대폰 화면 글씨 키움 — 손·휴대폰을 당기고 화면 속 체험권 칸을 크게 다시 그림(390px에서 칸 제목·센터명·혜택이 읽히게). 부제·거리 뺌.
+     11-10 썸네일 비주얼 교체: 힉스필드 «휴대폰 든 손» 사진 + 화면엔 실제 앱(v6.1) 체험권 칸 캡처 합성. 글자는 이미지에 넣지 않음(캡션 tc-cap).
      filled = 첫 카드가 우리 센터(핑크 테두리) · empty = 첫 자리 점선 빈칸(아직/지금은 앱에 안 뜸) */
   image:{AD_OFF:'13_trial_visual_empty.jpg', AD_ON_NONE:'13_trial_visual_empty.jpg', AD_ON_ACTIVE:'13_trial_visual_filled.jpg', AD_ON_SOLDOUT:'13_trial_visual_empty.jpg'},
   url:{
@@ -44,7 +45,7 @@ const TC_CAP = {
 const tcHead = (chip, ben, desc, state) => `<div class="gm-chd"><h3>${TRIAL_CARD.title}</h3>${chip}</div>
   <p class="gm-ben">${ben}</p>
   <p class="gm-desc">${desc}</p>
-  <div class="gm-thumb"><img src="img/${TRIAL_CARD.image[state]}" alt="휴대폰 속 니짐내짐 앱 홈 «${TRIAL_CARD.section}» 칸 예시 화면"></div>
+  <div class="gm-thumb"><img src="img/${TRIAL_CARD.image[state]}?v=20261110b" alt="휴대폰 속 니짐내짐 앱 홈 «${TRIAL_CARD.section}» 칸 예시 화면"></div>
   <p class="tc-cap">${TC_CAP[state]}</p>`;
 
 const tcSec = (n, h, body) => `<div class="nf-sec"><h4><span class="nf-n">${n}</span>${h}</h4>${body}</div>`;
@@ -53,7 +54,7 @@ const tcSec = (n, h, body) => `<div class="nf-sec"><h4><span class="nf-n">${n}</
 function tcConditions(done){
   const items = [
     {t:'온라인광고 진행 중', p:'앱에 센터가 보이는 건 온라인광고를 진행 중인 센터뿐이에요.'},
-    {t:'체험권 이벤트 등록', p:'혜택 문구(15자까지)와 이벤트 기간을 넣어요. 대표 사진은 선택이에요.'},
+    {t:'체험권 이벤트 등록', p:'혜택 문구(15자까지)와 이벤트 기간을 넣어요.'},
     {t:'기간 안 · 남은 수량 있음', p:'종료일이 지나거나 남은 수량이 0이 되면 앱 칸에서 자동으로 빠져요.'},
   ];
   return `<ul class="tc-cond">${items.map((it,i)=>`<li class="${done[i]?'is-done':''}">
@@ -79,8 +80,7 @@ function trialCard(state){
         <span class="nf-arr" aria-hidden="true">→</span>
         <div class="nf-step"><span class="nf-ic">${TC_ICON.ticket}</span><b><small>03</small>체험권 열기</b>
           <p>체험권을 열면 앱 홈 체험권 칸에 가까운 순으로 보여요.</p></div>
-      </div>
-      <div class="gm-note is-muted" style="margin-top:12px"><b>센터 관리 기능은 그대로</b>· 온라인광고를 하지 않아도 회원 관리 같은 센터 관리 기능은 지금처럼 쓰실 수 있어요.</div>`)}
+      </div>`)}
       <div class="gm-spacer"></div>
       <button type="button" class="gm-cta v-fill tc-act" data-act="adApply">온라인광고 신청하기</button>
     </article>`;
