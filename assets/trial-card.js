@@ -15,10 +15,7 @@ const TRIAL_CARD = {
   key:'trial_event',
   title:'체험권 이벤트',
   section:'지금 체험권 이벤트 중인 센터',   // 앱 홈 칸 제목 그대로(SPEC.md)
-  /* 11-10 v2: 휴대폰 화면 글씨 키움 — 손·휴대폰을 당기고 화면 속 체험권 칸을 크게 다시 그림(390px에서 칸 제목·센터명·혜택이 읽히게). 부제·거리 뺌.
-     11-10 썸네일 비주얼 교체: 힉스필드 «휴대폰 든 손» 사진 + 화면엔 실제 앱(v6.1) 체험권 칸 캡처 합성. 글자는 이미지에 넣지 않음(캡션 tc-cap).
-     filled = 첫 카드가 우리 센터(핑크 테두리) · empty = 첫 자리 점선 빈칸(아직/지금은 앱에 안 뜸) */
-  image:{AD_OFF:'13_trial_visual_empty.jpg', AD_ON_NONE:'13_trial_visual_empty.jpg', AD_ON_ACTIVE:'13_trial_visual_filled.jpg', AD_ON_SOLDOUT:'13_trial_visual_empty.jpg'},
+  image:'12_trial_event_section.jpg',
   url:{
     adApply:'(실서버 «온라인광고 신청하기»와 같은 신청 흐름)',
     trialNew:'/admin/trial-event/new',      // 가칭 — 실제 체험권 이벤트 등록 화면 경로는 개발 확인
@@ -45,7 +42,7 @@ const TC_CAP = {
 const tcHead = (chip, ben, desc, state) => `<div class="gm-chd"><h3>${TRIAL_CARD.title}</h3>${chip}</div>
   <p class="gm-ben">${ben}</p>
   <p class="gm-desc">${desc}</p>
-  <div class="gm-thumb"><img src="img/${TRIAL_CARD.image[state]}?v=20261110b" alt="휴대폰 속 니짐내짐 앱 홈 «${TRIAL_CARD.section}» 칸 예시 화면"></div>
+  <div class="gm-thumb"><img src="img/${TRIAL_CARD.image}" alt="니짐내짐 앱 홈 «${TRIAL_CARD.section}» 칸 예시 화면"></div>
   <p class="tc-cap">${TC_CAP[state]}</p>`;
 
 const tcSec = (n, h, body) => `<div class="nf-sec"><h4><span class="nf-n">${n}</span>${h}</h4>${body}</div>`;
